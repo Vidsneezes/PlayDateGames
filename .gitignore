@@ -1,0 +1,12 @@
+# Playdate build artifacts
+*.pdx
+*.zip
+
+# Build directories and intermediate files
+build/
+.vscode/
+pdxinfo 
+
+# Common OS-generated files
+.DS_Store
+Thumbs.db
