@@ -91,7 +91,7 @@ function DeathBall:init()
     self.position = pd.geometry.vector2D.new(deathBallStartPosition.x, deathBallStartPosition.y)
     self.direction = pd.geometry.vector2D.new(0,0)
     self.aim = 0
-    self.speed = 7
+    self.speed = 3
     self.sprite = gfx.sprite.new(tinyDot)
     
     self.sprite:setCollideRect(0,0,self.sprite:getSize())
