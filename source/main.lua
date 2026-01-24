@@ -2,6 +2,8 @@ import "CoreLibs/graphics"
 import "CoreLibs/ui"
 import "Corelibs/object"
 import "CoreLibs/animation"
+import "CoreLibs/sprites"
+import "secondary"
 
 local pd <const> = playdate
 local gfx <const> = playdate.graphics
@@ -274,6 +276,8 @@ local myInputHandlers = {
 }
 
 local function gameSetup()
+    SetBackground()
+    ReadJson()
     blobSystem:generateBlobs(30)
     pd.inputHandlers.push(myInputHandlers)
 end
@@ -291,8 +295,8 @@ function playdate.update()
 
     gfx.clear()
     gfx.sprite.update()
-    gfx.drawTextAligned("MiniBlob", 2, 220, kTextAlignment.left)
-    gfx.drawTextAligned("Score : 9999 ", 398, 220, kTextAlignment.right)
+    gfx.drawTextAligned(GameName, 2, 220, kTextAlignment.left)
+    gfx.drawTextAligned(ScoreLabel .. " : 9999 ", 398, 220, kTextAlignment.right)
     rectUI:draw(0,218)
 end
 -- end main loop
