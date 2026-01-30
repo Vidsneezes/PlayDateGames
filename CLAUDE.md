@@ -46,7 +46,7 @@ Systems never call each other. They communicate through component data:
 
 - `main.lua` — **DO NOT MODIFY.** Minimal entrypoint: imports + boot. Only touch to add new `import` lines.
 - `ecs/` — **DO NOT MODIFY.** Core engine, stable and complete.
-- `components.lua` — Add new components at the **bottom** of the file.
+- `components/` — One file per domain (`core.lua`, `input.lua`, `visual.lua`, `collision.lua`, `audio.lua`). Add new components at the bottom of the matching domain file. If no domain fits, create a new file and add its `import` to `main.lua`.
 - `systems/` — One file per system. Each file has SDK reference comments at the top.
 - `scenes/` — Scene constructors. `GameScene` uses the ECS loop; `MenuScene`/`GameOverScene` override `update()`.
 - `lib/utils.lua` — Shared utilities.
@@ -65,7 +65,7 @@ Systems never call each other. They communicate through component data:
 
 - Follow the exact pattern of existing system files: SDK reference block comment at top, then `System.new()` call.
 - When creating a new system, also remind the user to add the `import` line to `main.lua` and register it in the scene's `onEnter()`.
-- When creating a new component, add it to `components.lua` at the bottom.
+- When creating a new component, add it to the matching file under `components/` (e.g., input-related → `components/input.lua`). If no domain file fits, create a new one and add its `import` to `main.lua`.
 - When creating a new scene, follow the pattern in existing scene files: constructor function that returns a `Scene.new()` instance.
 - Register new systems in `onEnter()` respecting execution order: input → logic → output (render last).
 - Do not add `require` statements — Playdate uses `import`.

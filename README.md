@@ -86,6 +86,25 @@ Then open the `.pdx` folder with the Playdate Simulator:
 - **macOS**: `open -a "Playdate Simulator" builds/YourGame.pdx`
 - **Linux**: `$PLAYDATE_SDK_PATH/bin/PlaydateSimulator builds/YourGame.pdx`
 
+### Deploying to a Physical Playdate
+
+Connect the Playdate to your computer via USB, unlock it, and use `pdutil`:
+
+```bash
+# List connected devices
+pdutil list
+
+# Install the game to the device
+pdutil install builds/YourGame.pdx
+```
+
+Or use the **Playdate Simulator**: with the device connected, go to **Device > Upload Game to Device** in the simulator menu bar.
+
+You can also **sideload** via the web:
+1. Go to [play.date/account/sideload](https://play.date/account/sideload/)
+2. Zip your `.pdx` folder: `zip -r YourGame.pdx.zip builds/YourGame.pdx`
+3. Upload the zip — it will appear on your device next time it syncs over Wi-Fi
+
 ---
 
 ## Project Structure
@@ -101,7 +120,12 @@ source/
 │   ├── scene.lua               -- Scene: owns entities + systems, lifecycle hooks
 │   └── world.lua               -- World: manages the active scene + transitions
 │
-├── components.lua              -- All component constructors (Transform, Velocity, etc.)
+├── components/                 -- One file per domain. Each teammate owns their domain.
+│   ├── core.lua                -- Transform, Velocity, Health
+│   ├── input.lua               -- PlayerInput, CrankInput
+│   ├── visual.lua              -- SpriteComp
+│   ├── collision.lua           -- Collider
+│   └── audio.lua               -- AudioSource
 │
 ├── systems/                    -- One file per system. Each teammate owns their file(s).
 │   ├── player_system.lua       -- Button/d-pad input handling
@@ -187,9 +211,10 @@ An entity is just a table. Components are named fields. You pick which component
 
 ### Adding a New Component
 
-Open `components.lua` and add a constructor function at the bottom:
+Pick the component file that matches the domain (`components/core.lua`, `components/input.lua`, `components/collision.lua`, etc.) and add a constructor function at the bottom:
 
 ```lua
+-- in components/core.lua
 function Stamina(amount)
     return {
         current = amount or 100,
@@ -198,6 +223,8 @@ function Stamina(amount)
     }
 end
 ```
+
+If the component doesn't fit any existing file, create a new one under `components/` and add an `import` line in `main.lua`.
 
 Then use it when creating entities: `stamina = Stamina(50)`
 
@@ -311,9 +338,15 @@ Each person should primarily edit their own files:
 | Level / entity design | `scenes/game_scene.lua` |
 
 **Shared files** (coordinate before editing):
-- `components.lua` — add new components at the **bottom** of the file
+- `components/core.lua` — add universal components at the **bottom**
 - `scenes/game_scene.lua` — entity creation in `onEnter()`
 - `main.lua` — only to add new `import` lines (append to the relevant section)
+
+**Domain-owned component files** (each role adds components to their domain file):
+- Input person: `components/input.lua`
+- Audio person: `components/audio.lua`
+- Collision person: `components/collision.lua`
+- Rendering person: `components/visual.lua`
 
 **Never edit during the jam:**
 - `ecs/*` — the ECS core is stable and complete

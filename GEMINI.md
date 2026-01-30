@@ -81,7 +81,12 @@ source/
 │   ├── system.lua
 │   ├── scene.lua
 │   └── world.lua
-├── components.lua          -- Component constructors. Add new ones at the bottom.
+├── components/             -- One file per domain. Add to the matching domain file.
+│   ├── core.lua            -- Transform, Velocity, Health
+│   ├── input.lua           -- PlayerInput, CrankInput
+│   ├── visual.lua          -- SpriteComp
+│   ├── collision.lua       -- Collider
+│   └── audio.lua           -- AudioSource
 ├── systems/                -- One system per file. Each has SDK docs in comments.
 │   ├── player_system.lua
 │   ├── crank_system.lua
@@ -105,7 +110,7 @@ When writing code for this project:
 
 1. **Follow existing patterns.** Look at existing system/scene files before creating new ones.
 2. **New systems**: Create in `systems/`, use `System.new(name, requiredComponents, updateFn)`. Include Playdate SDK reference comments at the top. Then add `import` line in `main.lua` and register in scene's `onEnter()`.
-3. **New components**: Add constructor function at the bottom of `components.lua`.
+3. **New components**: Add constructor function at the bottom of the matching file under `components/` (e.g., collision-related → `components/collision.lua`). Create a new domain file if needed and add its `import` to `main.lua`.
 4. **New scenes**: Create in `scenes/`, return a `Scene.new()` instance from a constructor function. Add `import` line in `main.lua`.
 5. **Never use `require`** — Playdate uses `import`.
 6. **Never reference `io`, `os`, or `package`** — not available on Playdate.

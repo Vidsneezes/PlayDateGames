@@ -14,8 +14,12 @@ import "ecs/system"
 import "ecs/scene"
 import "ecs/world"
 
--- Components
-import "components"
+-- Components (one file per domain -- add new imports here as needed)
+import "components/core"
+import "components/input"
+import "components/visual"
+import "components/collision"
+import "components/audio"
 
 -- Systems (each file is independent -- safe to edit in parallel)
 import "systems/physics_system"
