@@ -1,0 +1,33 @@
+{
+    "runtime": {
+        "version": "Lua 5.4",
+        "nonstandardSymbol": ["+=", "-=", "*=", "/=", "//=", "%=", "<<=", ">>=", "&=", "|=", "^="],
+        "builtin": {
+            "io": "disable",
+            "os": "disable",
+            "package": "disable"
+        }
+    },
+    "diagnostics": {
+        "globals": ["playdate", "import", "class", "printTable", "where"],
+        "disable": ["lowercase-global", "need-check-nil"],
+        "severity": {
+            "duplicate-set-field": "Hint"
+        }
+    },
+    "workspace": {
+        "library": [
+            ".vscode/playdate-luacats"
+        ],
+        "checkThirdParty": false
+    },
+    "completion": {
+        "callSnippet": "Replace"
+    },
+    "format": {
+        "defaultConfig": {
+            "indent_style": "space",
+            "indent_size": "4"
+        }
+    }
+}
