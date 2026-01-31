@@ -28,11 +28,11 @@ BackgroundSystem = System.new("background", {}, function(entities, scene)
     if not scene.backgroundTilemap then
         -- Load grass tiles (4 tiles horizontally)
         -- Try different naming conventions
-        local grassTiles = gfx.imagetable.new("Images/bg-grass-table-4-1")
+        local grassTiles = gfx.imagetable.new("Images/grass")
 
         if not grassTiles then
             -- Try alternative naming
-            grassTiles = gfx.imagetable.new("Images/bg grass-table-4-1")
+            grassTiles = gfx.imagetable.new("Images/bg-grass-table-4-1")
         end
 
         if not grassTiles then
@@ -66,7 +66,7 @@ BackgroundSystem = System.new("background", {}, function(entities, scene)
         local tilesWide = math.ceil(worldW / tileSize)
         local tilesHigh = math.ceil(worldH / tileSize)
 
-        tilemap:setSize(tilesWide, tilesHigh)
+        tilemap:setSize(32, 32)
 
         -- Fill tilemap with random grass tiles (1-4)
         for y = 1, tilesHigh do
