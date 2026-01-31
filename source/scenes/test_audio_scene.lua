@@ -1,99 +1,136 @@
--- TestAudioScene.lua
+--[[
+    TEST AUDIO SCENE
+    Demonstrates the new ECS-based Audio Architecture:
+    1. Polyphonic SFX Pool
+    2. Reactive Music Sequencer (Multi-track)
+]]
+
 local gfx = playdate.graphics
 
 function TestAudioScene()
     local scene = Scene.new("test_audio")
 
-    -- Variables de estado de la escena
-    local currentScreen = "sfx"
-    local synth1, synth2, synth3, melodySynth
-    local melody = { 262, 294, 330, 349, 392, 392, 440, 440, 392, 0, 349, 349, 330, 330, 294, 294, 262 }
+    -- UI State for visualization
     local musicPlaying = false
-    local currentNote = 1
-    local musicTimer = nil
+    local trackStates = {
+        bass = true,   -- Starts ON
+        drums = true,  -- Starts ON
+        melody = false -- Starts OFF (Classic "add layer later" usage)
+    }
 
-    -- Inicialización de audio
-    local function initSynths()
-        synth1 = playdate.sound.synth.new(playdate.sound.kWaveTriangle)
-        synth2 = playdate.sound.synth.new(playdate.sound.kWaveSine)
-        synth3 = playdate.sound.synth.new(playdate.sound.kWaveSawtooth)
-        melodySynth = playdate.sound.synth.new(playdate.sound.kWaveSquare)
-        melodySynth:setVolume(0.3)
-    end
-
-    -- Lógica de la melodía (recursiva con timer)
-    local function playMelody()
-        if not musicPlaying then return end
-        local freq = melody[currentNote]
-        if freq > 0 then
-            melodySynth:playNote(freq, 0.3, 0.15)
-        end
-        currentNote = (currentNote % #melody) + 1
-        musicTimer = playdate.timer.performAfterDelay(200, playMelody)
-    end
-
-    local function toggleMusic()
-        if musicPlaying then
-            musicPlaying = false
-            if musicTimer then musicTimer:remove() end
-        else
-            musicPlaying = true
-            currentNote = 1
-            playMelody()
-        end
-    end
+    -- Only one entity is needed to drive the audio (The "AudioController")
+    local audioController
 
     function scene:onEnter()
-        initSynths()
+        -- Create our controller entity with the new SynthEmitter
+        audioController = Entity.new({
+            synthEmitter = SynthEmitter()
+        })
+        scene:addEntity(audioController)
+
+        -- Start music immediately via ECS trigger
+        audioController.synthEmitter.musicTrigger = "theme"
+        musicPlaying = true
+
+        -- Set initial volumes
+        -- Melody starts muted (0.0)
+        audioController.synthEmitter.trackVolumes = {
+            bass = 1.0,
+            drums = 1.0,
+            melody = 0.0
+        }
+    end
+
+    -- Helper to toggle a track
+    local function toggleTrack(trackName)
+        trackStates[trackName] = not trackStates[trackName]
+        local newVol = trackStates[trackName] and 1.0 or 0.0
+
+        -- Send volume command to ECS
+        audioController.synthEmitter.trackVolumes[trackName] = newVol
     end
 
     function scene:update()
+        -- IMPORTANT: Manually run the SynthSystem because we are overriding update()
+        -- Find entities with synthEmitter and update them
+        local synthEntities = scene:getEntitiesWith("synthEmitter")
+        SynthSystem.update(synthEntities, scene)
+
         gfx.clear(gfx.kColorWhite)
 
-        if currentScreen == "sfx" then
-            gfx.drawTextAligned("*SFX TEST*", 200, 20, kTextAlignment.center)
-            gfx.drawText("UP: Jump (Triangle)", 80, 90)
-            gfx.drawText("DOWN: Coin (Sine)", 80, 115)
-            gfx.drawText("LEFT: Error (Sawtooth)", 80, 140)
-            gfx.drawTextAligned("RIGHT: Go to Music Test", 200, 190, kTextAlignment.center)
-            gfx.drawTextAligned("B: Back to Menu", 200, 215, kTextAlignment.center)
+        -- Title
+        gfx.drawTextAligned("*REACTIVE AUDIO TEST*", 200, 15, kTextAlignment.center)
 
-            if playdate.buttonJustPressed(playdate.kButtonUp) then synth1:playNote(300, 0.4, 0.15) end
-            if playdate.buttonJustPressed(playdate.kButtonDown) then
-                synth2:playNote(523, 0.3, 0.1)
-                playdate.timer.performAfterDelay(100, function() synth2:playNote(659, 0.3, 0.1) end)
-            end
-            if playdate.buttonJustPressed(playdate.kButtonLeft) then synth3:playNote(150, 0.5, 0.3) end
-            if playdate.buttonJustPressed(playdate.kButtonRight) then currentScreen = "music" end
-            if playdate.buttonJustPressed(playdate.kButtonB) then GAME_WORLD:queueScene(MenuScene()) end
-        else
-            gfx.drawTextAligned("*MUSIC TEST*", 200, 20, kTextAlignment.center)
-            local btnY = 90
+        -- SFX SECTION
+        gfx.drawText("--- SFX (Polyphonic Pool) ---", 20, 40)
 
-            if musicPlaying then
-                gfx.fillRoundRect(100, btnY, 200, 50, 8)
+        gfx.drawText("UP: Jump (Tri)", 40, 60)
+        gfx.drawText("DOWN: Coin (Sine)", 40, 80)
+        gfx.drawText("LEFT: Explosion (Noise)", 40, 100)
+        gfx.drawText("RIGHT: Hit (Saw)", 40, 120)
+
+        -- MUSIC SECTION
+        gfx.drawText("--- MUSIC (Multi-Track) ---", 20, 150)
+        gfx.drawText("A: Toggle Melody Layer", 40, 170)
+        gfx.drawText("B: Toggle Drums Layer", 40, 190)
+
+        -- Visual Indicators for Tracks
+        local function drawTrackStatus(name, y)
+            local on = trackStates[name]
+            local label = name:upper() .. ": " .. (on and "ON" or "MUTED")
+            local x = 250
+
+            if on then
+                gfx.fillRoundRect(x, y, 100, 20, 4)
                 gfx.setImageDrawMode(gfx.kDrawModeInverted)
-                gfx.drawTextAligned("A: STOP", 200, btnY + 17, kTextAlignment.center)
+                gfx.drawTextAligned(label, x + 50, y + 2, kTextAlignment.center)
                 gfx.setImageDrawMode(gfx.kDrawModeCopy)
-                gfx.drawTextAligned("Note: " .. currentNote .. "/" .. #melody, 200, 155, kTextAlignment.center)
             else
-                gfx.drawRoundRect(100, btnY, 200, 50, 8)
-                gfx.drawTextAligned("A: PLAY", 200, btnY + 17, kTextAlignment.center)
+                gfx.drawRoundRect(x, y, 100, 20, 4)
+                gfx.drawTextAligned(label, x + 50, y + 2, kTextAlignment.center)
             end
+        end
 
-            gfx.drawTextAligned("LEFT: Back to SFX Test", 200, 190, kTextAlignment.center)
+        drawTrackStatus("melody", 170)
+        drawTrackStatus("drums", 190)
 
-            if playdate.buttonJustPressed(playdate.kButtonA) then toggleMusic() end
-            if playdate.buttonJustPressed(playdate.kButtonLeft) then
-                if musicPlaying then toggleMusic() end
-                currentScreen = "sfx"
-            end
+        -- INPUT HANDLERS (Populating the ECS Component)
+
+        -- SFX Triggers
+        if playdate.buttonJustPressed(playdate.kButtonUp) then
+            table.insert(audioController.synthEmitter.sfxTriggers, "jump")
+        end
+        if playdate.buttonJustPressed(playdate.kButtonDown) then
+            table.insert(audioController.synthEmitter.sfxTriggers, "coin")
+        end
+        if playdate.buttonJustPressed(playdate.kButtonLeft) then
+            table.insert(audioController.synthEmitter.sfxTriggers, "explosion")
+        end
+        if playdate.buttonJustPressed(playdate.kButtonRight) then
+            table.insert(audioController.synthEmitter.sfxTriggers, "hit")
+        end
+
+        -- Music Layer Toggles
+        if playdate.buttonJustPressed(playdate.kButtonA) then
+            toggleTrack("melody")
+        end
+        if playdate.buttonJustPressed(playdate.kButtonB) then
+            toggleTrack("drums")
+        end
+
+        -- Exit
+        gfx.drawTextAligned("Crank: Menu", 200, 220, kTextAlignment.center)
+        if playdate.isCrankDocked() == false then
+            -- Simple check to exit if crank moved (optional)
         end
     end
 
     function scene:onExit()
-        if musicTimer then musicTimer:remove() end
-        musicPlaying = false
+        -- Stop music cleanly
+        if audioController then
+            audioController.synthEmitter.musicTrigger = "stop"
+        end
+        -- Actual cleanup happens in system, but we force a stop command
     end
 
     return scene
