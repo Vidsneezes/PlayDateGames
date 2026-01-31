@@ -19,20 +19,21 @@
 local gfx = playdate.graphics
 
 -- Helper: Create sprite for emotion type
+-- PLACEHOLDER SHAPES DISABLED - using real sprites now
 local function createEmotionSprite(emotionType)
     local img = gfx.image.new(16, 16, gfx.kColorWhite)
-    gfx.lockFocus(img)
-    gfx.setColor(gfx.kColorBlack)
+    -- gfx.lockFocus(img)
+    -- gfx.setColor(gfx.kColorBlack)
 
-    if emotionType == "happy" then
-        gfx.fillPolygon(8, 2, 14, 14, 2, 14)  -- Triangle
-    elseif emotionType == "sad" then
-        gfx.fillCircleAtPoint(8, 8, 7)  -- Circle
-    elseif emotionType == "angry" then
-        gfx.fillRect(2, 2, 12, 12)  -- Square
-    end
+    -- if emotionType == "happy" then
+    --     gfx.fillPolygon(8, 2, 14, 14, 2, 14)  -- Triangle
+    -- elseif emotionType == "sad" then
+    --     gfx.fillCircleAtPoint(8, 8, 7)  -- Circle
+    -- elseif emotionType == "angry" then
+    --     gfx.fillRect(2, 2, 12, 12)  -- Square
+    -- end
 
-    gfx.unlockFocus()
+    -- gfx.unlockFocus()
     return img
 end
 

@@ -25,23 +25,24 @@ function BoidScene()
     }
 
     -- Helper: Create temporary sprite for each emotion type
+    -- PLACEHOLDER SHAPES DISABLED - using real sprites now
     local function createBoidSprite(emotionType)
         local img = gfx.image.new(16, 16, gfx.kColorWhite)
-        gfx.lockFocus(img)
-        gfx.setColor(gfx.kColorBlack)
+        -- gfx.lockFocus(img)
+        -- gfx.setColor(gfx.kColorBlack)
 
-        if emotionType == "happy" then
-            -- Triangle (pointing up)
-            gfx.fillPolygon(8, 2, 14, 14, 2, 14)
-        elseif emotionType == "sad" then
-            -- Circle
-            gfx.fillCircleAtPoint(8, 8, 7)
-        elseif emotionType == "angry" then
-            -- Square
-            gfx.fillRect(2, 2, 12, 12)
-        end
+        -- if emotionType == "happy" then
+        --     -- Triangle (pointing up)
+        --     gfx.fillPolygon(8, 2, 14, 14, 2, 14)
+        -- elseif emotionType == "sad" then
+        --     -- Circle
+        --     gfx.fillCircleAtPoint(8, 8, 7)
+        -- elseif emotionType == "angry" then
+        --     -- Square
+        --     gfx.fillRect(2, 2, 12, 12)
+        -- end
 
-        gfx.unlockFocus()
+        -- gfx.unlockFocus()
         return img
     end
 
