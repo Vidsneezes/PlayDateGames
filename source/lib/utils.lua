@@ -52,3 +52,35 @@ function setBackground(imagePath)
         end)
     end
 end
+
+function getCameraPosition(camera, gfx)
+    camX = camera.x
+    camY = camera.y
+
+    -- Draw world background pattern
+    gfx.setColor(gfx.kColorBlack)
+    local gridSize = 40
+    local worldW = camera.worldWidth
+    local worldH = camera.worldHeight
+
+    -- Draw grid lines (only visible portion)
+    local startX = math.floor(camX / gridSize) * gridSize
+    local startY = math.floor(camY / gridSize) * gridSize
+
+    for x = startX, camX + SCREEN_WIDTH, gridSize do
+        local screenX = x - camX
+        gfx.drawLine(screenX, 0, screenX, SCREEN_HEIGHT)
+    end
+
+    for y = startY, camY + SCREEN_HEIGHT, gridSize do
+        local screenY = y - camY
+        gfx.drawLine(0, screenY, SCREEN_WIDTH, screenY)
+    end
+
+    -- Draw world border
+    gfx.setLineWidth(2)
+    local borderX = 0 - camX
+    local borderY = 0 - camY
+    gfx.drawRect(borderX, borderY, worldW, worldH)
+    gfx.setLineWidth(1)
+end

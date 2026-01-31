@@ -7,6 +7,7 @@ import "CoreLibs/animation"
 
 -- Utilities
 import "lib/utils"
+import "lib/resources"
 
 -- ECS Core
 import "ecs/entity"
@@ -21,6 +22,7 @@ import "game/components/visual"
 import "game/components/collision"
 import "game/components/audio"
 import "game/components/emotion"
+import "game/components/boidvisual"
 
 -- Game Systems (each file is independent -- safe to edit in parallel)
 import "game/systems/camera_system"
@@ -31,12 +33,14 @@ import "game/systems/crank_system"
 import "game/systems/collision_system"
 import "game/systems/audio_system"
 import "game/systems/render_system"
+import "game/systems/boidrender_system"
 
 -- Scenes
 import "scenes/menu_scene"
 import "scenes/game_scene"
 import "scenes/boid_scene"
 import "scenes/gameover_scene"
+import "scenes/visualtest_scene"
 
 -- Boot
 GAME_WORLD = World.new()

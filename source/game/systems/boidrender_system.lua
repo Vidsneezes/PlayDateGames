@@ -52,7 +52,8 @@
 
 local gfx = playdate.graphics
 
-RenderSystem = System.new("render", {"transform", "sprite"}, function(entities, scene)
+BoidRenderSystem = System.new("render", {"transform", "boidsprite"}, function(entities, scene)
+    -- Clear screen at the start of each frame
 
     -- Get camera offset
     local camX = 0
@@ -60,47 +61,22 @@ RenderSystem = System.new("render", {"transform", "sprite"}, function(entities, 
     if scene.camera then
         camX = scene.camera.x
         camY = scene.camera.y
-
-        -- Draw world background pattern
-        gfx.setColor(gfx.kColorBlack)
-        local gridSize = 40
-        local worldW = scene.camera.worldWidth
-        local worldH = scene.camera.worldHeight
-
-        -- Draw grid lines (only visible portion)
-        local startX = math.floor(camX / gridSize) * gridSize
-        local startY = math.floor(camY / gridSize) * gridSize
-
-        for x = startX, camX + SCREEN_WIDTH, gridSize do
-            local screenX = x - camX
-            gfx.drawLine(screenX, 0, screenX, SCREEN_HEIGHT)
-        end
-
-        for y = startY, camY + SCREEN_HEIGHT, gridSize do
-            local screenY = y - camY
-            gfx.drawLine(0, screenY, SCREEN_WIDTH, screenY)
-        end
-
-        -- Draw world border
-        gfx.setLineWidth(2)
-        local borderX = 0 - camX
-        local borderY = 0 - camY
-        gfx.drawRect(borderX, borderY, worldW, worldH)
-        gfx.setLineWidth(1)
     end
 
     -- Draw entities with camera offset
     for _, e in ipairs(entities) do
         local t = e.transform
-        local s = e.sprite
+        local s = e.boidsprite
 
-        if s.visible and s.image then
+        if s.visible and s.bubble and s.body then
             local screenX = t.x - camX
             local screenY = t.y - camY
-            s.image:draw(screenX, screenY)
+            s.body:moveTo(screenX, screenY)
+            s.bubble:moveTo(screenX, screenY-10)
         end
     end
 
+    gfx.sprite.update()
     -- TODO: Draw UI elements (score, health, etc.) here
     -- Example:
     -- gfx.setColor(gfx.kColorBlack)

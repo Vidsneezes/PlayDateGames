@@ -14,15 +14,15 @@
 
 local gfx = playdate.graphics
 
-function GameScene()
+function VisualTestScene()
     local scene = Scene.new("game")
 
     -- Camera for scrolling world (accessible by all systems)
     scene.camera = {
-        x = 0,                    -- current viewport top-left X
-        y = 0,                    -- current viewport top-left Y
-        worldWidth = WORLD_WIDTH,   -- total world width
-        worldHeight = WORLD_HEIGHT  -- total world height
+        x = 0,           -- current viewport top-left X
+        y = 0,           -- current viewport top-left Y
+        worldWidth = 1200,   -- total world width
+        worldHeight = 800    -- total world height
     }
 
     function scene:onEnter()
@@ -34,23 +34,13 @@ function GameScene()
         self:addSystem(CollisionSystem)
         self:addSystem(AudioSystem)
         self:addSystem(RenderSystem)
+        self:addSystem(BoidRenderSystem)
 
-        -- Markers at corners and center of world
-        local markers = {
-            {x = 50, y = 50},         -- top-left
-            {x = 1150, y = 50},       -- top-right
-            {x = 600, y = 400},       -- center
-            {x = 50, y = 750},        -- bottom-left
-            {x = 1150, y = 750},      -- bottom-right
-        }
-
-        for _, pos in ipairs(markers) do
-            local marker = Entity.new({
-                transform = Transform(pos.x, pos.y),
-                sprite = SpriteComp(gfx.image.new("Images/chaos"))
-            })
-            self:addEntity(marker)
-        end
+        local boidtest = Entity.new({
+            transform = Transform(100, 80),
+            boidsprite = BoidSpriteComp(bodyImage, bubbleImage)
+        })
+        self:addEntity(boidtest)
     end
 
     function scene:onExit()
