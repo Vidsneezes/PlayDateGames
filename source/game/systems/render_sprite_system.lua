@@ -9,7 +9,7 @@
 
     Sprites:
         gfx.sprite.update()  -- Redraws all sprites in display list
-        sprite:setBackgroundDrawingCallback() -- Custom background drawing
+        gfx.sprite.setBackgroundDrawingCallback() -- Preserve custom background
 
     ──────────────────────────────────────────────────────
 ]]
@@ -17,6 +17,16 @@
 local gfx = playdate.graphics
 
 RenderSpriteSystem = System.new("renderSprite", {}, function(entities, scene)
-    -- Render all Playdate sprites (does NOT clear screen)
+    -- Set up background drawing callback to preserve tilemap when sprites move
+    gfx.sprite.setBackgroundDrawingCallback(function(x, y, width, height)
+        -- Redraw the tilemap in the dirty rect area
+        if scene.backgroundTilemap and scene.camera then
+            gfx.setClipRect(x, y, width, height)
+            scene.backgroundTilemap:draw(-scene.camera.x, -scene.camera.y)
+            gfx.clearClipRect()
+        end
+    end)
+
+    -- Render all Playdate sprites
     gfx.sprite.update()
 end)
