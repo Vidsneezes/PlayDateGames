@@ -115,10 +115,25 @@ function BoidScene()
     function scene:update()
         Scene.update(self)  -- runs all registered systems
 
+        -- Count emotions in a single loop
+        local happyCount = 0
+        local sadCount = 0
+        local angryCount = 0
+
+        for _, entity in ipairs(self.entities) do
+            if entity.happyBoid then
+                happyCount += 1
+            elseif entity.sadBoid then
+                sadCount += 1
+            elseif entity.angryBoid then
+                angryCount += 1
+            end
+        end
+
         -- Draw debug HUD
         gfx.setColor(gfx.kColorBlack)
-        gfx.drawText("Boid Scene - Camera: (" .. math.floor(self.camera.x) .. ", " .. math.floor(self.camera.y) .. ")", 5, 5)
-        gfx.drawText("Triangle=Happy, Circle=Sad, Square=Angry", 5, 220)
+        gfx.drawText("Camera: (" .. math.floor(self.camera.x) .. ", " .. math.floor(self.camera.y) .. ")", 5, 5)
+        gfx.drawText("Happy: " .. happyCount .. "  Sad: " .. sadCount .. "  Angry: " .. angryCount, 5, 220)
     end
 
     return scene
