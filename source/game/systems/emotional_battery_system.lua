@@ -63,6 +63,13 @@ EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity"
             -- Mark entity as exploding (will be drawn and deleted by explosion system)
             e.exploding = Exploding()
 
+            -- Track explosion type for stats
+            if battery.value >= 100 then
+                scene.explosionsHappy = (scene.explosionsHappy or 0) + 1
+            else
+                scene.explosionsAngry = (scene.explosionsAngry or 0) + 1
+            end
+
             -- Remove sprite from display list immediately
             if e.boidsprite and e.boidsprite.body then
                 e.boidsprite.body:remove()
@@ -82,21 +89,21 @@ EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity"
             currentEmotion = "angry"
         end
 
-        -- Drain battery based on current emotion (doubled while paused!)
+        -- Drain battery based on current emotion (30% slower for balance, doubled while paused!)
         if currentEmotion == "happy" then
-            battery.value -= 0.2 * drainMultiplier
+            battery.value -= 0.14 * drainMultiplier  -- was 0.2
         elseif currentEmotion == "sad" then
             if hasStopped(v) then
                 -- At edge, drain faster
-                battery.value -= 0.3 * drainMultiplier
+                battery.value -= 0.21 * drainMultiplier  -- was 0.3
             else
                 -- Moving, drain slower
-                battery.value -= 0.1 * drainMultiplier
+                battery.value -= 0.07 * drainMultiplier  -- was 0.1
             end
         elseif currentEmotion == "angry" then
             -- Drain to 0 then stop
             if battery.value > 0 then
-                battery.value -= 0.02 * drainMultiplier
+                battery.value -= 0.014 * drainMultiplier  -- was 0.02
             end
         end
 

@@ -66,11 +66,10 @@ HappinessCrankSystem = System.new("happinessCrank", {"transform", "emotionalBatt
         end
 
         -- Apply happiness increase to boids in frame
-        -- TESTING: Very high crank power - 360 degrees = +200 happiness total
-        -- TODO: Adjust this value for proper game balance
+        -- Crank power: 360 degrees = +180 happiness total (10% less for balance)
         -- Distributed among all boids in camera frame
         if #frameBoids > 0 then
-            local happinessPerDegree = 200 / 360  -- ~0.56 per degree (very high for testing)
+            local happinessPerDegree = 180 / 360  -- was 200/360, now 10% less
             local totalIncrease = crankChange * happinessPerDegree
             local increasePerBoid = totalIncrease / #frameBoids
 

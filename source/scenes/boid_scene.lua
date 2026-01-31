@@ -27,6 +27,10 @@ function BoidScene()
     -- Pause state (starts playing)
     scene.isPaused = false
 
+    -- Track explosions
+    scene.explosionsHappy = 0  -- exploded at 100 happiness
+    scene.explosionsAngry = 0  -- exploded at 0 happiness
+
     -- Helper: Create temporary sprite for each emotion type
     -- PLACEHOLDER SHAPES RE-ENABLED at 32x32 for testing
     local function createBoidSprite(emotionType)
@@ -185,7 +189,7 @@ function BoidScene()
 
             -- Win if all boids are happy (and there are boids)
             if allHappy and boidCount > 0 then
-                GAME_WORLD:queueScene(WinScene(self.totalBoidCount))
+                GAME_WORLD:queueScene(WinScene(self.totalBoidCount, self.explosionsHappy, self.explosionsAngry))
                 return
             end
 
