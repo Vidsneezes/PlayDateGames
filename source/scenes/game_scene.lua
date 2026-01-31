@@ -35,17 +35,6 @@ function GameScene()
         self:addSystem(AudioSystem)
         self:addSystem(RenderSystem)
 
-        -- Camera test: Create simple marker sprites around the world
-        -- (These help visualize camera movement)
-        local function createMarker(size)
-            local img = gfx.image.new(size, size, gfx.kColorWhite)
-            gfx.lockFocus(img)
-            gfx.setColor(gfx.kColorBlack)
-            gfx.fillRect(0, 0, size, size)
-            gfx.unlockFocus()
-            return img
-        end
-
         -- Markers at corners and center of world
         local markers = {
             {x = 50, y = 50},         -- top-left
@@ -58,7 +47,7 @@ function GameScene()
         for _, pos in ipairs(markers) do
             local marker = Entity.new({
                 transform = Transform(pos.x, pos.y),
-                sprite = SpriteComp(createMarker(20, 20))
+                sprite = SpriteComp(gfx.image.new("Images/chaos"))
             })
             self:addEntity(marker)
         end
