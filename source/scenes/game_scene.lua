@@ -19,10 +19,10 @@ function GameScene()
 
     -- Camera for scrolling world (accessible by all systems)
     scene.camera = {
-        x = 0,           -- current viewport top-left X
-        y = 0,           -- current viewport top-left Y
-        worldWidth = 1200,   -- total world width
-        worldHeight = 800    -- total world height
+        x = 0,                    -- current viewport top-left X
+        y = 0,                    -- current viewport top-left Y
+        worldWidth = WORLD_WIDTH,   -- total world width
+        worldHeight = WORLD_HEIGHT  -- total world height
     }
 
     function scene:onEnter()

@@ -9,6 +9,10 @@
 SCREEN_WIDTH = 400
 SCREEN_HEIGHT = 240
 
+-- World dimensions (adjust for testing - set to screen size for easy testing)
+WORLD_WIDTH = 1200   -- Set to 400 to match viewport for testing
+WORLD_HEIGHT = 800   -- Set to 240 to match viewport for testing
+
 -- Clamp a value between min and max
 function clamp(val, min, max)
     return math.max(min, math.min(max, val))

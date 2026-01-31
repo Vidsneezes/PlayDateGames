@@ -20,9 +20,11 @@ import "game/components/input"
 import "game/components/visual"
 import "game/components/collision"
 import "game/components/audio"
+import "game/components/emotion"
 
 -- Game Systems (each file is independent -- safe to edit in parallel)
 import "game/systems/camera_system"
+import "game/systems/boid_system"
 import "game/systems/physics_system"
 import "game/systems/player_system"
 import "game/systems/crank_system"
@@ -33,6 +35,7 @@ import "game/systems/render_system"
 -- Scenes
 import "scenes/menu_scene"
 import "scenes/game_scene"
+import "scenes/boid_scene"
 import "scenes/gameover_scene"
 
 -- Boot

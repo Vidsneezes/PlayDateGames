@@ -21,12 +21,15 @@ function MenuScene()
     function scene:update()
         gfx.clear(gfx.kColorWhite)
 
-        -- TODO: Replace with your title screen
-        gfx.drawTextAligned("*GAME TITLE*", 200, 80, kTextAlignment.center)
-        gfx.drawTextAligned("Press A to Start", 200, 140, kTextAlignment.center)
+        -- Title screen with two scene options
+        gfx.drawTextAligned("*GAME JAM*", 200, 60, kTextAlignment.center)
+        gfx.drawTextAligned("Press A for Game Scene", 200, 120, kTextAlignment.center)
+        gfx.drawTextAligned("Press B for Boid Scene", 200, 140, kTextAlignment.center)
 
         if playdate.buttonJustPressed(playdate.kButtonA) then
             GAME_WORLD:queueScene(GameScene())
+        elseif playdate.buttonJustPressed(playdate.kButtonB) then
+            GAME_WORLD:queueScene(BoidScene())
         end
     end
 
