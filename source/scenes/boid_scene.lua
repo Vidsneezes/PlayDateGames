@@ -189,7 +189,7 @@ function BoidScene()
 
             -- Win if all boids are happy (and there are boids)
             if allHappy and boidCount > 0 then
-                GAME_WORLD:queueScene(WinScene(self.totalBoidCount, self.explosionsHappy, self.explosionsAngry))
+                GAME_WORLD:queueScene(WinScene(boidCount, self.explosionsHappy, self.explosionsAngry))
                 return
             end
 
