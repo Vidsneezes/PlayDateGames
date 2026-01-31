@@ -104,18 +104,18 @@ EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity"
             goto continue
         end
 
+        -- Determine current emotion type (BEFORE camera frame check so it's available later)
+        local currentEmotion = nil
+        if e.happyBoid then
+            currentEmotion = "happy"
+        elseif e.sadBoid then
+            currentEmotion = "sad"
+        elseif e.angryBoid then
+            currentEmotion = "angry"
+        end
+
         -- Only drain battery if boid is within camera frame
         if isInCameraFrame(e.transform, scene.camera) then
-            -- Determine current emotion type
-            local currentEmotion = nil
-            if e.happyBoid then
-                currentEmotion = "happy"
-            elseif e.sadBoid then
-                currentEmotion = "sad"
-            elseif e.angryBoid then
-                currentEmotion = "angry"
-            end
-
             -- Drain battery based on current emotion (30% slower for balance, doubled while paused!)
             if currentEmotion == "happy" then
                 battery.value -= 0.14 * drainMultiplier  -- was 0.2

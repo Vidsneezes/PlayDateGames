@@ -16,12 +16,13 @@ local gfx = playdate.graphics
 function BoidScene()
     local scene = Scene.new("boid")
 
-    -- Camera for scrolling world (4x viewport area)
+    -- Camera for scrolling world (4x viewport area + 100px padding on each side)
     scene.camera = {
         x = 0,
         y = 0,
-        worldWidth = SCREEN_WIDTH * 2,   -- 800 (2x width = 4x area total)
-        worldHeight = SCREEN_HEIGHT * 2  -- 480 (2x height = 4x area total)
+        worldWidth = SCREEN_WIDTH * 2 + 200,   -- 1000 (800 + 100px padding on each side)
+        worldHeight = SCREEN_HEIGHT * 2 + 200, -- 680 (480 + 100px padding on each side)
+        padding = 100  -- Boids cannot enter this padded border area
     }
 
     -- Pause state (starts playing)
@@ -58,13 +59,14 @@ function BoidScene()
     local function spawnRandomBoids(scene, count)
         local worldW = scene.camera.worldWidth
         local worldH = scene.camera.worldHeight
+        local padding = scene.camera.padding
         local spriteSize = 32  -- Updated to 32x32 for testing
         local emotions = {"happy", "sad", "angry"}
 
         for i = 1, count do
-            -- Random position (keeping sprite in bounds)
-            local x = math.random(0, worldW - spriteSize)
-            local y = math.random(0, worldH - spriteSize)
+            -- Random position (keeping sprite in bounds, respecting padding)
+            local x = math.random(padding, worldW - padding - spriteSize)
+            local y = math.random(padding, worldH - padding - spriteSize)
 
             -- Random emotion
             local emotionType = emotions[math.random(1, 3)]
@@ -262,29 +264,6 @@ function BoidScene()
         gfx.drawRect(modeX - boxPadding, modeY - 3, textWidth + boxPadding * 2, 20)
         gfx.drawText(modeText, modeX, modeY)
 
-        -- Show capture progress bar when in capture mode and paused
-        if self.currentMode == "capture" and self.isPaused and self.captureProgress > 0 then
-            local progBarWidth = 60
-            local progBarHeight = 4
-            local progBarX = SCREEN_WIDTH - progBarWidth - 15
-            local progBarY = SCREEN_HEIGHT - statusBarHeight + 23
-
-            -- Background
-            gfx.setColor(gfx.kColorWhite)
-            gfx.fillRect(progBarX, progBarY, progBarWidth, progBarHeight)
-
-            -- Border
-            gfx.setColor(gfx.kColorBlack)
-            gfx.drawRect(progBarX, progBarY, progBarWidth, progBarHeight)
-
-            -- Fill based on progress (0-180 degrees)
-            local fillWidth = (self.captureProgress / 180) * progBarWidth
-            if fillWidth > 0 then
-                gfx.setColor(gfx.kColorBlack)
-                gfx.fillRect(progBarX + 1, progBarY + 1, fillWidth - 2, progBarHeight - 2)
-            end
-        end
-
         -- Draw camera frame (size depends on mode)
         -- Influence mode: normal frame (40px inset)
         -- Capture mode: smaller frame (80px inset)
@@ -319,6 +298,29 @@ function BoidScene()
         local crossSize = 5
         gfx.drawLine(centerX - crossSize, centerY, centerX + crossSize, centerY)
         gfx.drawLine(centerX, centerY - crossSize, centerX, centerY + crossSize)
+
+        -- Show capture progress bar below center cross (when in capture mode and paused)
+        if self.currentMode == "capture" and self.isPaused and self.captureProgress > 0 then
+            local progBarWidth = 80
+            local progBarHeight = 6
+            local progBarX = centerX - progBarWidth / 2
+            local progBarY = centerY + 15  -- below the cross
+
+            -- Background
+            gfx.setColor(gfx.kColorWhite)
+            gfx.fillRect(progBarX, progBarY, progBarWidth, progBarHeight)
+
+            -- Border
+            gfx.setColor(gfx.kColorBlack)
+            gfx.drawRect(progBarX, progBarY, progBarWidth, progBarHeight)
+
+            -- Fill based on progress (0-180 degrees)
+            local fillWidth = (self.captureProgress / 180) * progBarWidth
+            if fillWidth > 0 then
+                gfx.setColor(gfx.kColorBlack)
+                gfx.fillRect(progBarX + 1, progBarY + 1, fillWidth - 2, progBarHeight - 2)
+            end
+        end
     end
 
     return scene
