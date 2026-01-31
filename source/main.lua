@@ -22,6 +22,7 @@ import "components/collision"
 import "components/audio"
 
 -- Systems (each file is independent -- safe to edit in parallel)
+import "systems/camera_system"
 import "systems/physics_system"
 import "systems/player_system"
 import "systems/crank_system"

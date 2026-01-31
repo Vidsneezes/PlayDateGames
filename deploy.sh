@@ -30,8 +30,14 @@ echo "Build OK."
 # Deploy to device
 echo ""
 echo "Looking for connected Playdate..."
-if ! "$PDUTIL" list 2>/dev/null | grep -q .; then
-    echo "No Playdate found. Connect via USB and unlock the device."
+
+# Find Playdate device (usually /dev/sda1 with PLAYDATE label)
+DEVICE=$(lsblk -no NAME,LABEL | grep PLAYDATE | awk '{print "/dev/"$1}')
+if [ -z "$DEVICE" ]; then
+    echo "No Playdate found. Make sure it's connected via USB and in data disk mode."
+    echo ""
+    echo "On your Playdate:"
+    echo "  Settings > System > Reboot to Data Disk"
     echo ""
     echo "To sideload via web instead:"
     echo "  1. zip -r $GAME_NAME.pdx.zip $OUTPUT"
@@ -39,6 +45,27 @@ if ! "$PDUTIL" list 2>/dev/null | grep -q .; then
     exit 1
 fi
 
-echo "Installing $OUTPUT to device..."
-"$PDUTIL" install "$OUTPUT"
-echo "Deploy OK. Game should appear on the Playdate."
+echo "Found Playdate at $DEVICE"
+
+# Create mount point and mount
+MOUNT_POINT="/mnt/playdate"
+echo "Mounting Playdate..."
+sudo mkdir -p "$MOUNT_POINT"
+sudo mount "$DEVICE" "$MOUNT_POINT"
+
+if [ ! -d "$MOUNT_POINT/Games" ]; then
+    echo "Error: Mounted device doesn't have a Games directory. Wrong device?"
+    sudo umount "$MOUNT_POINT"
+    exit 1
+fi
+
+echo "Copying $OUTPUT to device..."
+sudo rm -rf "$MOUNT_POINT/Games/$GAME_NAME.pdx"
+sudo cp -r "$OUTPUT" "$MOUNT_POINT/Games/"
+sudo sync
+
+echo "Ejecting..."
+sudo umount "$MOUNT_POINT"
+echo ""
+echo "Deploy OK! Game copied to Playdate."
+echo "Your Playdate will reboot and $GAME_NAME should appear in Games."
