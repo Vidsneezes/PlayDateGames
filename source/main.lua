@@ -51,6 +51,6 @@ GAME_WORLD = World.new()
 GAME_WORLD:setScene(MenuScene())
 
 function playdate.update()
-    playdate.graphics.sprite.update()  -- Draw sprites on top
-  GAME_WORLD:update()  -- Draw background and UI first
+    playdate.graphics.sprite.update()  -- Draw sprites first
+    GAME_WORLD:update()  -- Draw background and UI on top
 end
