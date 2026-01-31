@@ -100,7 +100,34 @@ BoidSystem = System.new("boid", {"transform", "velocity", "boidsprite"}, functio
 
         -- Handle Angry Boids
         elseif e.angryBoid then
-          
+            local angry = e.angryBoid
+            -- Angry boids move diagonally and bounce off edges
+            -- If velocity is zero, it means they just became angry - set random diagonal direction
+            if v.dx == 0 and v.dy == 0 then
+                -- Pick random diagonal direction
+                local signX = math.random() > 0.5 and 1 or -1
+                local signY = math.random() > 0.5 and 1 or -1
+                v.dx = signX * angry.speed * 0.7  -- 0.7 for diagonal component
+                v.dy = signY * angry.speed * 0.7
+            end
+
+            -- Check for edge collisions and bounce
+            local worldW = scene.camera and scene.camera.worldWidth or WORLD_WIDTH
+            local worldH = scene.camera and scene.camera.worldHeight or WORLD_HEIGHT
+            local spriteSize = 16
+
+            local nextX = t.x + v.dx
+            local nextY = t.y + v.dy
+
+            -- Bounce off left/right edges
+            if nextX <= 0 or nextX >= worldW - spriteSize then
+                v.dx = -v.dx
+            end
+
+            -- Bounce off top/bottom edges
+            if nextY <= 0 or nextY >= worldH - spriteSize then
+                v.dy = -v.dy
+            end
         end
         t.x += v.dx
         t.y += v.dy

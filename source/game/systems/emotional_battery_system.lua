@@ -105,6 +105,9 @@ EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity"
                 e.sadBoid = SadBoid()
             elseif newEmotion == "angry" then
                 e.angryBoid = AngryBoid()
+                -- Reset velocity so BoidSystem picks a random diagonal direction
+                v.dx = 0
+                v.dy = 0
             end
 
             -- Update sprite
