@@ -28,8 +28,8 @@ RenderBoidHPSystem = System.new("renderBoidHP", {"transform", "emotionalBattery"
 
     -- Draw HP bar for each boid
     for _, e in ipairs(entities) do
-        -- Skip exploding entities
-        if e.exploding then
+        -- Skip exploding and captured entities
+        if e.exploding or e.captured then
             goto continue
         end
 

@@ -75,6 +75,11 @@ EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity"
     local drainMultiplier = scene.isPaused and 2.0 or 1.0
 
     for _, e in ipairs(entities) do
+        -- Skip captured boids (happiness frozen)
+        if e.captured then
+            goto continue
+        end
+
         local battery = e.emotionalBattery
         local v = e.velocity
 
