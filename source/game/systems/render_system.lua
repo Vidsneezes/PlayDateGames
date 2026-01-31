@@ -61,32 +61,33 @@ RenderSystem = System.new("render", {"transform", "sprite"}, function(entities, 
         camX = scene.camera.x
         camY = scene.camera.y
 
+        -- GRID DISABLED FOR TESTING
         -- Draw world background pattern
-        gfx.setColor(gfx.kColorBlack)
-        local gridSize = 40
-        local worldW = scene.camera.worldWidth
-        local worldH = scene.camera.worldHeight
+        -- gfx.setColor(gfx.kColorBlack)
+        -- local gridSize = 40
+        -- local worldW = scene.camera.worldWidth
+        -- local worldH = scene.camera.worldHeight
 
-        -- Draw grid lines (only visible portion)
-        local startX = math.floor(camX / gridSize) * gridSize
-        local startY = math.floor(camY / gridSize) * gridSize
+        -- -- Draw grid lines (only visible portion)
+        -- local startX = math.floor(camX / gridSize) * gridSize
+        -- local startY = math.floor(camY / gridSize) * gridSize
 
-        for x = startX, camX + SCREEN_WIDTH, gridSize do
-            local screenX = x - camX
-            gfx.drawLine(screenX, 0, screenX, SCREEN_HEIGHT)
-        end
+        -- for x = startX, camX + SCREEN_WIDTH, gridSize do
+        --     local screenX = x - camX
+        --     gfx.drawLine(screenX, 0, screenX, SCREEN_HEIGHT)
+        -- end
 
-        for y = startY, camY + SCREEN_HEIGHT, gridSize do
-            local screenY = y - camY
-            gfx.drawLine(0, screenY, SCREEN_WIDTH, screenY)
-        end
+        -- for y = startY, camY + SCREEN_HEIGHT, gridSize do
+        --     local screenY = y - camY
+        --     gfx.drawLine(0, screenY, SCREEN_WIDTH, screenY)
+        -- end
 
-        -- Draw world border
-        gfx.setLineWidth(2)
-        local borderX = 0 - camX
-        local borderY = 0 - camY
-        gfx.drawRect(borderX, borderY, worldW, worldH)
-        gfx.setLineWidth(1)
+        -- -- Draw world border
+        -- gfx.setLineWidth(2)
+        -- local borderX = 0 - camX
+        -- local borderY = 0 - camY
+        -- gfx.drawRect(borderX, borderY, worldW, worldH)
+        -- gfx.setLineWidth(1)
     end
 
     -- Draw entities with camera offset
@@ -101,27 +102,6 @@ RenderSystem = System.new("render", {"transform", "sprite"}, function(entities, 
         end
     end
 
-    -- Draw debug info (FPS and boid counter) in upper right corner
-    gfx.setColor(gfx.kColorBlack)
-
-    -- Get FPS
-    local fps = math.floor(playdate.getFPS())
-    local fpsText = "FPS: " .. tostring(fps)
-
-    -- Count boids (entities with happy, sad, or angry boid components)
-    local boidCount = 0
-    for _, entity in ipairs(scene.entities) do
-        if entity.happyBoid or entity.sadBoid or entity.angryBoid then
-            boidCount += 1
-        end
-    end
-    local boidText = "Boids: " .. tostring(boidCount)
-
-    -- Draw FPS counter (right-aligned)
-    local fpsWidth = gfx.getTextSize(fpsText)
-    gfx.drawText(fpsText, SCREEN_WIDTH - fpsWidth - 5, 5)
-
-    -- Draw boid counter below FPS (right-aligned)
-    local boidWidth = gfx.getTextSize(boidText)
-    gfx.drawText(boidText, SCREEN_WIDTH - boidWidth - 5, 20)
+    -- Debug info hidden for clean UI
+    -- (FPS and boid count removed for final UI design)
 end)

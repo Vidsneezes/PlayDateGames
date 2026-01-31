@@ -19,16 +19,16 @@
 local gfx = playdate.graphics
 
 -- Helper: Create sprite for emotion type
--- PLACEHOLDER SHAPES DISABLED - using real sprites now
+-- PLACEHOLDER SHAPES RE-ENABLED at 32x32 for testing
 local function createEmotionSprite(emotionType)
-    local img = emotionSad
+    local img = boidSpriteHappy
 
     if emotionType == "happy" then
-        img = emotionHappy
+        img = boidSpriteHappy
     elseif emotionType == "sad" then
-        img = emotionSad
+        img = boidSpriteSad
     elseif emotionType == "angry" then
-        img = emotionAngry  -- Square
+        img = boidSpriteAngry -- Square
     end
 
     return img
@@ -65,21 +65,21 @@ EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity"
             currentEmotion = "angry"
         end
 
-        -- Drain battery based on current emotion
+        -- Drain battery based on current emotion (increased rates for more challenge)
         if currentEmotion == "happy" then
-            battery.value -= 0.1
+            battery.value -= 0.2  -- was 0.1 (~5 sec to sad)
         elseif currentEmotion == "sad" then
             if hasStopped(v) then
                 -- At edge, drain faster
-                battery.value -= 0.15
+                battery.value -= 0.3  -- was 0.15 (~3.5 sec to angry)
             else
                 -- Moving, drain slower
-                battery.value -= 0.05
+                battery.value -= 0.1  -- was 0.05 (~10 sec to angry)
             end
         elseif currentEmotion == "angry" then
             -- Drain to 0 then stop
             if battery.value > 0 then
-                battery.value -= 0.01
+                battery.value -= 0.02  -- was 0.01
             end
         end
 
@@ -98,6 +98,9 @@ EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity"
             -- Add new emotion component
             if newEmotion == "happy" then
                 e.happyBoid = HappyBoid()
+                -- Reset velocity so BoidSystem picks a random cardinal direction
+                v.dx = 0
+                v.dy = 0
             elseif newEmotion == "sad" then
                 e.sadBoid = SadBoid()
             elseif newEmotion == "angry" then
@@ -112,7 +115,7 @@ EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity"
             if e.sprite then
                 e.sprite.image = newImage
             elseif e.boidsprite and e.boidsprite.body then
-                e.boidsprite.bubble:setImage(newImage)
+                e.boidsprite.body:setImage(newImage)
             end
         end
     end

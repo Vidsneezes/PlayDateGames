@@ -43,20 +43,37 @@ BoidSystem = System.new("boid", {"transform", "velocity", "boidsprite"}, functio
         -- Handle Happy Boids
         if e.happyBoid then
             local happy = e.happyBoid
-            -- Move toward world center
+            -- Happy boids drift slowly in cardinal directions (adds chaos, prevents clumping)
+
+            -- If velocity is zero, pick a random cardinal direction (horizontal OR vertical)
+            if v.dx == 0 and v.dy == 0 then
+                if math.random() > 0.5 then
+                    -- Move horizontally
+                    v.dx = (math.random() > 0.5 and 1 or -1) * happy.speed * 0.5  -- slow drift
+                    v.dy = 0
+                else
+                    -- Move vertically
+                    v.dx = 0
+                    v.dy = (math.random() > 0.5 and 1 or -1) * happy.speed * 0.5  -- slow drift
+                end
+            end
+
+            -- Bounce off edges (like angry boids but slower)
             local worldW = scene.camera and scene.camera.worldWidth or WORLD_WIDTH
             local worldH = scene.camera and scene.camera.worldHeight or WORLD_HEIGHT
-            local targetX = worldW / 2
-            local targetY = worldH / 2
-            local dx = targetX - t.x
-            local dy = targetY - t.y
+            local spriteSize = 32  -- Updated to 32x32 for testing
 
-            -- Stop if close enough to target (within 3 pixels)
-            local distToTarget = math.sqrt(dx * dx + dy * dy)
-            if distToTarget < 3 then
-                v.dx, v.dy = 0, 0
-            else
-                v.dx, v.dy = normalize(dx, dy, happy.speed)
+            local nextX = t.x + v.dx
+            local nextY = t.y + v.dy
+
+            -- Bounce off left/right edges
+            if nextX <= 0 or nextX >= worldW - spriteSize then
+                v.dx = -v.dx
+            end
+
+            -- Bounce off top/bottom edges
+            if nextY <= 0 or nextY >= worldH - spriteSize then
+                v.dy = -v.dy
             end
 
         -- Handle Sad Boids
@@ -65,7 +82,7 @@ BoidSystem = System.new("boid", {"transform", "velocity", "boidsprite"}, functio
             -- Move toward nearest world edge (but keep full sprite visible)
             local worldW = scene.camera and scene.camera.worldWidth or WORLD_WIDTH
             local worldH = scene.camera and scene.camera.worldHeight or WORLD_HEIGHT
-            local spriteSize = 16  -- sprite is 16x16 pixels
+            local spriteSize = 32  -- sprite is 32x32 pixels
 
             -- Distance to each edge (accounting for sprite size)
             local distLeft = t.x - 0  -- left edge target is 0
@@ -114,7 +131,7 @@ BoidSystem = System.new("boid", {"transform", "velocity", "boidsprite"}, functio
             -- Check for edge collisions and bounce
             local worldW = scene.camera and scene.camera.worldWidth or WORLD_WIDTH
             local worldH = scene.camera and scene.camera.worldHeight or WORLD_HEIGHT
-            local spriteSize = 16
+            local spriteSize = 32  -- Updated to 32x32 for testing
 
             local nextX = t.x + v.dx
             local nextY = t.y + v.dy
@@ -141,11 +158,10 @@ BoidSystem = System.new("boid", {"transform", "velocity", "boidsprite"}, functio
             camY = scene.camera.y
         end
 
-        if s.visible and s.bubble and s.body then
+        if s.visible and s.body then
             local screenX = t.x - camX
             local screenY = t.y - camY
             s.body:moveTo(screenX, screenY)
-            s.bubble:moveTo(screenX, screenY-12)
         end
     end
 end)

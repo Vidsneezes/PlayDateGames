@@ -16,28 +16,28 @@ local gfx = playdate.graphics
 function BoidScene()
     local scene = Scene.new("boid")
 
-    -- Camera for scrolling world (4x viewport area for testing)
+    -- Camera for scrolling world (4x viewport area)
     scene.camera = {
         x = 0,
         y = 0,
-        worldWidth = SCREEN_WIDTH * 2,   -- 800 (2x width)
-        worldHeight = SCREEN_HEIGHT * 2  -- 480 (2x height)
+        worldWidth = SCREEN_WIDTH * 2,   -- 800 (2x width = 4x area total)
+        worldHeight = SCREEN_HEIGHT * 2  -- 480 (2x height = 4x area total)
     }
 
     -- Helper: Create temporary sprite for each emotion type
-    -- PLACEHOLDER SHAPES DISABLED - using real sprites now
+    -- PLACEHOLDER SHAPES RE-ENABLED at 32x32 for testing
     local function createBoidSprite(emotionType)
-        local img = emotionAngry
+        local img = boidSpriteHappy
 
         if emotionType == "happy" then
             -- Triangle (pointing up)
-            img = emotionHappy
+            img = boidSpriteHappy
         elseif emotionType == "sad" then
             -- Circle
-            img = emotionSad
+            img = boidSpriteSad
         elseif emotionType == "angry" then
             -- Square
-            img = emotionAngry
+            img = boidSpriteAngry
         end
 
         return img
@@ -47,7 +47,7 @@ function BoidScene()
     local function spawnRandomBoids(scene, count)
         local worldW = scene.camera.worldWidth
         local worldH = scene.camera.worldHeight
-        local spriteSize = 16
+        local spriteSize = 32  -- Updated to 32x32 for testing
         local emotions = {"happy", "sad", "angry"}
 
         for i = 1, count do
@@ -72,7 +72,7 @@ function BoidScene()
             local boid = Entity.new({
                 transform = Transform(x, y),
                 velocity = Velocity(0, 0),
-                boidsprite = BoidSpriteComp(bodyImage,createBoidSprite(emotionType)),
+                boidsprite = BoidSpriteComp(createBoidSprite(emotionType)),
                 emotionalBattery = EmotionalBattery(initialBattery)
             })
 
@@ -94,6 +94,7 @@ function BoidScene()
         self:addSystem(CameraSystem)
         self:addSystem(HappinessCrankSystem)     -- Read crank input first
         self:addSystem(EmotionalBatterySystem)   -- Update emotions after happiness changes
+        self:addSystem(BackgroundSystem)         -- Draw grass tilemap background
         self:addSystem(BoidSystem)
         -- self:addSystem(PhysicsSystem) -- BoidSystem handles physics for boids now
         self:addSystem(RenderSystem) -- BoidSystem handles rendering for boids now
@@ -101,7 +102,7 @@ function BoidScene()
 
         -- Spawn test boids
         -- ADJUST THIS NUMBER to test performance
-        local BOID_COUNT = 50 -- Compromise between 20 (develop) and 100 (main)
+        local BOID_COUNT = 10  -- Small count for testing gameplay feel
         spawnRandomBoids(self, BOID_COUNT)
     end
 
@@ -112,10 +113,73 @@ function BoidScene()
     function scene:update()
         Scene.update(self)  -- runs all registered systems
 
-        -- Draw debug HUD
+        -- Reset game with A or B button
+        if playdate.buttonJustPressed(playdate.kButtonA) or playdate.buttonJustPressed(playdate.kButtonB) then
+            GAME_WORLD:queueScene(BoidScene())
+            return
+        end
+
+        -- Count emotions in a single loop
+        local happyCount = 0
+        local sadCount = 0
+        local angryCount = 0
+
+        for _, entity in ipairs(self.entities) do
+            if entity.happyBoid then
+                happyCount += 1
+            elseif entity.sadBoid then
+                sadCount += 1
+            elseif entity.angryBoid then
+                angryCount += 1
+            end
+        end
+
+        -- UI Layout constants
+        local statusBarHeight = 35
+        local gaugeWidth = 30  -- includes padding
+        local frameSize = 10
+
+        -- Draw bottom status bar (white background)
+        gfx.setColor(gfx.kColorWhite)
+        gfx.fillRect(0, SCREEN_HEIGHT - statusBarHeight, SCREEN_WIDTH, statusBarHeight)
+
+        -- Draw status bar border
         gfx.setColor(gfx.kColorBlack)
-        gfx.drawText("Boid Scene - Camera: (" .. math.floor(self.camera.x) .. ", " .. math.floor(self.camera.y) .. ")", 5, 5)
-        gfx.drawText("Triangle=Happy, Circle=Sad, Square=Angry", 5, 220)
+        gfx.drawLine(0, SCREEN_HEIGHT - statusBarHeight, SCREEN_WIDTH, SCREEN_HEIGHT - statusBarHeight)
+
+        -- Draw status bar text (emotion counts only)
+        local statusY = SCREEN_HEIGHT - statusBarHeight + 10
+        gfx.drawText("Happy: " .. happyCount .. "  Sad: " .. sadCount .. "  Angry: " .. angryCount, 10, statusY)
+
+        -- Draw camera frame (playable area excluding UI with padding)
+        local padding = 5
+        local playLeft = padding
+        local playTop = padding
+        local playRight = SCREEN_WIDTH - gaugeWidth - padding
+        local playBottom = SCREEN_HEIGHT - statusBarHeight - padding
+
+        -- Top-left corner
+        gfx.drawLine(playLeft, playTop, playLeft + frameSize, playTop)
+        gfx.drawLine(playLeft, playTop, playLeft, playTop + frameSize)
+
+        -- Top-right corner
+        gfx.drawLine(playRight - frameSize, playTop, playRight, playTop)
+        gfx.drawLine(playRight, playTop, playRight, playTop + frameSize)
+
+        -- Bottom-left corner
+        gfx.drawLine(playLeft, playBottom, playLeft + frameSize, playBottom)
+        gfx.drawLine(playLeft, playBottom - frameSize, playLeft, playBottom)
+
+        -- Bottom-right corner
+        gfx.drawLine(playRight - frameSize, playBottom, playRight, playBottom)
+        gfx.drawLine(playRight, playBottom - frameSize, playRight, playBottom)
+
+        -- Center cross (in middle of playable area)
+        local centerX = (playLeft + playRight) / 2
+        local centerY = (playTop + playBottom) / 2
+        local crossSize = 5
+        gfx.drawLine(centerX - crossSize, centerY, centerX + crossSize, centerY)
+        gfx.drawLine(centerX, centerY - crossSize, centerX, centerY + crossSize)
     end
 
     return scene
