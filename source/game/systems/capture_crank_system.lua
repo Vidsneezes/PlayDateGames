@@ -44,9 +44,15 @@ CaptureCrankSystem = System.new("captureCrank", {"transform", "emotionalBattery"
     -- Get crank rotation
     local crankChange = pd.getCrankChange()
 
+    -- DEBUG: B button also advances capture (simulates cranking down)
+    if pd.buttonIsPressed(pd.kButtonB) then
+        crankChange = -10  -- Simulate cranking down
+    end
+
     if crankChange < 0 then  -- Cranking DOWN (negative values)
-        -- Accumulate capture progress
+        -- Accumulate capture progress (clamp at 180)
         scene.captureProgress = (scene.captureProgress or 0) + math.abs(crankChange)
+        scene.captureProgress = math.min(scene.captureProgress, 180)
 
         -- Check if threshold reached (180 degrees)
         if scene.captureProgress >= 180 then
@@ -58,8 +64,9 @@ CaptureCrankSystem = System.new("captureCrank", {"transform", "emotionalBattery"
                 end
             end
 
-            -- Reset progress
+            -- Reset progress and unpause
             scene.captureProgress = 0
+            scene.isPaused = false
         end
     end
 end)
