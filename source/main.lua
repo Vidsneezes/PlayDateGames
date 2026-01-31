@@ -8,6 +8,7 @@ import "CoreLibs/animation"
 -- Utilities
 import "lib/utils"
 import "lib/resources"
+import "lib/synth"
 
 -- ECS Core
 import "ecs/entity"
@@ -38,8 +39,9 @@ import "game/systems/physics_system"
 import "game/systems/player_system"
 import "game/systems/crank_system"
 import "game/systems/collision_system"
-import "game/systems/audio_system"
+--import "game/systems/audio_system"
 import "game/systems/render_system"
+import "game/systems/synth_system"
 
 -- Scenes
 import "scenes/menu_scene"
@@ -56,5 +58,5 @@ GAME_WORLD = World.new()
 GAME_WORLD:setScene(MenuScene())
 
 function playdate.update()
-    GAME_WORLD:update()  -- Systems control render order
+    GAME_WORLD:update() -- Systems control render order
 end

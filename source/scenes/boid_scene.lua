@@ -13,6 +13,7 @@
 
 local gfx = playdate.graphics
 
+
 function BoidScene()
     local scene = Scene.new("boid")
 
@@ -20,8 +21,8 @@ function BoidScene()
     scene.camera = {
         x = 0,
         y = 0,
-        worldWidth = SCREEN_WIDTH * 2,   -- 800 (2x width = 4x area total)
-        worldHeight = SCREEN_HEIGHT * 2  -- 480 (2x height = 4x area total)
+        worldWidth = SCREEN_WIDTH * 2,  -- 800 (2x width = 4x area total)
+        worldHeight = SCREEN_HEIGHT * 2 -- 480 (2x height = 4x area total)
     }
 
     -- Pause state (starts playing)
@@ -50,8 +51,8 @@ function BoidScene()
     local function spawnRandomBoids(scene, count)
         local worldW = scene.camera.worldWidth
         local worldH = scene.camera.worldHeight
-        local spriteSize = 32  -- Updated to 32x32 for testing
-        local emotions = {"happy", "sad", "angry"}
+        local spriteSize = 32 -- Updated to 32x32 for testing
+        local emotions = { "happy", "sad", "angry" }
 
         for i = 1, count do
             -- Random position (keeping sprite in bounds)
@@ -64,11 +65,11 @@ function BoidScene()
             -- Set initial battery based on emotion (max for their range)
             local initialBattery = 100
             if emotionType == "happy" then
-                initialBattery = 100  -- Max for happy (61-100)
+                initialBattery = 100 -- Max for happy (61-100)
             elseif emotionType == "sad" then
-                initialBattery = 60   -- Max for sad (31-60)
+                initialBattery = 60  -- Max for sad (31-60)
             elseif emotionType == "angry" then
-                initialBattery = 30   -- Max for angry (0-30)
+                initialBattery = 30  -- Max for angry (0-30)
             end
 
             -- Create boid with appropriate component
@@ -95,23 +96,28 @@ function BoidScene()
     function scene:onEnter()
         -- Register systems in execution order
         self:addSystem(CameraSystem)
-        self:addSystem(HappinessCrankSystem)     -- Read crank input first
-        self:addSystem(EmotionalBatterySystem)   -- Update emotions after happiness changes
-        self:addSystem(EmotionInfluenceSystem)   -- Proximity effects (comment out if too slow)
-        self:addSystem(BoidSystem)               -- Update boid AI and sprites
-        self:addSystem(RenderClearSystem)        -- Clear screen to white
-        self:addSystem(RenderBackgroundSystem)   -- Draw grass tilemap
-        self:addSystem(RenderSpriteSystem)       -- Draw boid sprites
-        self:addSystem(RenderUISystem)           -- Draw UI last
+        self:addSystem(HappinessCrankSystem)   -- Read crank input first
+        self:addSystem(EmotionalBatterySystem) -- Update emotions after happiness changes
+        self:addSystem(EmotionInfluenceSystem) -- Proximity effects (comment out if too slow)
+        self:addSystem(BoidSystem)             -- Update boid AI and sprites
+        self:addSystem(RenderClearSystem)      -- Clear screen to white
+        self:addSystem(RenderBackgroundSystem) -- Draw grass tilemap
+        self:addSystem(RenderSpriteSystem)     -- Draw boid sprites
+        self:addSystem(RenderUISystem)         -- Draw UI last
 
         -- Spawn test boids
         -- ADJUST THIS NUMBER to test performance
-        local BOID_COUNT = 10  -- Small count for testing gameplay feel
+        local BOID_COUNT = 10 -- Small count for testing gameplay feel
         spawnRandomBoids(self, BOID_COUNT)
+
+        -- Audio Controller SynthEmitter
+        SynthStart(scene, "theme")
+        SynthPlay()
     end
 
     function scene:onExit()
         -- Clean up if needed
+        SynthDestroy(scene)
     end
 
     function scene:update()
@@ -124,7 +130,8 @@ function BoidScene()
             GAME_WORLD:queueScene(WinScene())
         end
 
-        Scene.update(self)  -- runs all registered systems
+        SynthUpdate(scene)
+        Scene.update(self) -- runs all registered systems
 
         -- Check win condition: all boids are happy (battery > 60)
         -- Only check during play mode
@@ -165,7 +172,7 @@ function BoidScene()
 
         -- UI Layout constants
         local statusBarHeight = 35
-        local gaugeWidth = 30  -- includes padding
+        local gaugeWidth = 30 -- includes padding
         local frameSize = 10
 
         -- Draw bottom status bar (white background)
