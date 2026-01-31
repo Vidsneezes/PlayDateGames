@@ -45,6 +45,41 @@ function BoidScene()
         return img
     end
 
+    -- Helper: Spawn multiple boids with random positions and emotions
+    local function spawnRandomBoids(scene, count)
+        local worldW = scene.camera.worldWidth
+        local worldH = scene.camera.worldHeight
+        local spriteSize = 16
+        local emotions = {"happy", "sad", "angry"}
+
+        for i = 1, count do
+            -- Random position (keeping sprite in bounds)
+            local x = math.random(0, worldW - spriteSize)
+            local y = math.random(0, worldH - spriteSize)
+
+            -- Random emotion
+            local emotionType = emotions[math.random(1, 3)]
+
+            -- Create boid with appropriate component
+            local boid = Entity.new({
+                transform = Transform(x, y),
+                velocity = Velocity(0, 0),
+                sprite = SpriteComp(createBoidSprite(emotionType))
+            })
+
+            -- Add emotion component based on type
+            if emotionType == "happy" then
+                boid.happyBoid = HappyBoid()
+            elseif emotionType == "sad" then
+                boid.sadBoid = SadBoid()
+            elseif emotionType == "angry" then
+                boid.angryBoid = AngryBoid()
+            end
+
+            scene:addEntity(boid)
+        end
+    end
+
     function scene:onEnter()
         -- Register systems in execution order
         self:addSystem(CameraSystem)
@@ -52,31 +87,10 @@ function BoidScene()
         self:addSystem(PhysicsSystem)
         self:addSystem(RenderSystem)
 
-        -- Create 3 test boids with different emotions
-        -- Positioned for viewport-sized world (400x240)
-        local boid1 = Entity.new({
-            transform = Transform(100, 60),  -- top-left quadrant (happy)
-            velocity = Velocity(0, 0),
-            happyBoid = HappyBoid(),  -- uses default speed (1.5)
-            sprite = SpriteComp(createBoidSprite("happy"))
-        })
-        self:addEntity(boid1)
-
-        local boid2 = Entity.new({
-            transform = Transform(300, 180),  -- bottom-right quadrant (sad)
-            velocity = Velocity(0, 0),
-            sadBoid = SadBoid(),  -- uses default speed (1.0)
-            sprite = SpriteComp(createBoidSprite("sad"))
-        })
-        self:addEntity(boid2)
-
-        local boid3 = Entity.new({
-            transform = Transform(350, 80),  -- top-right area (angry)
-            velocity = Velocity(0, 0),
-            angryBoid = AngryBoid(),  -- uses default speed (2.0) and detection range
-            sprite = SpriteComp(createBoidSprite("angry"))
-        })
-        self:addEntity(boid3)
+        -- Spawn test boids
+        -- ADJUST THIS NUMBER to test performance (3, 50, 100, etc.)
+        local BOID_COUNT = 100
+        spawnRandomBoids(self, BOID_COUNT)
     end
 
     function scene:onExit()
