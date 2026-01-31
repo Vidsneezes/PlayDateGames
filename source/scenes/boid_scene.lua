@@ -94,14 +94,16 @@ function BoidScene()
     function scene:onEnter()
         -- Register systems in execution order
         self:addSystem(CameraSystem)
-        self:addSystem(EmotionalBatterySystem)  -- Update emotions before movement
+        self:addSystem(HappinessCrankSystem)     -- Read crank input first
+        self:addSystem(EmotionalBatterySystem)   -- Update emotions after happiness changes
         self:addSystem(BoidSystem)
         self:addSystem(PhysicsSystem)
         self:addSystem(RenderSystem)
+        self:addSystem(HappinessUISystem)        -- Draw UI last
 
         -- Spawn test boids
-        -- ADJUST THIS NUMBER to test performance (3, 50, 100, etc.)
-        local BOID_COUNT = 100
+        -- ADJUST THIS NUMBER to test performance (recommended: 20-30)
+        local BOID_COUNT = 20
         spawnRandomBoids(self, BOID_COUNT)
     end
 
