@@ -16,8 +16,11 @@
 
 local gfx = playdate.graphics
 
+bgset = false
+
 RenderSpriteSystem = System.new("renderSprite", {}, function(entities, scene)
     -- Set up background drawing callback to preserve tilemap when sprites move
+    if not bgset then
     gfx.sprite.setBackgroundDrawingCallback(function(x, y, width, height)
         -- Redraw the tilemap in the dirty rect area
         if scene.backgroundTilemap and scene.camera then
@@ -26,6 +29,8 @@ RenderSpriteSystem = System.new("renderSprite", {}, function(entities, scene)
             gfx.clearClipRect()
         end
     end)
+    end
+    bgset = true
 
     -- Render all Playdate sprites
     gfx.sprite.update()
