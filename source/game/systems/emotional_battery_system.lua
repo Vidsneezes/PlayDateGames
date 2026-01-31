@@ -89,6 +89,27 @@ EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity"
         -- Clamp battery value
         battery.value = clamp(battery.value, 0, battery.max)
 
+        -- Check for explosion (battery at 0 or 100)
+        if battery.value <= 0 or battery.value >= 100 then
+            -- Draw explosion square (placeholder)
+            local camX = 0
+            local camY = 0
+            if scene.camera then
+                camX = scene.camera.x
+                camY = scene.camera.y
+            end
+
+            local screenX = e.transform.x - camX
+            local screenY = e.transform.y - camY
+            local explosionSize = 40
+
+            gfx.setColor(gfx.kColorBlack)
+            gfx.fillRect(screenX - explosionSize/2, screenY - explosionSize/2, explosionSize, explosionSize)
+
+            -- Mark entity for deletion
+            e.active = false
+        end
+
         -- Check if emotion should change
         local newEmotion = getEmotionFromBattery(battery.value)
 
