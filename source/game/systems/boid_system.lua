@@ -49,20 +49,28 @@ BoidSystem = System.new("boid", {"transform", "velocity"}, function(entities, sc
             local targetY = worldH / 2
             local dx = targetX - t.x
             local dy = targetY - t.y
-            v.dx, v.dy = normalize(dx, dy, happy.speed)
+
+            -- Stop if close enough to target (within 3 pixels)
+            local distToTarget = math.sqrt(dx * dx + dy * dy)
+            if distToTarget < 3 then
+                v.dx, v.dy = 0, 0
+            else
+                v.dx, v.dy = normalize(dx, dy, happy.speed)
+            end
 
         -- Handle Sad Boids
         elseif e.sadBoid then
             local sad = e.sadBoid
-            -- Move toward nearest world edge
+            -- Move toward nearest world edge (but keep full sprite visible)
             local worldW = scene.camera and scene.camera.worldWidth or WORLD_WIDTH
             local worldH = scene.camera and scene.camera.worldHeight or WORLD_HEIGHT
+            local spriteSize = 16  -- sprite is 16x16 pixels
 
-            -- Distance to each edge
-            local distLeft = t.x
-            local distRight = worldW - t.x
-            local distTop = t.y
-            local distBottom = worldH - t.y
+            -- Distance to each edge (accounting for sprite size)
+            local distLeft = t.x - 0  -- left edge target is 0
+            local distRight = (worldW - spriteSize) - t.x  -- right edge target keeps sprite in bounds
+            local distTop = t.y - 0  -- top edge target is 0
+            local distBottom = (worldH - spriteSize) - t.y  -- bottom edge target keeps sprite in bounds
 
             -- Find closest edge
             local minDist = math.min(distLeft, distRight, distTop, distBottom)
@@ -71,16 +79,23 @@ BoidSystem = System.new("boid", {"transform", "velocity"}, function(entities, sc
             if minDist == distLeft then
                 targetX, targetY = 0, t.y
             elseif minDist == distRight then
-                targetX, targetY = worldW, t.y
+                targetX, targetY = worldW - spriteSize, t.y
             elseif minDist == distTop then
                 targetX, targetY = t.x, 0
             else
-                targetX, targetY = t.x, worldH
+                targetX, targetY = t.x, worldH - spriteSize
             end
 
             local dx = targetX - t.x
             local dy = targetY - t.y
-            v.dx, v.dy = normalize(dx, dy, sad.speed)
+
+            -- Stop if close enough to edge (within 2 pixels)
+            local distToTarget = math.sqrt(dx * dx + dy * dy)
+            if distToTarget < 2 then
+                v.dx, v.dy = 0, 0
+            else
+                v.dx, v.dy = normalize(dx, dy, sad.speed)
+            end
 
         -- Handle Angry Boids
         elseif e.angryBoid then
