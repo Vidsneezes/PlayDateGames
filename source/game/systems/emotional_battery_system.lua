@@ -51,6 +51,9 @@ local function hasStopped(velocity)
 end
 
 EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity", "emotionalBattery"}, function(entities, scene)
+    -- Double drain while paused (risk/reward for pausing)
+    local drainMultiplier = scene.isPaused and 2.0 or 1.0
+
     for _, e in ipairs(entities) do
         local battery = e.emotionalBattery
         local v = e.velocity
@@ -65,21 +68,21 @@ EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity"
             currentEmotion = "angry"
         end
 
-        -- Drain battery based on current emotion (increased rates for more challenge)
+        -- Drain battery based on current emotion (doubled while paused!)
         if currentEmotion == "happy" then
-            battery.value -= 0.2  -- was 0.1 (~5 sec to sad)
+            battery.value -= 0.2 * drainMultiplier
         elseif currentEmotion == "sad" then
             if hasStopped(v) then
                 -- At edge, drain faster
-                battery.value -= 0.3  -- was 0.15 (~3.5 sec to angry)
+                battery.value -= 0.3 * drainMultiplier
             else
                 -- Moving, drain slower
-                battery.value -= 0.1  -- was 0.05 (~10 sec to angry)
+                battery.value -= 0.1 * drainMultiplier
             end
         elseif currentEmotion == "angry" then
             -- Drain to 0 then stop
             if battery.value > 0 then
-                battery.value -= 0.02  -- was 0.01
+                battery.value -= 0.02 * drainMultiplier
             end
         end
 

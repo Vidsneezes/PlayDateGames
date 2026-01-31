@@ -24,6 +24,9 @@ function BoidScene()
         worldHeight = SCREEN_HEIGHT * 2  -- 480 (2x height = 4x area total)
     }
 
+    -- Pause state (starts playing)
+    scene.isPaused = false
+
     -- Helper: Create temporary sprite for each emotion type
     -- PLACEHOLDER SHAPES RE-ENABLED at 32x32 for testing
     local function createBoidSprite(emotionType)
@@ -112,31 +115,33 @@ function BoidScene()
     end
 
     function scene:update()
+        -- A button toggles pause
+        if playdate.buttonJustPressed(playdate.kButtonA) then
+            self.isPaused = not self.isPaused
+        end
+
         Scene.update(self)  -- runs all registered systems
 
         -- Check win condition: all boids are happy (battery > 60)
-        local allHappy = true
-        local boidCount = 0
-        for _, entity in ipairs(self.entities) do
-            if entity.emotionalBattery then
-                boidCount += 1
-                if entity.emotionalBattery.value <= 60 then
-                    allHappy = false
-                    break
+        -- Only check during play mode
+        if not self.isPaused then
+            local allHappy = true
+            local boidCount = 0
+            for _, entity in ipairs(self.entities) do
+                if entity.emotionalBattery then
+                    boidCount += 1
+                    if entity.emotionalBattery.value <= 60 then
+                        allHappy = false
+                        break
+                    end
                 end
             end
-        end
 
-        -- Win if all boids are happy (and there are boids)
-        if allHappy and boidCount > 0 then
-            GAME_WORLD:queueScene(WinScene())
-            return
-        end
-
-        -- Reset game with A or B button
-        if playdate.buttonJustPressed(playdate.kButtonA) or playdate.buttonJustPressed(playdate.kButtonB) then
-            GAME_WORLD:queueScene(BoidScene())
-            return
+            -- Win if all boids are happy (and there are boids)
+            if allHappy and boidCount > 0 then
+                GAME_WORLD:queueScene(WinScene())
+                return
+            end
         end
 
         -- Count emotions in a single loop
@@ -171,8 +176,29 @@ function BoidScene()
         local statusY = SCREEN_HEIGHT - statusBarHeight + 10
         gfx.drawText("Happy: " .. happyCount .. "  Sad: " .. sadCount .. "  Angry: " .. angryCount, 10, statusY)
 
+        -- Draw pause state indicator in lower right (UI area)
+        local pauseText = self.isPaused and "⏸ PAUSED" or "▶ PLAYING"
+        local textWidth = gfx.getTextSize(pauseText)
+        local pauseX = SCREEN_WIDTH - textWidth - 15
+        local pauseY = SCREEN_HEIGHT - statusBarHeight + 10
+
+        -- Inverted colors when paused (white on black)
+        if self.isPaused then
+            gfx.setColor(gfx.kColorBlack)
+            gfx.fillRect(pauseX - 3, pauseY - 2, textWidth + 6, 18)
+            gfx.setColor(gfx.kColorWhite)
+            gfx.drawText(pauseText, pauseX, pauseY)
+        else
+            -- Normal style when playing (black on white)
+            gfx.setColor(gfx.kColorWhite)
+            gfx.fillRect(pauseX - 3, pauseY - 2, textWidth + 6, 18)
+            gfx.setColor(gfx.kColorBlack)
+            gfx.drawRect(pauseX - 3, pauseY - 2, textWidth + 6, 18)
+            gfx.drawText(pauseText, pauseX, pauseY)
+        end
+
         -- Draw camera frame (playable area excluding UI with padding)
-        local padding = 5
+        local padding = 10
         local playLeft = padding
         local playTop = padding
         local playRight = SCREEN_WIDTH - gaugeWidth - padding

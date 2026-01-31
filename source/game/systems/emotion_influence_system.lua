@@ -16,6 +16,11 @@
 ]]
 
 EmotionInfluenceSystem = System.new("emotionInfluence", {"transform", "emotionalBattery"}, function(entities, scene)
+    -- No proximity effects while paused
+    if scene.isPaused then
+        return
+    end
+
     -- Configuration
     local ANGRY_INFLUENCE_RADIUS = 60      -- pixels
     local ANGRY_DRAIN_AMOUNT = 0.15         -- extra drain per frame

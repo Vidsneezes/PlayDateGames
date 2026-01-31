@@ -35,13 +35,18 @@ end
 -- BoidSystem processes entities with transform and velocity
 -- It checks for emotion components and applies appropriate behaviors
 BoidSystem = System.new("boid", {"transform", "velocity", "boidsprite"}, function(entities, scene)
+    -- Boids frozen while paused
+    local isPaused = scene.isPaused or false
+
     for _, e in ipairs(entities) do
         local t = e.transform
         local v = e.velocity
         local s = e.boidsprite
 
-        -- Handle Happy Boids
-        if e.happyBoid then
+        -- Skip movement logic if paused
+        if not isPaused then
+            -- Handle Happy Boids
+            if e.happyBoid then
             local happy = e.happyBoid
             -- Happy boids drift slowly in cardinal directions (adds chaos, prevents clumping)
 
@@ -146,8 +151,15 @@ BoidSystem = System.new("boid", {"transform", "velocity", "boidsprite"}, functio
                 v.dy = -v.dy
             end
         end
-        t.x += v.dx
-        t.y += v.dy
+
+        -- End movement logic
+        end
+
+        -- Apply movement (only if not paused)
+        if not isPaused then
+            t.x += v.dx
+            t.y += v.dy
+        end
 
         -- Render Boids
           -- Get camera offset
