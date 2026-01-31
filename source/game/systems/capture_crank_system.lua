@@ -14,27 +14,6 @@
 
 local pd = playdate
 
--- Helper: Check if a boid is within the SMALLER capture frame
-local function isInCaptureFrame(transform, camera)
-    local camX = camera.x
-    local camY = camera.y
-
-    -- Convert to screen coordinates
-    local screenX = transform.x - camX
-    local screenY = transform.y - camY
-
-    -- Capture frame is HALF the size (80px inset instead of 40px)
-    local frameInset = 80
-    local statusBarHeight = 35
-    local frameLeft = frameInset
-    local frameTop = frameInset
-    local frameRight = frameInset + (SCREEN_WIDTH - (frameInset * 2))
-    local frameBottom = frameInset + ((SCREEN_HEIGHT - statusBarHeight) - (frameInset * 2))
-
-    return screenX >= frameLeft and screenX <= frameRight and
-           screenY >= frameTop and screenY <= frameBottom
-end
-
 CaptureCrankSystem = System.new("captureCrank", {"transform", "emotionalBattery"}, function(entities, scene)
     -- Only work while paused in capture mode
     if not scene.isPaused or scene.currentMode ~= "capture" then
@@ -58,9 +37,30 @@ CaptureCrankSystem = System.new("captureCrank", {"transform", "emotionalBattery"
         if scene.captureProgress >= 180 then
             -- Find all boids in capture frame and capture them
             for _, e in ipairs(entities) do
-                if not e.captured and isInCaptureFrame(e.transform, scene.camera) then
-                    -- Capture this boid!
-                    e.captured = Captured()
+                if not e.captured and isInCameraFrame(e.transform, scene.camera, 80) then
+                    -- Check if boid is happy (battery > 60)
+                    if e.emotionalBattery.value > 60 then
+                        -- Capture this happy boid!
+                        e.captured = Captured()
+                    else
+                        -- Not happy - explode instead!
+                        e.exploding = Exploding()
+
+                        -- Track explosion type for stats
+                        if e.emotionalBattery.value >= 100 then
+                            scene.explosionsHappy = (scene.explosionsHappy or 0) + 1
+                        else
+                            scene.explosionsAngry = (scene.explosionsAngry or 0) + 1
+                        end
+
+                        -- Remove sprite from display list
+                        if e.boidsprite and e.boidsprite.body then
+                            e.boidsprite.body:remove()
+                        end
+                        if e.boidsprite and e.boidsprite.head then
+                            e.boidsprite.head:remove()
+                        end
+                    end
                 end
             end
 

@@ -35,6 +35,43 @@ function distance(x1, y1, x2, y2)
     return math.sqrt(dx * dx + dy * dy)
 end
 
+-- Check if a boid is within a camera frame
+-- frameInset: 40 for influence mode, 80 for capture mode
+function isInCameraFrame(transform, camera, frameInset)
+    if not camera then return true end
+
+    frameInset = frameInset or 40  -- Default to influence mode
+
+    local camX = camera.x
+    local camY = camera.y
+    local screenX = transform.x - camX
+    local screenY = transform.y - camY
+
+    local statusBarHeight = 35
+    local frameLeft = frameInset
+    local frameTop = frameInset
+    local frameRight = frameInset + (SCREEN_WIDTH - (frameInset * 2))
+    local frameBottom = frameInset + ((SCREEN_HEIGHT - statusBarHeight) - (frameInset * 2))
+
+    return screenX >= frameLeft and screenX <= frameRight and
+           screenY >= frameTop and screenY <= frameBottom
+end
+
+-- Create sprite image for emotion type
+function createEmotionSprite(emotionType)
+    local img = boidSpriteHappy
+
+    if emotionType == "happy" then
+        img = animationBoidHeadHappy:image()
+    elseif emotionType == "sad" then
+        img = animationBoidHeadSad:image()
+    elseif emotionType == "angry" then
+        img = animationBoidHeadAngry:image()
+    end
+
+    return img
+end
+
 -- Load a JSON config file via Playdate datastore
 -- Usage: local config = loadConfig("Data")
 function loadConfig(path)

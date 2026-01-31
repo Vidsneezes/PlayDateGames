@@ -18,22 +18,6 @@
 
 local gfx = playdate.graphics
 
--- Helper: Create sprite for emotion type
--- PLACEHOLDER SHAPES RE-ENABLED at 32x32 for testing
-local function createEmotionSprite(emotionType)
-    local img = boidSpriteHappy
-
-    if emotionType == "happy" then
-        img = animationBoidHeadHappy:image()
-    elseif emotionType == "sad" then
-        img = animationBoidHeadSad:image()
-    elseif emotionType == "angry" then
-        img = animationBoidHeadAngry:image()
-    end
-
-    return img
-end
-
 -- Helper: Get current emotion type based on battery value
 local function getEmotionFromBattery(batteryValue)
     if batteryValue > 60 then
@@ -48,26 +32,6 @@ end
 -- Helper: Check if boid has stopped moving
 local function hasStopped(velocity)
     return velocity.dx == 0 and velocity.dy == 0
-end
-
--- Helper: Check if a boid is within the camera frame
-local function isInCameraFrame(transform, camera)
-    if not camera then return true end
-
-    local camX = camera.x
-    local camY = camera.y
-    local screenX = transform.x - camX
-    local screenY = transform.y - camY
-
-    local frameInset = 40
-    local statusBarHeight = 35
-    local frameLeft = frameInset
-    local frameTop = frameInset
-    local frameRight = frameInset + (SCREEN_WIDTH - (frameInset * 2))
-    local frameBottom = frameInset + ((SCREEN_HEIGHT - statusBarHeight) - (frameInset * 2))
-
-    return screenX >= frameLeft and screenX <= frameRight and
-           screenY >= frameTop and screenY <= frameBottom
 end
 
 EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity", "emotionalBattery"}, function(entities, scene)

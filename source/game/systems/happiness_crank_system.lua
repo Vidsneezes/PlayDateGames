@@ -23,30 +23,6 @@
 
 local pd = playdate
 
--- Helper: Check if a boid is within the camera frame (not just viewport)
-local function isInCameraFrame(transform, camera)
-    local camX = camera.x
-    local camY = camera.y
-
-    -- Convert world coordinates to screen coordinates
-    local screenX = transform.x - camX
-    local screenY = transform.y - camY
-
-    -- Camera frame bounds (matching boid_scene.lua frame)
-    local frameInset = 40
-    local statusBarHeight = 35
-    local gaugeWidth = 30
-
-    local frameLeft = frameInset
-    local frameTop = frameInset
-    local frameRight = frameInset + (SCREEN_WIDTH - (frameInset * 2))
-    local frameBottom = frameInset + ((SCREEN_HEIGHT - statusBarHeight) - (frameInset * 2))
-
-    -- Check if boid is within frame bounds
-    return screenX >= frameLeft and screenX <= frameRight and
-           screenY >= frameTop and screenY <= frameBottom
-end
-
 HappinessCrankSystem = System.new("happinessCrank", {"transform", "emotionalBattery"}, function(entities, scene)
     -- Crank only works while paused in influence mode
     if not scene.isPaused or scene.currentMode ~= "influence" then

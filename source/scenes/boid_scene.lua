@@ -36,25 +36,6 @@ function BoidScene()
     scene.explosionsHappy = 0  -- exploded at 100 happiness
     scene.explosionsAngry = 0  -- exploded at 0 happiness
 
-    -- Helper: Create temporary sprite for each emotion type
-    -- PLACEHOLDER SHAPES RE-ENABLED at 32x32 for testing
-    local function createBoidSprite(emotionType)
-        local img = boidSpriteHappy
-
-        if emotionType == "happy" then
-            -- Triangle (pointing up)
-            img = boidSpriteHappy
-        elseif emotionType == "sad" then
-            -- Circle
-            img = boidSpriteSad
-        elseif emotionType == "angry" then
-            -- Square
-            img = boidSpriteAngry
-        end
-
-        return img
-    end
-
     -- Helper: Spawn multiple boids with random positions and emotions
     local function spawnRandomBoids(scene, count)
         local worldW = scene.camera.worldWidth
@@ -85,7 +66,7 @@ function BoidScene()
             local boid = Entity.new({
                 transform = Transform(x, y),
                 velocity = Velocity(0, 0),
-                boidsprite = BoidSpriteComp(createBoidSprite(emotionType)),
+                boidsprite = BoidSpriteComp(createEmotionSprite(emotionType)),
                 emotionalBattery = EmotionalBattery(initialBattery)
             })
 
@@ -182,30 +163,36 @@ function BoidScene()
             local allHappy = true
             local allAngry = true
             local boidCount = 0
+            local capturedCount = 0
 
             for _, entity in ipairs(self.entities) do
                 if entity.emotionalBattery then
-                    boidCount += 1
+                    if entity.captured then
+                        capturedCount += 1
+                    else
+                        -- Only count non-captured boids for happiness check
+                        boidCount += 1
 
-                    -- Check happiness (battery > 60)
-                    if entity.emotionalBattery.value <= 60 then
-                        allHappy = false
-                    end
+                        -- Check happiness (battery > 60)
+                        if entity.emotionalBattery.value <= 60 then
+                            allHappy = false
+                        end
 
-                    -- Check if angry (has angryBoid component)
-                    if not entity.angryBoid then
-                        allAngry = false
+                        -- Check if angry (has angryBoid component)
+                        if not entity.angryBoid then
+                            allAngry = false
+                        end
                     end
                 end
             end
 
-            -- Win if all boids are happy (and there are boids)
-            if allHappy and boidCount > 0 then
+            -- Win if all non-captured boids are happy OR if everything is captured
+            if (allHappy and boidCount >= 0) or (boidCount == 0 and capturedCount > 0) then
                 GAME_WORLD:queueScene(WinScene(self.totalBoidCount, self.explosionsHappy, self.explosionsAngry))
                 return
             end
 
-            -- Lose if all boids are angry (and there are boids)
+            -- Lose if all non-captured boids are angry (and there are uncaptured boids)
             if allAngry and boidCount > 0 then
                 GAME_WORLD:queueScene(LoseScene())
                 return
