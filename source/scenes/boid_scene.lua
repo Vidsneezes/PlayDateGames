@@ -16,12 +16,12 @@ local gfx = playdate.graphics
 function BoidScene()
     local scene = Scene.new("boid")
 
-    -- Camera for scrolling world (larger for chaotic gameplay testing)
+    -- Camera for scrolling world (4x viewport area)
     scene.camera = {
         x = 0,
         y = 0,
-        worldWidth = SCREEN_WIDTH * 4,   -- 1600 (4x width - very spread out)
-        worldHeight = SCREEN_HEIGHT * 4  -- 960 (4x height - very spread out)
+        worldWidth = SCREEN_WIDTH * 2,   -- 800 (2x width = 4x area total)
+        worldHeight = SCREEN_HEIGHT * 2  -- 480 (2x height = 4x area total)
     }
 
     -- Helper: Create temporary sprite for each emotion type
@@ -104,7 +104,7 @@ function BoidScene()
 
         -- Spawn test boids
         -- ADJUST THIS NUMBER to test performance
-        local BOID_COUNT = 50 -- Compromise between 20 (develop) and 100 (main)
+        local BOID_COUNT = 10  -- Small count for testing gameplay feel
         spawnRandomBoids(self, BOID_COUNT)
     end
 
