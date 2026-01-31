@@ -25,7 +25,7 @@ function WinScene()
         gfx.drawTextAligned("Press A to play again", 200, 140, kTextAlignment.center)
 
         if playdate.buttonJustPressed(playdate.kButtonA) then
-            GAME_WORLD:queueScene(BoidScene())
+            GAME_WORLD:queueScene(CreditScene())
         end
     end
 

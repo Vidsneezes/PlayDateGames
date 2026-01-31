@@ -50,6 +50,7 @@ import "scenes/win_scene"
 import "scenes/gameover_scene"
 import "scenes/visualtest_scene"
 import "scenes/test_audio_scene"
+import "scenes/credits_scene"
 
 -- Boot
 GAME_WORLD = World.new()

@@ -120,6 +120,10 @@ function BoidScene()
             self.isPaused = not self.isPaused
         end
 
+        if playdate.buttonJustPressed(playdate.kButtonB) then
+            GAME_WORLD:queueScene(WinScene())
+        end
+
         Scene.update(self)  -- runs all registered systems
 
         -- Check win condition: all boids are happy (battery > 60)
