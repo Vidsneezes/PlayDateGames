@@ -34,6 +34,11 @@ local function isVisible(transform, camera)
 end
 
 HappinessCrankSystem = System.new("happinessCrank", {"transform", "emotionalBattery"}, function(entities, scene)
+    -- Crank only works while paused
+    if not scene.isPaused then
+        return
+    end
+
     -- Get crank rotation
     local crankChange = pd.getCrankChange()
 

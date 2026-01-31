@@ -36,6 +36,11 @@ CameraSystem = System.new("camera", {}, function(entities, scene)
         return
     end
 
+    -- Camera frozen while paused
+    if scene.isPaused then
+        return
+    end
+
     local cam = scene.camera
     local speed = 10  -- pixels per frame at 30 FPS (fast for chaotic gameplay)
 

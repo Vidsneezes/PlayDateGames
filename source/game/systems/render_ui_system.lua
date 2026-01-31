@@ -31,6 +31,11 @@ end
 RenderUISystem = System.new("renderUI", {"transform", "emotionalBattery"}, function(entities, scene)
     if not scene.camera then return end
 
+    -- Only show happiness gauge while paused
+    if not scene.isPaused then
+        return
+    end
+
     -- Find visible boids and calculate happiness
     local visibleCount = 0
     local totalHappiness = 0
