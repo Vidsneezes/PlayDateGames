@@ -27,17 +27,17 @@ function BoidScene()
     -- Helper: Create temporary sprite for each emotion type
     -- PLACEHOLDER SHAPES RE-ENABLED at 32x32 for testing
     local function createBoidSprite(emotionType)
-        local img = emotionAngry
+        local img = boidSpriteHappy
 
         if emotionType == "happy" then
             -- Triangle (pointing up)
-            img = emotionHappy
+            img = boidSpriteHappy
         elseif emotionType == "sad" then
             -- Circle
-            img = emotionSad
+            img = boidSpriteSad
         elseif emotionType == "angry" then
             -- Square
-            img = emotionAngry
+            img = boidSpriteAngry
         end
 
         return img
@@ -72,7 +72,7 @@ function BoidScene()
             local boid = Entity.new({
                 transform = Transform(x, y),
                 velocity = Velocity(0, 0),
-                boidsprite = BoidSpriteComp(bodyImage,createBoidSprite(emotionType)),
+                boidsprite = BoidSpriteComp(createBoidSprite(emotionType)),
                 emotionalBattery = EmotionalBattery(initialBattery)
             })
 

@@ -21,14 +21,14 @@ local gfx = playdate.graphics
 -- Helper: Create sprite for emotion type
 -- PLACEHOLDER SHAPES RE-ENABLED at 32x32 for testing
 local function createEmotionSprite(emotionType)
-    local img = emotionSad
+    local img = boidSpriteHappy
 
     if emotionType == "happy" then
-        img = emotionHappy
+        img = boidSpriteHappy
     elseif emotionType == "sad" then
-        img = emotionSad
+        img = boidSpriteSad
     elseif emotionType == "angry" then
-        img = emotionAngry  -- Square
+        img = boidSpriteAngry -- Square
     end
 
     return img
@@ -115,7 +115,7 @@ EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity"
             if e.sprite then
                 e.sprite.image = newImage
             elseif e.boidsprite and e.boidsprite.body then
-                e.boidsprite.bubble:setImage(newImage)
+                e.boidsprite.body:setImage(newImage)
             end
         end
     end

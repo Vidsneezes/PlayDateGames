@@ -13,11 +13,8 @@
 -- Visual representation (used by RenderSystem)
 function BoidSpriteComp(imgBody, imgBubble)
     local spriteBody = playdate.graphics.sprite.new(imgBody)
-    local spriteBubble = playdate.graphics.sprite.new(imgBubble)
-    spriteBubble:add()
     spriteBody:add()
     return {
-        bubble = spriteBubble,
         body = spriteBody,      
         visible = true,
     }
