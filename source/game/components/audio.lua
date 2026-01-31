@@ -21,3 +21,12 @@ function AudioSource(player)
         shouldPlay = false, -- set to true to trigger playback
     }
 end
+
+-- Component for purely synthesized audio (no files)
+-- Used by SynthSystem + SoundBank
+function SynthEmitter()
+    return {
+        sfxTriggers = {},   -- List of SFX names to play this frame: { "jump", "coin" }
+        musicTrigger = nil, -- Music command to set this frame: "theme" or "stop"
+    }
+end
