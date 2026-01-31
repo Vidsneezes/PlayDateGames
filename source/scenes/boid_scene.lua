@@ -61,14 +61,14 @@ function BoidScene()
             -- Random emotion
             local emotionType = emotions[math.random(1, 3)]
 
-            -- Set initial battery based on emotion (max for their range)
-            local initialBattery = 100
+            -- Set initial battery based on emotion (safe values, not at explosion thresholds)
+            local initialBattery = 80
             if emotionType == "happy" then
-                initialBattery = 100  -- Max for happy (61-100)
+                initialBattery = 80   -- Safe for happy (61-99, avoiding 100 explosion)
             elseif emotionType == "sad" then
-                initialBattery = 60   -- Max for sad (31-60)
+                initialBattery = 50   -- Mid-range for sad (31-60)
             elseif emotionType == "angry" then
-                initialBattery = 30   -- Max for angry (0-30)
+                initialBattery = 20   -- Safe for angry (1-30, avoiding 0 explosion)
             end
 
             -- Create boid with appropriate component
