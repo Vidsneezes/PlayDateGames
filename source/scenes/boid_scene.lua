@@ -102,7 +102,7 @@ function BoidScene()
         self:addSystem(RenderClearSystem)        -- Clear screen to white
         self:addSystem(RenderBackgroundSystem)   -- Draw grass tilemap
         self:addSystem(RenderSpriteSystem)       -- Draw boid sprites
-        self:addSystem(RenderUISystem)           -- Draw UI last
+        -- self:addSystem(RenderUISystem)           -- Happiness gauge (DISABLED - using individual HP bars)
 
         -- Spawn test boids
         -- ADJUST THIS NUMBER to test performance
@@ -181,32 +181,28 @@ function BoidScene()
         gfx.drawText("Happy: " .. happyCount .. "  Sad: " .. sadCount .. "  Angry: " .. angryCount, 10, statusY)
 
         -- Draw pause state indicator in lower right (UI area)
-        local pauseText = self.isPaused and "⏸ PAUSED" or "▶ PLAYING"
+        local pauseText = self.isPaused and "PAUSED" or "PLAYING"
         local textWidth = gfx.getTextSize(pauseText)
+        local boxPadding = 5  -- larger box
         local pauseX = SCREEN_WIDTH - textWidth - 15
         local pauseY = SCREEN_HEIGHT - statusBarHeight + 10
 
-        -- Inverted colors when paused (white on black)
-        if self.isPaused then
-            gfx.setColor(gfx.kColorBlack)
-            gfx.fillRect(pauseX - 3, pauseY - 2, textWidth + 6, 18)
-            gfx.setColor(gfx.kColorWhite)
-            gfx.drawText(pauseText, pauseX, pauseY)
-        else
-            -- Normal style when playing (black on white)
-            gfx.setColor(gfx.kColorWhite)
-            gfx.fillRect(pauseX - 3, pauseY - 2, textWidth + 6, 18)
-            gfx.setColor(gfx.kColorBlack)
-            gfx.drawRect(pauseX - 3, pauseY - 2, textWidth + 6, 18)
-            gfx.drawText(pauseText, pauseX, pauseY)
-        end
+        -- Simple box with black text (same style for both states)
+        gfx.setColor(gfx.kColorWhite)
+        gfx.fillRect(pauseX - boxPadding, pauseY - 3, textWidth + boxPadding * 2, 20)
+        gfx.setColor(gfx.kColorBlack)
+        gfx.drawRect(pauseX - boxPadding, pauseY - 3, textWidth + boxPadding * 2, 20)
+        gfx.drawText(pauseText, pauseX, pauseY)
 
-        -- Draw camera frame (playable area excluding UI with padding)
-        local padding = 10
-        local playLeft = padding
-        local playTop = padding
-        local playRight = SCREEN_WIDTH - gaugeWidth - padding
-        local playBottom = SCREEN_HEIGHT - statusBarHeight - padding
+        -- Draw camera frame (smaller and centered, ignoring gauge for centering)
+        local frameInset = 40  -- distance from edges (larger = smaller frame)
+        local frameWidth = SCREEN_WIDTH - (frameInset * 2)
+        local frameHeight = (SCREEN_HEIGHT - statusBarHeight) - (frameInset * 2)
+
+        local playLeft = frameInset
+        local playTop = frameInset
+        local playRight = frameInset + frameWidth
+        local playBottom = frameInset + frameHeight
 
         -- Top-left corner
         gfx.drawLine(playLeft, playTop, playLeft + frameSize, playTop)
