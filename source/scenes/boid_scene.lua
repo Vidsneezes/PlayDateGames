@@ -60,11 +60,22 @@ function BoidScene()
             -- Random emotion
             local emotionType = emotions[math.random(1, 3)]
 
+            -- Set initial battery based on emotion (max for their range)
+            local initialBattery = 100
+            if emotionType == "happy" then
+                initialBattery = 100  -- Max for happy (61-100)
+            elseif emotionType == "sad" then
+                initialBattery = 60   -- Max for sad (31-60)
+            elseif emotionType == "angry" then
+                initialBattery = 30   -- Max for angry (0-30)
+            end
+
             -- Create boid with appropriate component
             local boid = Entity.new({
                 transform = Transform(x, y),
                 velocity = Velocity(0, 0),
-                boidsprite = BoidSpriteComp(boidRectangle, bubbleImage)
+                boidsprite = BoidSpriteComp(createBoidSprite(emotionType), bubbleImage),
+                emotionalBattery = EmotionalBattery(initialBattery)
             })
 
             -- Add emotion component based on type
@@ -83,15 +94,16 @@ function BoidScene()
     function scene:onEnter()
         -- Register systems in execution order
         self:addSystem(CameraSystem)
+        self:addSystem(HappinessCrankSystem)     -- Read crank input first
+        self:addSystem(EmotionalBatterySystem)   -- Update emotions after happiness changes
         self:addSystem(BoidSystem)
-        -- self:addSystem(PhysicsSystem)
-        --self:addSystem(RenderSystem)
-        --self:addSystem(BoidRenderSystem)
+        -- self:addSystem(PhysicsSystem) -- BoidSystem handles physics for boids now
+        -- self:addSystem(RenderSystem) -- BoidSystem handles rendering for boids now
+        self:addSystem(HappinessUISystem)        -- Draw UI last
 
         -- Spawn test boids
-        -- ADJUST THIS NUMBER to test performance (3, 50, 100, etc.)
-        -- 40 leads to 23 fps
-        local BOID_COUNT = 100
+        -- ADJUST THIS NUMBER to test performance
+        local BOID_COUNT = 50 -- Compromise between 20 (develop) and 100 (main)
         spawnRandomBoids(self, BOID_COUNT)
     end
 
