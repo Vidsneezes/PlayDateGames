@@ -1,23 +1,40 @@
 --[[
-    EMOTION COMPONENT
-    Defines the emotional state of a boid, which drives its behavior.
+    EMOTION COMPONENTS
+    Separate components for each boid emotion type.
+    Each has its own parameters for customization.
 
     Usage:
-        local boid = Entity.new({
+        local happyBoid = Entity.new({
             transform = Transform(100, 50),
             velocity = Velocity(0, 0),
-            emotion = Emotion("happy"),
+            happyBoid = HappyBoid(),  -- or HappyBoid(2.0) for custom speed
             sprite = SpriteComp(image)
         })
 
     Emotion types:
-        "happy" - moves toward center of world
-        "sad"   - moves toward nearest edge of world
-        "angry" - moves toward closest non-angry boid
+        HappyBoid - moves toward center of world
+        SadBoid   - moves toward nearest edge of world
+        AngryBoid - moves toward closest non-angry boid
 ]]
 
-function Emotion(type)
+-- Happy boids move toward the center of the world
+function HappyBoid(speed)
     return {
-        type = type,  -- "happy", "sad", or "angry"
+        speed = speed or 1.5,  -- movement speed
+    }
+end
+
+-- Sad boids move toward the nearest edge of the world
+function SadBoid(speed)
+    return {
+        speed = speed or 1.0,  -- movement speed
+    }
+end
+
+-- Angry boids chase other (non-angry) boids
+function AngryBoid(speed, detectionRange)
+    return {
+        speed = speed or 2.0,              -- movement speed
+        detectionRange = detectionRange or 999,  -- how far they can detect targets
     }
 end

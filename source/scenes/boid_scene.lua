@@ -57,7 +57,7 @@ function BoidScene()
         local boid1 = Entity.new({
             transform = Transform(100, 60),  -- top-left quadrant (happy)
             velocity = Velocity(0, 0),
-            emotion = Emotion("happy"),
+            happyBoid = HappyBoid(),  -- uses default speed (1.5)
             sprite = SpriteComp(createBoidSprite("happy"))
         })
         self:addEntity(boid1)
@@ -65,7 +65,7 @@ function BoidScene()
         local boid2 = Entity.new({
             transform = Transform(300, 180),  -- bottom-right quadrant (sad)
             velocity = Velocity(0, 0),
-            emotion = Emotion("sad"),
+            sadBoid = SadBoid(),  -- uses default speed (1.0)
             sprite = SpriteComp(createBoidSprite("sad"))
         })
         self:addEntity(boid2)
@@ -73,7 +73,7 @@ function BoidScene()
         local boid3 = Entity.new({
             transform = Transform(350, 80),  -- top-right area (angry)
             velocity = Velocity(0, 0),
-            emotion = Emotion("angry"),
+            angryBoid = AngryBoid(),  -- uses default speed (2.0) and detection range
             sprite = SpriteComp(createBoidSprite("angry"))
         })
         self:addEntity(boid3)

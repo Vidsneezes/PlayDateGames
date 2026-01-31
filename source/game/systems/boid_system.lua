@@ -1,10 +1,12 @@
 --[[
     BOID SYSTEM
-    Controls boid movement based on emotional state.
+    Controls boid movement based on emotional component type.
 
     Happy boids → move toward world center
     Sad boids   → move toward nearest world edge
     Angry boids → move toward closest non-angry boid
+
+    Each emotion component has its own parameters (speed, detection range, etc.)
 
     ── Playdate SDK Quick Reference ──────────────────────
 
@@ -30,13 +32,16 @@ local function normalize(dx, dy, speed)
     return 0, 0
 end
 
-BoidSystem = System.new("boid", {"transform", "velocity", "emotion"}, function(entities, scene)
+-- BoidSystem processes entities with transform and velocity
+-- It checks for emotion components and applies appropriate behaviors
+BoidSystem = System.new("boid", {"transform", "velocity"}, function(entities, scene)
     for _, e in ipairs(entities) do
         local t = e.transform
         local v = e.velocity
-        local emotion = e.emotion
 
-        if emotion.type == "happy" then
+        -- Handle Happy Boids
+        if e.happyBoid then
+            local happy = e.happyBoid
             -- Move toward world center
             local worldW = scene.camera and scene.camera.worldWidth or WORLD_WIDTH
             local worldH = scene.camera and scene.camera.worldHeight or WORLD_HEIGHT
@@ -44,9 +49,11 @@ BoidSystem = System.new("boid", {"transform", "velocity", "emotion"}, function(e
             local targetY = worldH / 2
             local dx = targetX - t.x
             local dy = targetY - t.y
-            v.dx, v.dy = normalize(dx, dy, 1.5)
+            v.dx, v.dy = normalize(dx, dy, happy.speed)
 
-        elseif emotion.type == "sad" then
+        -- Handle Sad Boids
+        elseif e.sadBoid then
+            local sad = e.sadBoid
             -- Move toward nearest world edge
             local worldW = scene.camera and scene.camera.worldWidth or WORLD_WIDTH
             local worldH = scene.camera and scene.camera.worldHeight or WORLD_HEIGHT
@@ -73,20 +80,24 @@ BoidSystem = System.new("boid", {"transform", "velocity", "emotion"}, function(e
 
             local dx = targetX - t.x
             local dy = targetY - t.y
-            v.dx, v.dy = normalize(dx, dy, 1.0)
+            v.dx, v.dy = normalize(dx, dy, sad.speed)
 
-        elseif emotion.type == "angry" then
+        -- Handle Angry Boids
+        elseif e.angryBoid then
+            local angry = e.angryBoid
             -- Move toward closest non-angry boid
-            local allBoids = scene:getEntitiesWith("emotion")
             local closestDist = math.huge
             local closestBoid = nil
 
-            for _, other in ipairs(allBoids) do
-                if other.id ~= e.id and other.emotion.type ~= "angry" then
-                    local dist = distance(t.x, t.y, other.transform.x, other.transform.y)
-                    if dist < closestDist then
-                        closestDist = dist
-                        closestBoid = other
+            -- Check all entities for non-angry boids (happy or sad)
+            for _, other in ipairs(scene.entities) do
+                if other.active and other.id ~= e.id then
+                    if other.happyBoid or other.sadBoid then
+                        local dist = distance(t.x, t.y, other.transform.x, other.transform.y)
+                        if dist < closestDist and dist <= angry.detectionRange then
+                            closestDist = dist
+                            closestBoid = other
+                        end
                     end
                 end
             end
@@ -94,7 +105,7 @@ BoidSystem = System.new("boid", {"transform", "velocity", "emotion"}, function(e
             if closestBoid then
                 local dx = closestBoid.transform.x - t.x
                 local dy = closestBoid.transform.y - t.y
-                v.dx, v.dy = normalize(dx, dy, 2.0)
+                v.dx, v.dy = normalize(dx, dy, angry.speed)
             else
                 -- No target, stay still
                 v.dx, v.dy = 0, 0
