@@ -14,21 +14,21 @@ import "ecs/system"
 import "ecs/scene"
 import "ecs/world"
 
--- Components (one file per domain -- add new imports here as needed)
-import "components/core"
-import "components/input"
-import "components/visual"
-import "components/collision"
-import "components/audio"
+-- Game Components (one file per domain -- add new imports here as needed)
+import "game/components/core"
+import "game/components/input"
+import "game/components/visual"
+import "game/components/collision"
+import "game/components/audio"
 
--- Systems (each file is independent -- safe to edit in parallel)
-import "systems/camera_system"
-import "systems/physics_system"
-import "systems/player_system"
-import "systems/crank_system"
-import "systems/collision_system"
-import "systems/audio_system"
-import "systems/render_system"
+-- Game Systems (each file is independent -- safe to edit in parallel)
+import "game/systems/camera_system"
+import "game/systems/physics_system"
+import "game/systems/player_system"
+import "game/systems/crank_system"
+import "game/systems/collision_system"
+import "game/systems/audio_system"
+import "game/systems/render_system"
 
 -- Scenes
 import "scenes/menu_scene"
