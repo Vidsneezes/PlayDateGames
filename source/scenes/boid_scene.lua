@@ -94,6 +94,7 @@ function BoidScene()
         self:addSystem(CameraSystem)
         self:addSystem(HappinessCrankSystem)     -- Read crank input first
         self:addSystem(EmotionalBatterySystem)   -- Update emotions after happiness changes
+        self:addSystem(EmotionInfluenceSystem)   -- Proximity effects (comment out if too slow)
         self:addSystem(BoidSystem)               -- Update boid AI and sprites
         self:addSystem(RenderClearSystem)        -- Clear screen to white
         self:addSystem(RenderBackgroundSystem)   -- Draw grass tilemap
