@@ -28,7 +28,7 @@ local function isVisible(transform, camera)
            transform.y >= camY and transform.y <= camY + SCREEN_HEIGHT
 end
 
-HappinessUISystem = System.new("happinessUI", {"transform", "emotionalBattery"}, function(entities, scene)
+RenderUISystem = System.new("renderUI", {"transform", "emotionalBattery"}, function(entities, scene)
     if not scene.camera then return end
 
     -- Find visible boids and calculate happiness
