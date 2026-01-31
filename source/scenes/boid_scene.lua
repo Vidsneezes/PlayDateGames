@@ -112,6 +112,8 @@ function BoidScene()
 
     function scene:onExit()
         -- Clean up if needed
+        bgset = false
+        playdate.graphics.sprite.removeAll()
     end
 
     function scene:update()

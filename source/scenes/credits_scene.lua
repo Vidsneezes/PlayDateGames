@@ -30,7 +30,7 @@ function CreditScene()
         gfx.drawTextAligned("Vidsneeze(Oscar)", 200, 250+ ypos, kTextAlignment.center)
 
         if playdate.buttonJustPressed(playdate.kButtonA) then
-            GAME_WORLD:queueScene(BoidScene())
+            GAME_WORLD:queueScene(MenuScene())
         end
     end
 
