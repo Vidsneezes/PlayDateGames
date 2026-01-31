@@ -84,12 +84,13 @@ function BoidScene()
         -- Register systems in execution order
         self:addSystem(CameraSystem)
         self:addSystem(BoidSystem)
-        self:addSystem(PhysicsSystem)
-        self:addSystem(RenderSystem)
-        self:addSystem(BoidRenderSystem)
+        -- self:addSystem(PhysicsSystem)
+        --self:addSystem(RenderSystem)
+        --self:addSystem(BoidRenderSystem)
 
         -- Spawn test boids
         -- ADJUST THIS NUMBER to test performance (3, 50, 100, etc.)
+        -- 40 leads to 23 fps
         local BOID_COUNT = 100
         spawnRandomBoids(self, BOID_COUNT)
     end
@@ -100,6 +101,7 @@ function BoidScene()
 
     function scene:update()
         Scene.update(self)  -- runs all registered systems
+        gfx.sprite.update()
 
         -- Draw debug HUD
         gfx.setColor(gfx.kColorBlack)

@@ -34,10 +34,11 @@ end
 
 -- BoidSystem processes entities with transform and velocity
 -- It checks for emotion components and applies appropriate behaviors
-BoidSystem = System.new("boid", {"transform", "velocity"}, function(entities, scene)
+BoidSystem = System.new("boid", {"transform", "velocity", "boidsprite"}, function(entities, scene)
     for _, e in ipairs(entities) do
         local t = e.transform
         local v = e.velocity
+        local s = e.boidsprite
 
         -- Handle Happy Boids
         if e.happyBoid then
@@ -99,32 +100,25 @@ BoidSystem = System.new("boid", {"transform", "velocity"}, function(entities, sc
 
         -- Handle Angry Boids
         elseif e.angryBoid then
-            local angry = e.angryBoid
-            -- Move toward closest non-angry boid
-            local closestDist = math.huge
-            local closestBoid = nil
+          
+        end
+        t.x += v.dx
+        t.y += v.dy
 
-            -- Check all entities for non-angry boids (happy or sad)
-            for _, other in ipairs(scene.entities) do
-                if other.active and other.id ~= e.id then
-                    if other.happyBoid or other.sadBoid then
-                        local dist = distance(t.x, t.y, other.transform.x, other.transform.y)
-                        if dist < closestDist and dist <= angry.detectionRange then
-                            closestDist = dist
-                            closestBoid = other
-                        end
-                    end
-                end
-            end
+        -- Render Boids
+          -- Get camera offset
+        local camX = 0
+        local camY = 0
+        if scene.camera then
+            camX = scene.camera.x
+            camY = scene.camera.y
+        end
 
-            if closestBoid then
-                local dx = closestBoid.transform.x - t.x
-                local dy = closestBoid.transform.y - t.y
-                v.dx, v.dy = normalize(dx, dy, angry.speed)
-            else
-                -- No target, stay still
-                v.dx, v.dy = 0, 0
-            end
+        if s.visible and s.bubble and s.body then
+            local screenX = t.x - camX
+            local screenY = t.y - camY
+            s.body:moveTo(screenX, screenY)
+            s.bubble:moveTo(screenX, screenY-12)
         end
     end
 end)
