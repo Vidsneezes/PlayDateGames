@@ -110,6 +110,9 @@ function BoidScene()
         -- ADJUST THIS NUMBER to test performance
         local BOID_COUNT = 10  -- Small count for testing gameplay feel
         spawnRandomBoids(self, BOID_COUNT)
+
+        -- Store total count for win screen
+        self.totalBoidCount = BOID_COUNT
     end
 
     function scene:onExit()
@@ -182,7 +185,7 @@ function BoidScene()
 
             -- Win if all boids are happy (and there are boids)
             if allHappy and boidCount > 0 then
-                GAME_WORLD:queueScene(WinScene())
+                GAME_WORLD:queueScene(WinScene(self.totalBoidCount))
                 return
             end
 
