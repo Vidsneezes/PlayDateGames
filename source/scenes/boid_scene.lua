@@ -16,12 +16,12 @@ local gfx = playdate.graphics
 function BoidScene()
     local scene = Scene.new("boid")
 
-    -- Camera for scrolling world (viewport-sized for testing)
+    -- Camera for scrolling world (4x viewport area for testing)
     scene.camera = {
         x = 0,
         y = 0,
-        worldWidth = SCREEN_WIDTH,   -- 400 (same as viewport for testing)
-        worldHeight = SCREEN_HEIGHT  -- 240 (same as viewport for testing)
+        worldWidth = SCREEN_WIDTH * 2,   -- 800 (2x width)
+        worldHeight = SCREEN_HEIGHT * 2  -- 480 (2x height)
     }
 
     -- Helper: Create temporary sprite for each emotion type
