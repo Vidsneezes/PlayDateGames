@@ -24,11 +24,11 @@ local function createEmotionSprite(emotionType)
     local img = boidSpriteHappy
 
     if emotionType == "happy" then
-        img = boidSpriteHappy
+        img = animationBoidHeadHappy:image()
     elseif emotionType == "sad" then
-        img = boidSpriteSad
+        img = animationBoidHeadSad:image()
     elseif emotionType == "angry" then
-        img = boidSpriteAngry -- Square
+        img = animationBoidHeadAngry:image()
     end
 
     return img
@@ -166,8 +166,8 @@ EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity"
             local newImage = createEmotionSprite(newEmotion)
             if e.sprite then
                 e.sprite.image = newImage
-            elseif e.boidsprite and e.boidsprite.body then
-                e.boidsprite.body:setImage(newImage)
+            elseif e.boidsprite and e.boidsprite.body and e.boidsprite.head then
+                e.boidsprite.head:setImage(newImage)
             end
         end
 

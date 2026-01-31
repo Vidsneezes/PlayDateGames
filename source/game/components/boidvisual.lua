@@ -11,11 +11,15 @@
 ]]
 
 -- Visual representation (used by RenderSystem)
-function BoidSpriteComp(imgBody, imgBubble)
-    local spriteBody = playdate.graphics.sprite.new(imgBody)
+function BoidSpriteComp(imgHead)
+    local spriteBody = playdate.graphics.sprite.new(animationBoidBodyMove:image())
     spriteBody:setOpaque(false)  -- Transparent background (don't cover grass)
     spriteBody:add()
+    local spriteHead = playdate.graphics.sprite.new(imgHead)
+    spriteHead:setOpaque(false)
+    spriteHead:add()
     return {
+        head = spriteHead,
         body = spriteBody,
         visible = true,
     }
