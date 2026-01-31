@@ -15,7 +15,7 @@
 
 local gfx = playdate.graphics
 
-RenderExplosionSystem = System.new("renderExplosion", {"transform", "exploding"}, function(entities, scene)
+RenderExplosionSystem = System.new("renderExplosion", { "transform", "exploding" }, function(entities, scene)
     -- Get camera offset
     local camX = 0
     local camY = 0
@@ -32,9 +32,12 @@ RenderExplosionSystem = System.new("renderExplosion", {"transform", "exploding"}
 
         -- Draw explosion square (placeholder)
         gfx.setColor(gfx.kColorBlack)
-        gfx.fillRect(screenX - explosionSize/2, screenY - explosionSize/2, explosionSize, explosionSize)
+        gfx.fillRect(screenX - explosionSize / 2, screenY - explosionSize / 2, explosionSize, explosionSize)
 
         -- Mark entity for deletion after drawing
         e.active = false
+
+        -- Play sfx sound
+        SynthPlaySound("explosion")
     end
 end)
