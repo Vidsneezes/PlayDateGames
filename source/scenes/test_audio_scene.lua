@@ -71,8 +71,8 @@ function TestAudioScene()
 
         -- MUSIC SECTION
         gfx.drawText("--- MUSIC (Multi-Track) ---", 20, 150)
-        gfx.drawText("A: Toggle Melody Layer", 40, 170)
-        gfx.drawText("B: Toggle Drums Layer", 40, 190)
+        gfx.drawText("A: Toggle Melody", 40, 170)
+        gfx.drawText("B: Toggle Drums", 40, 190)
 
         -- Visual Indicators for Tracks
         local function drawTrackStatus(name, y)
@@ -120,8 +120,9 @@ function TestAudioScene()
 
         -- Exit
         gfx.drawTextAligned("Crank: Menu", 200, 220, kTextAlignment.center)
+
         if playdate.isCrankDocked() == false then
-            -- Simple check to exit if crank moved (optional)
+            GAME_WORLD:setScene(MenuScene()) -- Simple check to exit if crank moved (optional)
         end
     end
 
