@@ -115,6 +115,12 @@ function BoidScene()
     function scene:update()
         Scene.update(self)  -- runs all registered systems
 
+        -- Reset game with A or B button
+        if playdate.buttonJustPressed(playdate.kButtonA) or playdate.buttonJustPressed(playdate.kButtonB) then
+            GAME_WORLD:queueScene(BoidScene())
+            return
+        end
+
         -- Count emotions in a single loop
         local happyCount = 0
         local sadCount = 0
@@ -130,10 +136,47 @@ function BoidScene()
             end
         end
 
-        -- Draw debug HUD
+        -- Draw camera frame visualization (playable area with padding for UI)
         gfx.setColor(gfx.kColorBlack)
+        local frameSize = 10  -- size of corner markers
+        local padLeft = 10
+        local padTop = 10
+        local padBottom = 10
+        local padRight = 35  -- extra padding for happiness bar on right
+
+        -- Playable area boundaries
+        local playLeft = padLeft
+        local playTop = padTop
+        local playRight = SCREEN_WIDTH - padRight
+        local playBottom = SCREEN_HEIGHT - padBottom
+
+        -- Top-left corner
+        gfx.drawLine(playLeft, playTop, playLeft + frameSize, playTop)
+        gfx.drawLine(playLeft, playTop, playLeft, playTop + frameSize)
+
+        -- Top-right corner
+        gfx.drawLine(playRight - frameSize, playTop, playRight, playTop)
+        gfx.drawLine(playRight, playTop, playRight, playTop + frameSize)
+
+        -- Bottom-left corner
+        gfx.drawLine(playLeft, playBottom, playLeft + frameSize, playBottom)
+        gfx.drawLine(playLeft, playBottom - frameSize, playLeft, playBottom)
+
+        -- Bottom-right corner
+        gfx.drawLine(playRight - frameSize, playBottom, playRight, playBottom)
+        gfx.drawLine(playRight, playBottom - frameSize, playRight, playBottom)
+
+        -- Center cross (in middle of playable area)
+        local centerX = (playLeft + playRight) / 2
+        local centerY = (playTop + playBottom) / 2
+        local crossSize = 5
+        gfx.drawLine(centerX - crossSize, centerY, centerX + crossSize, centerY)
+        gfx.drawLine(centerX, centerY - crossSize, centerX, centerY + crossSize)
+
+        -- Draw debug HUD
         gfx.drawText("Camera: (" .. math.floor(self.camera.x) .. ", " .. math.floor(self.camera.y) .. ")", 5, 5)
         gfx.drawText("Happy: " .. happyCount .. "  Sad: " .. sadCount .. "  Angry: " .. angryCount, 5, 220)
+        gfx.drawText("Press A or B to reset", SCREEN_WIDTH - 120, 5)
     end
 
     return scene
