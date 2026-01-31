@@ -38,3 +38,12 @@ function AngryBoid(speed, detectionRange)
         detectionRange = detectionRange or 999,  -- how far they can detect targets
     }
 end
+
+-- Emotional battery - determines emotion state over time
+-- 0-30: Angry, 31-60: Sad, 61+: Happy
+function EmotionalBattery(value)
+    return {
+        value = value or 100,  -- current battery level (0-100)
+        max = 100,
+    }
+end

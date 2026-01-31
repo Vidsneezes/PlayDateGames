@@ -24,6 +24,7 @@ import "game/components/emotion"
 
 -- Game Systems (each file is independent -- safe to edit in parallel)
 import "game/systems/camera_system"
+import "game/systems/emotional_battery_system"
 import "game/systems/boid_system"
 import "game/systems/physics_system"
 import "game/systems/player_system"
