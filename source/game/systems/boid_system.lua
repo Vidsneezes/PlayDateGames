@@ -39,6 +39,11 @@ BoidSystem = System.new("boid", {"transform", "velocity", "boidsprite"}, functio
     local isPaused = scene.isPaused or false
 
     for _, e in ipairs(entities) do
+        -- Skip captured boids (they're frozen)
+        if e.captured then
+            goto skipBoid
+        end
+
         local t = e.transform
         local v = e.velocity
         local s = e.boidsprite
@@ -174,5 +179,7 @@ BoidSystem = System.new("boid", {"transform", "velocity", "boidsprite"}, functio
             local screenY = t.y - camY
             s.body:moveTo(screenX, screenY)
         end
+
+        ::skipBoid::
     end
 end)

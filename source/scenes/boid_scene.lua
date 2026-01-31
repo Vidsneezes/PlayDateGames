@@ -27,6 +27,10 @@ function BoidScene()
     -- Pause state (starts playing)
     scene.isPaused = false
 
+    -- Current mode (influence = happiness, capture = freeze boids)
+    scene.currentMode = "influence"  -- "influence" or "capture"
+    scene.captureProgress = 0        -- progress toward capturing (0-180 degrees)
+
     -- Track explosions
     scene.explosionsHappy = 0  -- exploded at 100 happiness
     scene.explosionsAngry = 0  -- exploded at 0 happiness
@@ -99,7 +103,8 @@ function BoidScene()
     function scene:onEnter()
         -- Register systems in execution order
         self:addSystem(CameraSystem)
-        self:addSystem(HappinessCrankSystem)     -- Read crank input first
+        self:addSystem(HappinessCrankSystem)     -- Influence mode: crank UP for happiness
+        self:addSystem(CaptureCrankSystem)       -- Capture mode: crank DOWN to capture
         self:addSystem(EmotionalBatterySystem)   -- Update emotions after happiness changes
         self:addSystem(EmotionInfluenceSystem)   -- Proximity effects (comment out if too slow)
         self:addSystem(BoidSystem)               -- Update boid AI and sprites
@@ -107,6 +112,7 @@ function BoidScene()
         self:addSystem(RenderBackgroundSystem)   -- Draw grass tilemap
         self:addSystem(RenderSpriteSystem)       -- Draw boid sprites
         self:addSystem(RenderBoidHPSystem)       -- Draw HP bars on top of sprites
+        self:addSystem(RenderCapturedSystem)     -- Draw squares around captured boids
         self:addSystem(RenderExplosionSystem)    -- Draw explosions and cleanup
         -- self:addSystem(RenderUISystem)           -- Happiness gauge (DISABLED - using individual HP bars)
 
@@ -129,8 +135,14 @@ function BoidScene()
             self.isPaused = not self.isPaused
         end
 
-        -- B button increases happiness (crank alternative) - only while paused
-        if playdate.buttonJustPressed(playdate.kButtonB) and self.isPaused then
+        -- B button switches mode (while playing)
+        if playdate.buttonJustPressed(playdate.kButtonB) and not self.isPaused then
+            self.currentMode = (self.currentMode == "influence") and "capture" or "influence"
+            self.captureProgress = 0  -- reset capture progress when switching
+        end
+
+        -- B button increases happiness (crank alternative) - only while paused in influence mode
+        if playdate.buttonJustPressed(playdate.kButtonB) and self.isPaused and self.currentMode == "influence" then
             -- Helper: Check if a boid is within the camera frame
             local function isInCameraFrame(transform)
                 local camX = self.camera.x
@@ -230,22 +242,53 @@ function BoidScene()
         local statusY = SCREEN_HEIGHT - statusBarHeight + 10
         gfx.drawText("Happy: " .. happyCount .. "  Sad: " .. sadCount .. "  Angry: " .. angryCount, 10, statusY)
 
-        -- Draw pause state indicator in lower right (UI area)
-        local pauseText = self.isPaused and "PAUSED" or "PLAYING"
-        local textWidth = gfx.getTextSize(pauseText)
+        -- Draw mode indicator in lower right (UI area)
+        local modeText
+        if self.currentMode == "influence" then
+            modeText = self.isPaused and "Influencing" or "Mode: Influence"
+        else  -- capture mode
+            modeText = self.isPaused and "Capturing" or "Mode: Capture"
+        end
+
+        local textWidth = gfx.getTextSize(modeText)
         local boxPadding = 5  -- larger box
-        local pauseX = SCREEN_WIDTH - textWidth - 15
-        local pauseY = SCREEN_HEIGHT - statusBarHeight + 10
+        local modeX = SCREEN_WIDTH - textWidth - 15
+        local modeY = SCREEN_HEIGHT - statusBarHeight + 10
 
         -- Simple box with black text (same style for both states)
         gfx.setColor(gfx.kColorWhite)
-        gfx.fillRect(pauseX - boxPadding, pauseY - 3, textWidth + boxPadding * 2, 20)
+        gfx.fillRect(modeX - boxPadding, modeY - 3, textWidth + boxPadding * 2, 20)
         gfx.setColor(gfx.kColorBlack)
-        gfx.drawRect(pauseX - boxPadding, pauseY - 3, textWidth + boxPadding * 2, 20)
-        gfx.drawText(pauseText, pauseX, pauseY)
+        gfx.drawRect(modeX - boxPadding, modeY - 3, textWidth + boxPadding * 2, 20)
+        gfx.drawText(modeText, modeX, modeY)
 
-        -- Draw camera frame (smaller and centered, ignoring gauge for centering)
-        local frameInset = 40  -- distance from edges (larger = smaller frame)
+        -- Show capture progress bar when in capture mode and paused
+        if self.currentMode == "capture" and self.isPaused and self.captureProgress > 0 then
+            local progBarWidth = 60
+            local progBarHeight = 4
+            local progBarX = SCREEN_WIDTH - progBarWidth - 15
+            local progBarY = SCREEN_HEIGHT - statusBarHeight + 23
+
+            -- Background
+            gfx.setColor(gfx.kColorWhite)
+            gfx.fillRect(progBarX, progBarY, progBarWidth, progBarHeight)
+
+            -- Border
+            gfx.setColor(gfx.kColorBlack)
+            gfx.drawRect(progBarX, progBarY, progBarWidth, progBarHeight)
+
+            -- Fill based on progress (0-180 degrees)
+            local fillWidth = (self.captureProgress / 180) * progBarWidth
+            if fillWidth > 0 then
+                gfx.setColor(gfx.kColorBlack)
+                gfx.fillRect(progBarX + 1, progBarY + 1, fillWidth - 2, progBarHeight - 2)
+            end
+        end
+
+        -- Draw camera frame (size depends on mode)
+        -- Influence mode: normal frame (40px inset)
+        -- Capture mode: smaller frame (80px inset)
+        local frameInset = (self.currentMode == "capture") and 80 or 40
         local frameWidth = SCREEN_WIDTH - (frameInset * 2)
         local frameHeight = (SCREEN_HEIGHT - statusBarHeight) - (frameInset * 2)
 
