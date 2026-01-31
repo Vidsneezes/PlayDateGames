@@ -19,21 +19,24 @@
 local gfx = playdate.graphics
 
 -- Helper: Create sprite for emotion type
--- PLACEHOLDER SHAPES DISABLED - using real sprites now
+-- PLACEHOLDER SHAPES RE-ENABLED at 32x32 for testing
 local function createEmotionSprite(emotionType)
-    local img = gfx.image.new(16, 16, gfx.kColorWhite)
-    -- gfx.lockFocus(img)
-    -- gfx.setColor(gfx.kColorBlack)
+    local img = gfx.image.new(32, 32, gfx.kColorWhite)
+    gfx.lockFocus(img)
+    gfx.setColor(gfx.kColorBlack)
 
-    -- if emotionType == "happy" then
-    --     gfx.fillPolygon(8, 2, 14, 14, 2, 14)  -- Triangle
-    -- elseif emotionType == "sad" then
-    --     gfx.fillCircleAtPoint(8, 8, 7)  -- Circle
-    -- elseif emotionType == "angry" then
-    --     gfx.fillRect(2, 2, 12, 12)  -- Square
-    -- end
+    if emotionType == "happy" then
+        -- Triangle (pointing up) - scaled to 32x32
+        gfx.fillPolygon(16, 4, 28, 28, 4, 28)
+    elseif emotionType == "sad" then
+        -- Circle - scaled to 32x32
+        gfx.fillCircleAtPoint(16, 16, 14)
+    elseif emotionType == "angry" then
+        -- Square - scaled to 32x32
+        gfx.fillRect(4, 4, 24, 24)
+    end
 
-    -- gfx.unlockFocus()
+    gfx.unlockFocus()
     return img
 end
 
@@ -68,21 +71,21 @@ EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity"
             currentEmotion = "angry"
         end
 
-        -- Drain battery based on current emotion
+        -- Drain battery based on current emotion (increased rates for more challenge)
         if currentEmotion == "happy" then
-            battery.value -= 0.1
+            battery.value -= 0.2  -- was 0.1 (~5 sec to sad)
         elseif currentEmotion == "sad" then
             if hasStopped(v) then
                 -- At edge, drain faster
-                battery.value -= 0.15
+                battery.value -= 0.3  -- was 0.15 (~3.5 sec to angry)
             else
                 -- Moving, drain slower
-                battery.value -= 0.05
+                battery.value -= 0.1  -- was 0.05 (~10 sec to angry)
             end
         elseif currentEmotion == "angry" then
             -- Drain to 0 then stop
             if battery.value > 0 then
-                battery.value -= 0.01
+                battery.value -= 0.02  -- was 0.01
             end
         end
 
@@ -101,6 +104,9 @@ EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity"
             -- Add new emotion component
             if newEmotion == "happy" then
                 e.happyBoid = HappyBoid()
+                -- Reset velocity so BoidSystem picks a random cardinal direction
+                v.dx = 0
+                v.dy = 0
             elseif newEmotion == "sad" then
                 e.sadBoid = SadBoid()
             elseif newEmotion == "angry" then

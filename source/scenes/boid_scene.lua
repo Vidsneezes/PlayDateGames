@@ -16,33 +16,33 @@ local gfx = playdate.graphics
 function BoidScene()
     local scene = Scene.new("boid")
 
-    -- Camera for scrolling world (4x viewport area for testing)
+    -- Camera for scrolling world (larger for chaotic gameplay testing)
     scene.camera = {
         x = 0,
         y = 0,
-        worldWidth = SCREEN_WIDTH * 2,   -- 800 (2x width)
-        worldHeight = SCREEN_HEIGHT * 2  -- 480 (2x height)
+        worldWidth = SCREEN_WIDTH * 4,   -- 1600 (4x width - very spread out)
+        worldHeight = SCREEN_HEIGHT * 4  -- 960 (4x height - very spread out)
     }
 
     -- Helper: Create temporary sprite for each emotion type
-    -- PLACEHOLDER SHAPES DISABLED - using real sprites now
+    -- PLACEHOLDER SHAPES RE-ENABLED at 32x32 for testing
     local function createBoidSprite(emotionType)
-        local img = gfx.image.new(16, 16, gfx.kColorWhite)
-        -- gfx.lockFocus(img)
-        -- gfx.setColor(gfx.kColorBlack)
+        local img = gfx.image.new(32, 32, gfx.kColorWhite)
+        gfx.lockFocus(img)
+        gfx.setColor(gfx.kColorBlack)
 
-        -- if emotionType == "happy" then
-        --     -- Triangle (pointing up)
-        --     gfx.fillPolygon(8, 2, 14, 14, 2, 14)
-        -- elseif emotionType == "sad" then
-        --     -- Circle
-        --     gfx.fillCircleAtPoint(8, 8, 7)
-        -- elseif emotionType == "angry" then
-        --     -- Square
-        --     gfx.fillRect(2, 2, 12, 12)
-        -- end
+        if emotionType == "happy" then
+            -- Triangle (pointing up) - scaled to 32x32
+            gfx.fillPolygon(16, 4, 28, 28, 4, 28)
+        elseif emotionType == "sad" then
+            -- Circle - scaled to 32x32
+            gfx.fillCircleAtPoint(16, 16, 14)
+        elseif emotionType == "angry" then
+            -- Square - scaled to 32x32
+            gfx.fillRect(4, 4, 24, 24)
+        end
 
-        -- gfx.unlockFocus()
+        gfx.unlockFocus()
         return img
     end
 
@@ -50,7 +50,7 @@ function BoidScene()
     local function spawnRandomBoids(scene, count)
         local worldW = scene.camera.worldWidth
         local worldH = scene.camera.worldHeight
-        local spriteSize = 16
+        local spriteSize = 32  -- Updated to 32x32 for testing
         local emotions = {"happy", "sad", "angry"}
 
         for i = 1, count do

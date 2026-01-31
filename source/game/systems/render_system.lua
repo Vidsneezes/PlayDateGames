@@ -61,32 +61,33 @@ RenderSystem = System.new("render", {"transform", "sprite"}, function(entities, 
         camX = scene.camera.x
         camY = scene.camera.y
 
+        -- GRID DISABLED FOR TESTING
         -- Draw world background pattern
-        gfx.setColor(gfx.kColorBlack)
-        local gridSize = 40
-        local worldW = scene.camera.worldWidth
-        local worldH = scene.camera.worldHeight
+        -- gfx.setColor(gfx.kColorBlack)
+        -- local gridSize = 40
+        -- local worldW = scene.camera.worldWidth
+        -- local worldH = scene.camera.worldHeight
 
-        -- Draw grid lines (only visible portion)
-        local startX = math.floor(camX / gridSize) * gridSize
-        local startY = math.floor(camY / gridSize) * gridSize
+        -- -- Draw grid lines (only visible portion)
+        -- local startX = math.floor(camX / gridSize) * gridSize
+        -- local startY = math.floor(camY / gridSize) * gridSize
 
-        for x = startX, camX + SCREEN_WIDTH, gridSize do
-            local screenX = x - camX
-            gfx.drawLine(screenX, 0, screenX, SCREEN_HEIGHT)
-        end
+        -- for x = startX, camX + SCREEN_WIDTH, gridSize do
+        --     local screenX = x - camX
+        --     gfx.drawLine(screenX, 0, screenX, SCREEN_HEIGHT)
+        -- end
 
-        for y = startY, camY + SCREEN_HEIGHT, gridSize do
-            local screenY = y - camY
-            gfx.drawLine(0, screenY, SCREEN_WIDTH, screenY)
-        end
+        -- for y = startY, camY + SCREEN_HEIGHT, gridSize do
+        --     local screenY = y - camY
+        --     gfx.drawLine(0, screenY, SCREEN_WIDTH, screenY)
+        -- end
 
-        -- Draw world border
-        gfx.setLineWidth(2)
-        local borderX = 0 - camX
-        local borderY = 0 - camY
-        gfx.drawRect(borderX, borderY, worldW, worldH)
-        gfx.setLineWidth(1)
+        -- -- Draw world border
+        -- gfx.setLineWidth(2)
+        -- local borderX = 0 - camX
+        -- local borderY = 0 - camY
+        -- gfx.drawRect(borderX, borderY, worldW, worldH)
+        -- gfx.setLineWidth(1)
     end
 
     -- Draw entities with camera offset
