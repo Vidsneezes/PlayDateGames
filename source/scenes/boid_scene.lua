@@ -94,11 +94,11 @@ function BoidScene()
         self:addSystem(CameraSystem)
         self:addSystem(HappinessCrankSystem)     -- Read crank input first
         self:addSystem(EmotionalBatterySystem)   -- Update emotions after happiness changes
-        self:addSystem(BackgroundSystem)         -- Draw grass tilemap background
-        self:addSystem(BoidSystem)
-        -- self:addSystem(PhysicsSystem) -- BoidSystem handles physics for boids now
-        self:addSystem(RenderSystem) -- BoidSystem handles rendering for boids now
-        self:addSystem(HappinessUISystem)        -- Draw UI last
+        self:addSystem(BoidSystem)               -- Update boid AI and sprites
+        self:addSystem(RenderClearSystem)        -- Clear screen to white
+        self:addSystem(RenderBackgroundSystem)   -- Draw grass tilemap
+        self:addSystem(RenderSpriteSystem)       -- Draw boid sprites
+        self:addSystem(RenderUISystem)           -- Draw UI last
 
         -- Spawn test boids
         -- ADJUST THIS NUMBER to test performance

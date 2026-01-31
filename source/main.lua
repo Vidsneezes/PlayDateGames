@@ -29,14 +29,16 @@ import "game/systems/camera_system"
 import "game/systems/happiness_crank_system"
 import "game/systems/emotional_battery_system"
 import "game/systems/boid_system"
-import "game/systems/background_system"
+import "game/systems/render_clear_system"
+import "game/systems/render_background_system"
+import "game/systems/render_sprite_system"
+import "game/systems/render_ui_system"
 import "game/systems/physics_system"
 import "game/systems/player_system"
 import "game/systems/crank_system"
 import "game/systems/collision_system"
 import "game/systems/audio_system"
 import "game/systems/render_system"
-import "game/systems/happiness_ui_system"
 
 -- Scenes
 import "scenes/menu_scene"
@@ -51,6 +53,5 @@ GAME_WORLD = World.new()
 GAME_WORLD:setScene(MenuScene())
 
 function playdate.update()
-    playdate.graphics.sprite.update()  -- Draw sprites first
-    GAME_WORLD:update()  -- Draw background and UI on top
+    GAME_WORLD:update()  -- Systems control render order
 end

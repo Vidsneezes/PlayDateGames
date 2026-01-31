@@ -23,54 +23,43 @@
 
 local gfx = playdate.graphics
 
-BackgroundSystem = System.new("background", {}, function(entities, scene)
+RenderBackgroundSystem = System.new("renderBackground", {}, function(entities, scene)
     -- Create tilemap once if it doesn't exist
     if not scene.backgroundTilemap then
-        -- Load grass tiles
-        -- File: Images/grass-table-32-32.png (128x32 image with 4 tiles)
-        -- SDK automatically finds the -table-32-32 version when you load "Images/grass"
+        -- Load grass tiles (file: Images/grass-table-32-32.png)
         local grassTiles = gfx.imagetable.new("Images/grass")
 
         if not grassTiles then
-            print("ERROR: Failed to load grass tilemap from Images/grass-table-32-32.png")
+            print("ERROR: Failed to load Images/grass-table-32-32.png")
             return
         end
 
-        print("SUCCESS: Loaded grass tilemap with " .. grassTiles:getLength() .. " tiles")
-
-        -- Create tilemap
+        -- Create and configure tilemap
         local tilemap = gfx.tilemap.new()
         tilemap:setImageTable(grassTiles)
 
-        -- Calculate tilemap size based on world dimensions
-        -- Using 32x32 grass tiles
+        -- Calculate tilemap size (32x32 tiles)
         local tileSize = 32
         local worldW = scene.camera and scene.camera.worldWidth or 800
         local worldH = scene.camera and scene.camera.worldHeight or 480
         local tilesWide = math.ceil(worldW / tileSize)
         local tilesHigh = math.ceil(worldH / tileSize)
 
-        tilemap:setSize(32, 32)
+        tilemap:setSize(tilesWide, tilesHigh)
 
-        -- Fill tilemap with random grass tiles (1-4)
+        -- Fill with random grass tiles (1-4)
         for y = 1, tilesHigh do
             for x = 1, tilesWide do
-                local randomTile = math.random(1, 4)
-                tilemap:setTileAtPosition(x, y, randomTile)
+                tilemap:setTileAtPosition(x, y, math.random(1, 4))
             end
         end
 
-        -- Store tilemap on scene
         scene.backgroundTilemap = tilemap
         scene.backgroundTileSize = tileSize
     end
 
     -- Draw tilemap with camera offset
     if scene.backgroundTilemap and scene.camera then
-        local camX = scene.camera.x
-        local camY = scene.camera.y
-
-        -- Draw tilemap at negative camera position (world space)
-        scene.backgroundTilemap:draw(-camX, -camY)
+        scene.backgroundTilemap:draw(-scene.camera.x, -scene.camera.y)
     end
 end)
