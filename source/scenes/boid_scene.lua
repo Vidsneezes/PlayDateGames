@@ -103,6 +103,7 @@ function BoidScene()
         self:addSystem(RenderBackgroundSystem)   -- Draw grass tilemap
         self:addSystem(RenderSpriteSystem)       -- Draw boid sprites
         self:addSystem(RenderBoidHPSystem)       -- Draw HP bars on top of sprites
+        self:addSystem(RenderExplosionSystem)    -- Draw explosions and cleanup
         -- self:addSystem(RenderUISystem)           -- Happiness gauge (DISABLED - using individual HP bars)
 
         -- Spawn test boids
@@ -121,8 +122,36 @@ function BoidScene()
             self.isPaused = not self.isPaused
         end
 
-        if playdate.buttonJustPressed(playdate.kButtonB) then
-            GAME_WORLD:queueScene(WinScene())
+        -- B button increases happiness (crank alternative) - only while paused
+        if playdate.buttonJustPressed(playdate.kButtonB) and self.isPaused then
+            -- Helper: Check if a boid is within the camera frame
+            local function isInCameraFrame(transform)
+                local camX = self.camera.x
+                local camY = self.camera.y
+                local screenX = transform.x - camX
+                local screenY = transform.y - camY
+
+                local frameInset = 40
+                local statusBarHeight = 35
+                local frameLeft = frameInset
+                local frameTop = frameInset
+                local frameRight = frameInset + (SCREEN_WIDTH - (frameInset * 2))
+                local frameBottom = frameInset + ((SCREEN_HEIGHT - statusBarHeight) - (frameInset * 2))
+
+                return screenX >= frameLeft and screenX <= frameRight and
+                       screenY >= frameTop and screenY <= frameBottom
+            end
+
+            -- Find boids in frame and increase happiness
+            local happinessIncrease = 10  -- Fixed amount per B press
+            for _, entity in ipairs(self.entities) do
+                if entity.emotionalBattery and entity.transform then
+                    if isInCameraFrame(entity.transform) then
+                        entity.emotionalBattery.value += happinessIncrease
+                        entity.emotionalBattery.value = clamp(entity.emotionalBattery.value, 0, 100)
+                    end
+                end
+            end
         end
 
         Scene.update(self)  -- runs all registered systems

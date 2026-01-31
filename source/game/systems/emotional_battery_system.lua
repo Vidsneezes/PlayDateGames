@@ -58,6 +58,20 @@ EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity"
         local battery = e.emotionalBattery
         local v = e.velocity
 
+        -- Check for explosion FIRST (before drain) - battery at 0 or 100
+        if battery.value <= 0 or battery.value >= 100 then
+            -- Mark entity as exploding (will be drawn and deleted by explosion system)
+            e.exploding = Exploding()
+
+            -- Remove sprite from display list immediately
+            if e.boidsprite and e.boidsprite.body then
+                e.boidsprite.body:remove()
+            end
+
+            -- Skip rest of processing for this entity
+            goto continue
+        end
+
         -- Determine current emotion type
         local currentEmotion = nil
         if e.happyBoid then
@@ -88,27 +102,6 @@ EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity"
 
         -- Clamp battery value
         battery.value = clamp(battery.value, 0, battery.max)
-
-        -- Check for explosion (battery at 0 or 100)
-        if battery.value <= 0 or battery.value >= 100 then
-            -- Draw explosion square (placeholder)
-            local camX = 0
-            local camY = 0
-            if scene.camera then
-                camX = scene.camera.x
-                camY = scene.camera.y
-            end
-
-            local screenX = e.transform.x - camX
-            local screenY = e.transform.y - camY
-            local explosionSize = 40
-
-            gfx.setColor(gfx.kColorBlack)
-            gfx.fillRect(screenX - explosionSize/2, screenY - explosionSize/2, explosionSize, explosionSize)
-
-            -- Mark entity for deletion
-            e.active = false
-        end
 
         -- Check if emotion should change
         local newEmotion = getEmotionFromBattery(battery.value)
@@ -142,5 +135,7 @@ EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity"
                 e.boidsprite.body:setImage(newImage)
             end
         end
+
+        ::continue::
     end
 end)

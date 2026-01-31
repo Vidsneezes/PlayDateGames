@@ -28,6 +28,11 @@ RenderBoidHPSystem = System.new("renderBoidHP", {"transform", "emotionalBattery"
 
     -- Draw HP bar for each boid
     for _, e in ipairs(entities) do
+        -- Skip exploding entities
+        if e.exploding then
+            goto continue
+        end
+
         local t = e.transform
         local battery = e.emotionalBattery
 
@@ -59,5 +64,7 @@ RenderBoidHPSystem = System.new("renderBoidHP", {"transform", "emotionalBattery"
         local midX = barX + (barWidth / 2)
         gfx.setColor(gfx.kColorBlack)
         gfx.drawLine(midX, barY, midX, barY + barHeight)
+
+        ::continue::
     end
 end)
