@@ -263,7 +263,7 @@ function PauseScene()
 
     function scene:update()
         gfx.clear(gfx.kColorWhite)
-        gfx.drawTextAligned("*PAUSED*", 200, 100, kTextAlignment.center)
+        gfx.drawTextAligned("PAUSED", 200, 100, kTextAlignment.center)
         if playdate.buttonJustPressed(playdate.kButtonB) then
             GAME_WORLD:queueScene(GameScene())
         end

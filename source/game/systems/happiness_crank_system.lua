@@ -23,14 +23,28 @@
 
 local pd = playdate
 
--- Helper: Check if a boid is visible in the current viewport
-local function isVisible(transform, camera)
+-- Helper: Check if a boid is within the camera frame (not just viewport)
+local function isInCameraFrame(transform, camera)
     local camX = camera.x
     local camY = camera.y
 
-    -- Check if boid is within viewport bounds
-    return transform.x >= camX and transform.x <= camX + SCREEN_WIDTH and
-           transform.y >= camY and transform.y <= camY + SCREEN_HEIGHT
+    -- Convert world coordinates to screen coordinates
+    local screenX = transform.x - camX
+    local screenY = transform.y - camY
+
+    -- Camera frame bounds (matching boid_scene.lua frame)
+    local frameInset = 40
+    local statusBarHeight = 35
+    local gaugeWidth = 30
+
+    local frameLeft = frameInset
+    local frameTop = frameInset
+    local frameRight = frameInset + (SCREEN_WIDTH - (frameInset * 2))
+    local frameBottom = frameInset + ((SCREEN_HEIGHT - statusBarHeight) - (frameInset * 2))
+
+    -- Check if boid is within frame bounds
+    return screenX >= frameLeft and screenX <= frameRight and
+           screenY >= frameTop and screenY <= frameBottom
 end
 
 HappinessCrankSystem = System.new("happinessCrank", {"transform", "emotionalBattery"}, function(entities, scene)
@@ -43,24 +57,23 @@ HappinessCrankSystem = System.new("happinessCrank", {"transform", "emotionalBatt
     local crankChange = pd.getCrankChange()
 
     if crankChange ~= 0 and scene.camera then
-        -- Find all visible boids
-        local visibleBoids = {}
+        -- Find all boids within camera frame
+        local frameBoids = {}
         for _, e in ipairs(entities) do
-            if isVisible(e.transform, scene.camera) then
-                visibleBoids[#visibleBoids + 1] = e
+            if isInCameraFrame(e.transform, scene.camera) then
+                frameBoids[#frameBoids + 1] = e
             end
         end
 
-        -- Apply happiness increase to visible boids
-        -- TESTING: Very high crank power - 360 degrees = +200 happiness total
-        -- TODO: Adjust this value for proper game balance
-        -- Distributed among all visible boids
-        if #visibleBoids > 0 then
-            local happinessPerDegree = 200 / 360  -- ~0.56 per degree (very high for testing)
+        -- Apply happiness increase to boids in frame
+        -- Crank power: 360 degrees = +180 happiness total (10% less for balance)
+        -- Distributed among all boids in camera frame
+        if #frameBoids > 0 then
+            local happinessPerDegree = 180 / 360  -- was 200/360, now 10% less
             local totalIncrease = crankChange * happinessPerDegree
-            local increasePerBoid = totalIncrease / #visibleBoids
+            local increasePerBoid = totalIncrease / #frameBoids
 
-            for _, boid in ipairs(visibleBoids) do
+            for _, boid in ipairs(frameBoids) do
                 boid.emotionalBattery.value += increasePerBoid
                 boid.emotionalBattery.value = clamp(boid.emotionalBattery.value, 0, 100)
             end

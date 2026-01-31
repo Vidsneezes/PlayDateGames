@@ -47,3 +47,10 @@ function EmotionalBattery(value)
         max = 100,
     }
 end
+
+-- Explosion marker (entity will be deleted after rendering)
+function Exploding()
+    return {
+        frameCount = 0  -- frames to show explosion
+    }
+end

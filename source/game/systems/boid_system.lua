@@ -161,8 +161,7 @@ BoidSystem = System.new("boid", {"transform", "velocity", "boidsprite"}, functio
             t.y += v.dy
         end
 
-        -- Render Boids
-          -- Get camera offset
+        -- Render Boids (HP bars now in separate system)
         local camX = 0
         local camY = 0
         if scene.camera then

@@ -127,10 +127,13 @@ function TestAudioScene()
     end
 
     function scene:onExit()
+        -- Stop SoundBank
+        SoundBank.stopMusic()
+
         -- Stop music cleanly
-        if audioController then
-            audioController.synthEmitter.musicTrigger = "stop"
-        end
+        --if audioController then
+        --    audioController.synthEmitter.musicTrigger = "stop"
+        --end
         -- Actual cleanup happens in system, but we force a stop command
     end
 
