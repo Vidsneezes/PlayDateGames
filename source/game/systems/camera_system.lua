@@ -37,7 +37,7 @@ CameraSystem = System.new("camera", {}, function(entities, scene)
     end
 
     local cam = scene.camera
-    local speed = 6  -- pixels per frame at 30 FPS (doubled for larger world)
+    local speed = 10  -- pixels per frame at 30 FPS (fast for chaotic gameplay)
 
     -- Read arrow keys
     local dx = 0
