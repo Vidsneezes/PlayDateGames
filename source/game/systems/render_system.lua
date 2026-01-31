@@ -102,27 +102,6 @@ RenderSystem = System.new("render", {"transform", "sprite"}, function(entities, 
         end
     end
 
-    -- Draw debug info (FPS and boid counter) in upper right corner
-    gfx.setColor(gfx.kColorBlack)
-
-    -- Get FPS
-    local fps = math.floor(playdate.getFPS())
-    local fpsText = "FPS: " .. tostring(fps)
-
-    -- Count boids (entities with happy, sad, or angry boid components)
-    local boidCount = 0
-    for _, entity in ipairs(scene.entities) do
-        if entity.happyBoid or entity.sadBoid or entity.angryBoid then
-            boidCount += 1
-        end
-    end
-    local boidText = "Boids: " .. tostring(boidCount)
-
-    -- Draw FPS counter (right-aligned)
-    local fpsWidth = gfx.getTextSize(fpsText)
-    gfx.drawText(fpsText, SCREEN_WIDTH - fpsWidth - 5, 5)
-
-    -- Draw boid counter below FPS (right-aligned)
-    local boidWidth = gfx.getTextSize(boidText)
-    gfx.drawText(boidText, SCREEN_WIDTH - boidWidth - 5, 20)
+    -- Debug info hidden for clean UI
+    -- (FPS and boid count removed for final UI design)
 end)

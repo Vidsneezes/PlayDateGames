@@ -136,19 +136,29 @@ function BoidScene()
             end
         end
 
-        -- Draw camera frame visualization (playable area with padding for UI)
-        gfx.setColor(gfx.kColorBlack)
-        local frameSize = 10  -- size of corner markers
-        local padLeft = 10
-        local padTop = 10
-        local padBottom = 10
-        local padRight = 35  -- extra padding for happiness bar on right
+        -- UI Layout constants
+        local statusBarHeight = 35
+        local gaugeWidth = 30  -- includes padding
+        local frameSize = 10
 
-        -- Playable area boundaries
-        local playLeft = padLeft
-        local playTop = padTop
-        local playRight = SCREEN_WIDTH - padRight
-        local playBottom = SCREEN_HEIGHT - padBottom
+        -- Draw bottom status bar (white background)
+        gfx.setColor(gfx.kColorWhite)
+        gfx.fillRect(0, SCREEN_HEIGHT - statusBarHeight, SCREEN_WIDTH, statusBarHeight)
+
+        -- Draw status bar border
+        gfx.setColor(gfx.kColorBlack)
+        gfx.drawLine(0, SCREEN_HEIGHT - statusBarHeight, SCREEN_WIDTH, SCREEN_HEIGHT - statusBarHeight)
+
+        -- Draw status bar text (emotion counts only)
+        local statusY = SCREEN_HEIGHT - statusBarHeight + 10
+        gfx.drawText("Happy: " .. happyCount .. "  Sad: " .. sadCount .. "  Angry: " .. angryCount, 10, statusY)
+
+        -- Draw camera frame (playable area excluding UI with padding)
+        local padding = 5
+        local playLeft = padding
+        local playTop = padding
+        local playRight = SCREEN_WIDTH - gaugeWidth - padding
+        local playBottom = SCREEN_HEIGHT - statusBarHeight - padding
 
         -- Top-left corner
         gfx.drawLine(playLeft, playTop, playLeft + frameSize, playTop)
@@ -172,11 +182,6 @@ function BoidScene()
         local crossSize = 5
         gfx.drawLine(centerX - crossSize, centerY, centerX + crossSize, centerY)
         gfx.drawLine(centerX, centerY - crossSize, centerX, centerY + crossSize)
-
-        -- Draw debug HUD
-        gfx.drawText("Camera: (" .. math.floor(self.camera.x) .. ", " .. math.floor(self.camera.y) .. ")", 5, 5)
-        gfx.drawText("Happy: " .. happyCount .. "  Sad: " .. sadCount .. "  Angry: " .. angryCount, 5, 220)
-        gfx.drawText("Press A or B to reset", SCREEN_WIDTH - 120, 5)
     end
 
     return scene
