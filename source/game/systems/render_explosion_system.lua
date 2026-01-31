@@ -38,6 +38,6 @@ RenderExplosionSystem = System.new("renderExplosion", { "transform", "exploding"
         e.active = false
 
         -- Play sfx sound
-        SynthPlaySound("explosion")
+        SynthTriggerSFX("explosion")
     end
 end)
