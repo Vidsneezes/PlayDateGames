@@ -13,7 +13,6 @@
 
 local gfx = playdate.graphics
 
-
 function BoidScene()
     local scene = Scene.new("boid")
 
@@ -29,8 +28,8 @@ function BoidScene()
     scene.isPaused = false
 
     -- Track explosions
-    scene.explosionsHappy = 0  -- exploded at 100 happiness
-    scene.explosionsAngry = 0  -- exploded at 0 happiness
+    scene.explosionsHappy = 0 -- exploded at 100 happiness
+    scene.explosionsAngry = 0 -- exploded at 0 happiness
 
     -- Helper: Create temporary sprite for each emotion type
     -- PLACEHOLDER SHAPES RE-ENABLED at 32x32 for testing
@@ -69,19 +68,11 @@ function BoidScene()
             -- Set initial battery based on emotion (safe values, not at explosion thresholds)
             local initialBattery = 80
             if emotionType == "happy" then
-<<<<<<< HEAD
-                initialBattery = 100 -- Max for happy (61-100)
+                initialBattery = 80 -- Safe for happy (61-99, avoiding 100 explosion)
             elseif emotionType == "sad" then
-                initialBattery = 60  -- Max for sad (31-60)
+                initialBattery = 50 -- Mid-range for sad (31-60)
             elseif emotionType == "angry" then
-                initialBattery = 30  -- Max for angry (0-30)
-=======
-                initialBattery = 80   -- Safe for happy (61-99, avoiding 100 explosion)
-            elseif emotionType == "sad" then
-                initialBattery = 50   -- Mid-range for sad (31-60)
-            elseif emotionType == "angry" then
-                initialBattery = 20   -- Safe for angry (1-30, avoiding 0 explosion)
->>>>>>> main
+                initialBattery = 20 -- Safe for angry (1-30, avoiding 0 explosion)
             end
 
             -- Create boid with appropriate component
@@ -108,7 +99,6 @@ function BoidScene()
     function scene:onEnter()
         -- Register systems in execution order
         self:addSystem(CameraSystem)
-<<<<<<< HEAD
         self:addSystem(HappinessCrankSystem)   -- Read crank input first
         self:addSystem(EmotionalBatterySystem) -- Update emotions after happiness changes
         self:addSystem(EmotionInfluenceSystem) -- Proximity effects (comment out if too slow)
@@ -116,43 +106,26 @@ function BoidScene()
         self:addSystem(RenderClearSystem)      -- Clear screen to white
         self:addSystem(RenderBackgroundSystem) -- Draw grass tilemap
         self:addSystem(RenderSpriteSystem)     -- Draw boid sprites
-        self:addSystem(RenderUISystem)         -- Draw UI last
-=======
-        self:addSystem(HappinessCrankSystem)     -- Read crank input first
-        self:addSystem(EmotionalBatterySystem)   -- Update emotions after happiness changes
-        self:addSystem(EmotionInfluenceSystem)   -- Proximity effects (comment out if too slow)
-        self:addSystem(BoidSystem)               -- Update boid AI and sprites
-        self:addSystem(RenderClearSystem)        -- Clear screen to white
-        self:addSystem(RenderBackgroundSystem)   -- Draw grass tilemap
-        self:addSystem(RenderSpriteSystem)       -- Draw boid sprites
-        self:addSystem(RenderBoidHPSystem)       -- Draw HP bars on top of sprites
-        self:addSystem(RenderExplosionSystem)    -- Draw explosions and cleanup
+        self:addSystem(RenderBoidHPSystem)     -- Draw HP bars on top of sprites
+        self:addSystem(RenderExplosionSystem)  -- Draw explosions and cleanup
         -- self:addSystem(RenderUISystem)           -- Happiness gauge (DISABLED - using individual HP bars)
->>>>>>> main
 
         -- Spawn test boids
         -- ADJUST THIS NUMBER to test performance
         local BOID_COUNT = 10 -- Small count for testing gameplay feel
         spawnRandomBoids(self, BOID_COUNT)
 
-<<<<<<< HEAD
-        -- Audio Controller SynthEmitter
-        SynthStart(scene, "theme")
-        SynthPlay()
-=======
         -- Store total count for win screen
         self.totalBoidCount = BOID_COUNT
->>>>>>> main
+
+        SynthStart(self, "theme")
     end
 
     function scene:onExit()
         -- Clean up if needed
-<<<<<<< HEAD
-        SynthDestroy(scene)
-=======
         bgset = false
         playdate.graphics.sprite.removeAll()
->>>>>>> main
+        SynthDestroy(self)
     end
 
     function scene:update()
@@ -178,11 +151,11 @@ function BoidScene()
                 local frameBottom = frameInset + ((SCREEN_HEIGHT - statusBarHeight) - (frameInset * 2))
 
                 return screenX >= frameLeft and screenX <= frameRight and
-                       screenY >= frameTop and screenY <= frameBottom
+                    screenY >= frameTop and screenY <= frameBottom
             end
 
             -- Find boids in frame and increase happiness
-            local happinessIncrease = 10  -- Fixed amount per B press
+            local happinessIncrease = 10 -- Fixed amount per B press
             for _, entity in ipairs(self.entities) do
                 if entity.emotionalBattery and entity.transform then
                     if isInCameraFrame(entity.transform) then
@@ -193,8 +166,8 @@ function BoidScene()
             end
         end
 
-        SynthUpdate(scene)
         Scene.update(self) -- runs all registered systems
+        SynthUpdate(self)
 
         -- Check win/lose conditions during play mode
         if not self.isPaused then
@@ -266,7 +239,7 @@ function BoidScene()
         -- Draw pause state indicator in lower right (UI area)
         local pauseText = self.isPaused and "PAUSED" or "PLAYING"
         local textWidth = gfx.getTextSize(pauseText)
-        local boxPadding = 5  -- larger box
+        local boxPadding = 5 -- larger box
         local pauseX = SCREEN_WIDTH - textWidth - 15
         local pauseY = SCREEN_HEIGHT - statusBarHeight + 10
 
@@ -278,7 +251,7 @@ function BoidScene()
         gfx.drawText(pauseText, pauseX, pauseY)
 
         -- Draw camera frame (smaller and centered, ignoring gauge for centering)
-        local frameInset = 40  -- distance from edges (larger = smaller frame)
+        local frameInset = 40 -- distance from edges (larger = smaller frame)
         local frameWidth = SCREEN_WIDTH - (frameInset * 2)
         local frameHeight = (SCREEN_HEIGHT - statusBarHeight) - (frameInset * 2)
 

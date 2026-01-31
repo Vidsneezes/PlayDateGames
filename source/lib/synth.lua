@@ -29,8 +29,8 @@ end
 
 function SynthDefaultTrackState()
     SynthSetTrackState("bass", true)
-    SynthSetTrackState("drums", false)
-    SynthSetTrackState("melody", false)
+    SynthSetTrackState("drums", true)
+    SynthSetTrackState("melody", true)
 end
 
 function SynthSetMusic(trackName)
