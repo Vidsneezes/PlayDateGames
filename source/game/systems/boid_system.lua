@@ -161,7 +161,7 @@ BoidSystem = System.new("boid", {"transform", "velocity", "boidsprite"}, functio
             t.y += v.dy
         end
 
-        -- Render Boids and HP bars
+        -- Render Boids (HP bars now in separate system)
         local camX = 0
         local camY = 0
         if scene.camera then
@@ -173,35 +173,6 @@ BoidSystem = System.new("boid", {"transform", "velocity", "boidsprite"}, functio
             local screenX = t.x - camX
             local screenY = t.y - camY
             s.body:moveTo(screenX, screenY)
-
-            -- Draw HP bar below boid (if entity has emotionalBattery)
-            if e.emotionalBattery then
-                local gfx = playdate.graphics
-                local barWidth = 30
-                local barHeight = 4
-                local barX = screenX - barWidth / 2
-                local barY = screenY + 40  -- further below sprite for visibility
-
-                -- Background (empty bar)
-                gfx.setColor(gfx.kColorWhite)
-                gfx.fillRect(barX, barY, barWidth, barHeight)
-
-                -- Border
-                gfx.setColor(gfx.kColorBlack)
-                gfx.drawRect(barX, barY, barWidth, barHeight)
-
-                -- Fill based on battery value (0-100)
-                local fillWidth = (e.emotionalBattery.value / 100) * barWidth
-                if fillWidth > 0 then
-                    gfx.setColor(gfx.kColorBlack)
-                    gfx.fillRect(barX + 1, barY + 1, fillWidth - 2, barHeight - 2)
-                end
-
-                -- Mark the middle (50%)
-                local midX = barX + (barWidth / 2)
-                gfx.setColor(gfx.kColorBlack)
-                gfx.drawLine(midX, barY, midX, barY + barHeight)
-            end
         end
     end
 end)

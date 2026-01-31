@@ -102,6 +102,7 @@ function BoidScene()
         self:addSystem(RenderClearSystem)        -- Clear screen to white
         self:addSystem(RenderBackgroundSystem)   -- Draw grass tilemap
         self:addSystem(RenderSpriteSystem)       -- Draw boid sprites
+        self:addSystem(RenderBoidHPSystem)       -- Draw HP bars on top of sprites
         -- self:addSystem(RenderUISystem)           -- Happiness gauge (DISABLED - using individual HP bars)
 
         -- Spawn test boids
