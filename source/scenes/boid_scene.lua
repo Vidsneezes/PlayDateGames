@@ -102,7 +102,9 @@ function BoidScene()
         self:addSystem(RenderClearSystem)        -- Clear screen to white
         self:addSystem(RenderBackgroundSystem)   -- Draw grass tilemap
         self:addSystem(RenderSpriteSystem)       -- Draw boid sprites
-        self:addSystem(RenderUISystem)           -- Draw UI last
+        self:addSystem(RenderBoidHPSystem)       -- Draw HP bars on top of sprites
+        self:addSystem(RenderExplosionSystem)    -- Draw explosions and cleanup
+        -- self:addSystem(RenderUISystem)           -- Happiness gauge (DISABLED - using individual HP bars)
 
         -- Spawn test boids
         -- ADJUST THIS NUMBER to test performance
@@ -122,23 +124,58 @@ function BoidScene()
             self.isPaused = not self.isPaused
         end
 
-        if playdate.buttonJustPressed(playdate.kButtonB) then
-            GAME_WORLD:queueScene(WinScene())
+        -- B button increases happiness (crank alternative) - only while paused
+        if playdate.buttonJustPressed(playdate.kButtonB) and self.isPaused then
+            -- Helper: Check if a boid is within the camera frame
+            local function isInCameraFrame(transform)
+                local camX = self.camera.x
+                local camY = self.camera.y
+                local screenX = transform.x - camX
+                local screenY = transform.y - camY
+
+                local frameInset = 40
+                local statusBarHeight = 35
+                local frameLeft = frameInset
+                local frameTop = frameInset
+                local frameRight = frameInset + (SCREEN_WIDTH - (frameInset * 2))
+                local frameBottom = frameInset + ((SCREEN_HEIGHT - statusBarHeight) - (frameInset * 2))
+
+                return screenX >= frameLeft and screenX <= frameRight and
+                       screenY >= frameTop and screenY <= frameBottom
+            end
+
+            -- Find boids in frame and increase happiness
+            local happinessIncrease = 10  -- Fixed amount per B press
+            for _, entity in ipairs(self.entities) do
+                if entity.emotionalBattery and entity.transform then
+                    if isInCameraFrame(entity.transform) then
+                        entity.emotionalBattery.value += happinessIncrease
+                        entity.emotionalBattery.value = clamp(entity.emotionalBattery.value, 0, 100)
+                    end
+                end
+            end
         end
 
         Scene.update(self)  -- runs all registered systems
 
-        -- Check win condition: all boids are happy (battery > 60)
-        -- Only check during play mode
+        -- Check win/lose conditions during play mode
         if not self.isPaused then
             local allHappy = true
+            local allAngry = true
             local boidCount = 0
+
             for _, entity in ipairs(self.entities) do
                 if entity.emotionalBattery then
                     boidCount += 1
+
+                    -- Check happiness (battery > 60)
                     if entity.emotionalBattery.value <= 60 then
                         allHappy = false
-                        break
+                    end
+
+                    -- Check if angry (has angryBoid component)
+                    if not entity.angryBoid then
+                        allAngry = false
                     end
                 end
             end
@@ -146,6 +183,12 @@ function BoidScene()
             -- Win if all boids are happy (and there are boids)
             if allHappy and boidCount > 0 then
                 GAME_WORLD:queueScene(WinScene())
+                return
+            end
+
+            -- Lose if all boids are angry (and there are boids)
+            if allAngry and boidCount > 0 then
+                GAME_WORLD:queueScene(LoseScene())
                 return
             end
         end
@@ -183,32 +226,28 @@ function BoidScene()
         gfx.drawText("Happy: " .. happyCount .. "  Sad: " .. sadCount .. "  Angry: " .. angryCount, 10, statusY)
 
         -- Draw pause state indicator in lower right (UI area)
-        local pauseText = self.isPaused and "⏸ PAUSED" or "▶ PLAYING"
+        local pauseText = self.isPaused and "PAUSED" or "PLAYING"
         local textWidth = gfx.getTextSize(pauseText)
+        local boxPadding = 5  -- larger box
         local pauseX = SCREEN_WIDTH - textWidth - 15
         local pauseY = SCREEN_HEIGHT - statusBarHeight + 10
 
-        -- Inverted colors when paused (white on black)
-        if self.isPaused then
-            gfx.setColor(gfx.kColorBlack)
-            gfx.fillRect(pauseX - 3, pauseY - 2, textWidth + 6, 18)
-            gfx.setColor(gfx.kColorWhite)
-            gfx.drawText(pauseText, pauseX, pauseY)
-        else
-            -- Normal style when playing (black on white)
-            gfx.setColor(gfx.kColorWhite)
-            gfx.fillRect(pauseX - 3, pauseY - 2, textWidth + 6, 18)
-            gfx.setColor(gfx.kColorBlack)
-            gfx.drawRect(pauseX - 3, pauseY - 2, textWidth + 6, 18)
-            gfx.drawText(pauseText, pauseX, pauseY)
-        end
+        -- Simple box with black text (same style for both states)
+        gfx.setColor(gfx.kColorWhite)
+        gfx.fillRect(pauseX - boxPadding, pauseY - 3, textWidth + boxPadding * 2, 20)
+        gfx.setColor(gfx.kColorBlack)
+        gfx.drawRect(pauseX - boxPadding, pauseY - 3, textWidth + boxPadding * 2, 20)
+        gfx.drawText(pauseText, pauseX, pauseY)
 
-        -- Draw camera frame (playable area excluding UI with padding)
-        local padding = 10
-        local playLeft = padding
-        local playTop = padding
-        local playRight = SCREEN_WIDTH - gaugeWidth - padding
-        local playBottom = SCREEN_HEIGHT - statusBarHeight - padding
+        -- Draw camera frame (smaller and centered, ignoring gauge for centering)
+        local frameInset = 40  -- distance from edges (larger = smaller frame)
+        local frameWidth = SCREEN_WIDTH - (frameInset * 2)
+        local frameHeight = (SCREEN_HEIGHT - statusBarHeight) - (frameInset * 2)
+
+        local playLeft = frameInset
+        local playTop = frameInset
+        local playRight = frameInset + frameWidth
+        local playBottom = frameInset + frameHeight
 
         -- Top-left corner
         gfx.drawLine(playLeft, playTop, playLeft + frameSize, playTop)

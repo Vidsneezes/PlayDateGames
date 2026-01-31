@@ -33,19 +33,23 @@ import "game/systems/boid_system"
 import "game/systems/render_clear_system"
 import "game/systems/render_background_system"
 import "game/systems/render_sprite_system"
+import "game/systems/render_boid_hp_system"
+import "game/systems/render_explosion_system"
 import "game/systems/render_ui_system"
 import "game/systems/physics_system"
 import "game/systems/player_system"
 import "game/systems/crank_system"
 import "game/systems/collision_system"
-import "game/systems/audio_system"
+--import "game/systems/audio_system"
 import "game/systems/render_system"
+import "game/systems/synth_system"
 
 -- Scenes
 import "scenes/menu_scene"
 import "scenes/game_scene"
 import "scenes/boid_scene"
 import "scenes/win_scene"
+import "scenes/lose_scene"
 import "scenes/gameover_scene"
 import "scenes/visualtest_scene"
 import "scenes/test_audio_scene"
@@ -56,5 +60,5 @@ GAME_WORLD = World.new()
 GAME_WORLD:setScene(MenuScene())
 
 function playdate.update()
-    GAME_WORLD:update()  -- Systems control render order
+    GAME_WORLD:update() -- Systems control render order
 end
