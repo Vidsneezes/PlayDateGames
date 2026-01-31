@@ -169,10 +169,11 @@ BoidSystem = System.new("boid", {"transform", "velocity", "boidsprite"}, functio
             camY = scene.camera.y
         end
 
-        if s.visible and s.body then
+        if s.visible and s.body and s.head then
             local screenX = t.x - camX
             local screenY = t.y - camY
             s.body:moveTo(screenX, screenY)
+            s.head:moveTo(screenX, screenY)
         end
     end
 end)
