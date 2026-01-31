@@ -98,7 +98,7 @@ function BoidScene()
         self:addSystem(EmotionalBatterySystem)   -- Update emotions after happiness changes
         self:addSystem(BoidSystem)
         -- self:addSystem(PhysicsSystem) -- BoidSystem handles physics for boids now
-        -- self:addSystem(RenderSystem) -- BoidSystem handles rendering for boids now
+        self:addSystem(RenderSystem) -- BoidSystem handles rendering for boids now
         self:addSystem(HappinessUISystem)        -- Draw UI last
 
         -- Spawn test boids
@@ -113,7 +113,6 @@ function BoidScene()
 
     function scene:update()
         Scene.update(self)  -- runs all registered systems
-        gfx.sprite.update()
 
         -- Draw debug HUD
         gfx.setColor(gfx.kColorBlack)

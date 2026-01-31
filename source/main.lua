@@ -49,5 +49,6 @@ GAME_WORLD = World.new()
 GAME_WORLD:setScene(MenuScene())
 
 function playdate.update()
+    playdate.graphics.sprite.update()
     GAME_WORLD:update()
 end
