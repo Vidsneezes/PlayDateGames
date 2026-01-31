@@ -64,7 +64,7 @@ function BoidScene()
             local boid = Entity.new({
                 transform = Transform(x, y),
                 velocity = Velocity(0, 0),
-                sprite = SpriteComp(createBoidSprite(emotionType))
+                boidsprite = BoidSpriteComp(boidRectangle, bubbleImage)
             })
 
             -- Add emotion component based on type
@@ -86,6 +86,7 @@ function BoidScene()
         self:addSystem(BoidSystem)
         self:addSystem(PhysicsSystem)
         self:addSystem(RenderSystem)
+        self:addSystem(BoidRenderSystem)
 
         -- Spawn test boids
         -- ADJUST THIS NUMBER to test performance (3, 50, 100, etc.)

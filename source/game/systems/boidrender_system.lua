@@ -72,7 +72,7 @@ BoidRenderSystem = System.new("render", {"transform", "boidsprite"}, function(en
             local screenX = t.x - camX
             local screenY = t.y - camY
             s.body:moveTo(screenX, screenY)
-            s.bubble:moveTo(screenX, screenY-10)
+            s.bubble:moveTo(screenX, screenY-12)
         end
     end
 
