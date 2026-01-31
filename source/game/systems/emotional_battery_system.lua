@@ -21,19 +21,16 @@ local gfx = playdate.graphics
 -- Helper: Create sprite for emotion type
 -- PLACEHOLDER SHAPES DISABLED - using real sprites now
 local function createEmotionSprite(emotionType)
-    local img = gfx.image.new(16, 16, gfx.kColorWhite)
-    -- gfx.lockFocus(img)
-    -- gfx.setColor(gfx.kColorBlack)
+    local img = emotionSad
 
-    -- if emotionType == "happy" then
-    --     gfx.fillPolygon(8, 2, 14, 14, 2, 14)  -- Triangle
-    -- elseif emotionType == "sad" then
-    --     gfx.fillCircleAtPoint(8, 8, 7)  -- Circle
-    -- elseif emotionType == "angry" then
-    --     gfx.fillRect(2, 2, 12, 12)  -- Square
-    -- end
+    if emotionType == "happy" then
+        img = emotionHappy
+    elseif emotionType == "sad" then
+        img = emotionSad
+    elseif emotionType == "angry" then
+        img = emotionAngry  -- Square
+    end
 
-    -- gfx.unlockFocus()
     return img
 end
 
@@ -115,7 +112,7 @@ EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity"
             if e.sprite then
                 e.sprite.image = newImage
             elseif e.boidsprite and e.boidsprite.body then
-                e.boidsprite.body:setImage(newImage)
+                e.boidsprite.bubble:setImage(newImage)
             end
         end
     end

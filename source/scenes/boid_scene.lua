@@ -27,22 +27,19 @@ function BoidScene()
     -- Helper: Create temporary sprite for each emotion type
     -- PLACEHOLDER SHAPES DISABLED - using real sprites now
     local function createBoidSprite(emotionType)
-        local img = gfx.image.new(16, 16, gfx.kColorWhite)
-        -- gfx.lockFocus(img)
-        -- gfx.setColor(gfx.kColorBlack)
+        local img = emotionAngry
 
-        -- if emotionType == "happy" then
-        --     -- Triangle (pointing up)
-        --     gfx.fillPolygon(8, 2, 14, 14, 2, 14)
-        -- elseif emotionType == "sad" then
-        --     -- Circle
-        --     gfx.fillCircleAtPoint(8, 8, 7)
-        -- elseif emotionType == "angry" then
-        --     -- Square
-        --     gfx.fillRect(2, 2, 12, 12)
-        -- end
+        if emotionType == "happy" then
+            -- Triangle (pointing up)
+            img = emotionHappy
+        elseif emotionType == "sad" then
+            -- Circle
+            img = emotionSad
+        elseif emotionType == "angry" then
+            -- Square
+            img = emotionAngry
+        end
 
-        -- gfx.unlockFocus()
         return img
     end
 
@@ -75,7 +72,7 @@ function BoidScene()
             local boid = Entity.new({
                 transform = Transform(x, y),
                 velocity = Velocity(0, 0),
-                boidsprite = BoidSpriteComp(createBoidSprite(emotionType), bubbleImage),
+                boidsprite = BoidSpriteComp(bodyImage,createBoidSprite(emotionType)),
                 emotionalBattery = EmotionalBattery(initialBattery)
             })
 
