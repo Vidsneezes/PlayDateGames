@@ -39,15 +39,25 @@ function SynthSetMusic(trackName)
     SynthDefaultTrackState()
 end
 
+function SynthMute()
+    SynthSetTrackState("bass", false)
+    SynthSetTrackState("drums", false)
+    SynthSetTrackState("melody", false)
+end
+
 function SynthStop()
     musicPlaying = false
+    SoundBank.stopMusic()
 end
 
 function SynthPlay()
     musicPlaying = true
+    SoundBank.playMusic()
 end
 
 function SynthDestroy(scene)
+    SynthStop()
+
     if audioController then
         audioController.synthEmitter.musicTrigger = "stop"
     end
