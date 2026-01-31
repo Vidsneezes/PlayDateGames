@@ -50,6 +50,26 @@ local function hasStopped(velocity)
     return velocity.dx == 0 and velocity.dy == 0
 end
 
+-- Helper: Check if a boid is within the camera frame
+local function isInCameraFrame(transform, camera)
+    if not camera then return true end
+
+    local camX = camera.x
+    local camY = camera.y
+    local screenX = transform.x - camX
+    local screenY = transform.y - camY
+
+    local frameInset = 40
+    local statusBarHeight = 35
+    local frameLeft = frameInset
+    local frameTop = frameInset
+    local frameRight = frameInset + (SCREEN_WIDTH - (frameInset * 2))
+    local frameBottom = frameInset + ((SCREEN_HEIGHT - statusBarHeight) - (frameInset * 2))
+
+    return screenX >= frameLeft and screenX <= frameRight and
+           screenY >= frameTop and screenY <= frameBottom
+end
+
 EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity", "emotionalBattery"}, function(entities, scene)
     -- Double drain while paused (risk/reward for pausing)
     local drainMultiplier = scene.isPaused and 2.0 or 1.0
@@ -79,36 +99,39 @@ EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity"
             goto continue
         end
 
-        -- Determine current emotion type
-        local currentEmotion = nil
-        if e.happyBoid then
-            currentEmotion = "happy"
-        elseif e.sadBoid then
-            currentEmotion = "sad"
-        elseif e.angryBoid then
-            currentEmotion = "angry"
-        end
-
-        -- Drain battery based on current emotion (30% slower for balance, doubled while paused!)
-        if currentEmotion == "happy" then
-            battery.value -= 0.14 * drainMultiplier  -- was 0.2
-        elseif currentEmotion == "sad" then
-            if hasStopped(v) then
-                -- At edge, drain faster
-                battery.value -= 0.21 * drainMultiplier  -- was 0.3
-            else
-                -- Moving, drain slower
-                battery.value -= 0.07 * drainMultiplier  -- was 0.1
+        -- Only drain battery if boid is within camera frame
+        if isInCameraFrame(e.transform, scene.camera) then
+            -- Determine current emotion type
+            local currentEmotion = nil
+            if e.happyBoid then
+                currentEmotion = "happy"
+            elseif e.sadBoid then
+                currentEmotion = "sad"
+            elseif e.angryBoid then
+                currentEmotion = "angry"
             end
-        elseif currentEmotion == "angry" then
-            -- Drain to 0 then stop
-            if battery.value > 0 then
-                battery.value -= 0.014 * drainMultiplier  -- was 0.02
-            end
-        end
 
-        -- Clamp battery value
-        battery.value = clamp(battery.value, 0, battery.max)
+            -- Drain battery based on current emotion (30% slower for balance, doubled while paused!)
+            if currentEmotion == "happy" then
+                battery.value -= 0.14 * drainMultiplier  -- was 0.2
+            elseif currentEmotion == "sad" then
+                if hasStopped(v) then
+                    -- At edge, drain faster
+                    battery.value -= 0.21 * drainMultiplier  -- was 0.3
+                else
+                    -- Moving, drain slower
+                    battery.value -= 0.07 * drainMultiplier  -- was 0.1
+                end
+            elseif currentEmotion == "angry" then
+                -- Drain to 0 then stop
+                if battery.value > 0 then
+                    battery.value -= 0.014 * drainMultiplier  -- was 0.02
+                end
+            end
+
+            -- Clamp battery value
+            battery.value = clamp(battery.value, 0, battery.max)
+        end
 
         -- Check if emotion should change
         local newEmotion = getEmotionFromBattery(battery.value)
