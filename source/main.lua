@@ -8,6 +8,7 @@ import "CoreLibs/animation"
 -- Utilities
 import "lib/utils"
 import "lib/resources"
+import "lib/synth"
 
 -- ECS Core
 import "ecs/entity"
@@ -42,7 +43,6 @@ import "game/systems/physics_system"
 import "game/systems/player_system"
 import "game/systems/crank_system"
 import "game/systems/collision_system"
---import "game/systems/audio_system"
 import "game/systems/render_system"
 import "game/systems/synth_system"
 
@@ -56,6 +56,7 @@ import "scenes/gameover_scene"
 import "scenes/visualtest_scene"
 import "scenes/test_audio_scene"
 import "scenes/credits_scene"
+
 
 -- Boot
 GAME_WORLD = World.new()

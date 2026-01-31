@@ -25,7 +25,7 @@ function LoseScene()
         gfx.drawTextAligned("Press A to try again", 200, 140, kTextAlignment.center)
 
         if playdate.buttonJustPressed(playdate.kButtonA) then
-            GAME_WORLD:queueScene(BoidScene())
+            GAME_WORLD:queueScene(MenuScene())
         end
     end
 
