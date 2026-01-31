@@ -25,11 +25,14 @@ function MenuScene()
         gfx.drawTextAligned("*GAME JAM*", 200, 60, kTextAlignment.center)
         gfx.drawTextAligned("Press A for Game Scene", 200, 120, kTextAlignment.center)
         gfx.drawTextAligned("Press B for Boid Scene", 200, 140, kTextAlignment.center)
+        gfx.drawTextAligned("Press DOWN for Test Audio Scene", 200, 160, kTextAlignment.center)
 
         if playdate.buttonJustPressed(playdate.kButtonA) then
             GAME_WORLD:queueScene(GameScene())
         elseif playdate.buttonJustPressed(playdate.kButtonB) then
             GAME_WORLD:queueScene(BoidScene())
+        elseif playdate.buttonJustPressed(playdate.kButtonDown) then
+            GAME_WORLD:queueScene(TestAudioScene())
         end
     end
 

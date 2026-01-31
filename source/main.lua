@@ -43,6 +43,7 @@ import "scenes/game_scene"
 import "scenes/boid_scene"
 import "scenes/gameover_scene"
 import "scenes/visualtest_scene"
+import "scenes/test_audio_scene"
 
 -- Boot
 GAME_WORLD = World.new()
