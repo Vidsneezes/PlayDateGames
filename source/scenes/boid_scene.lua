@@ -38,13 +38,13 @@ function BoidScene()
 
         if emotionType == "happy" then
             -- Triangle (pointing up)
-            img = boidSpriteHappy
+            img = imageTableHeadHappy:getImage(1)
         elseif emotionType == "sad" then
             -- Circle
-            img = boidSpriteSad
+            img = imageTableHeadSad:getImage(1)
         elseif emotionType == "angry" then
             -- Square
-            img = boidSpriteAngry
+            img = imageTableHeadAngry:getImage(1)
         end
 
         return img
