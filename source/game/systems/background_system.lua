@@ -26,29 +26,13 @@ local gfx = playdate.graphics
 BackgroundSystem = System.new("background", {}, function(entities, scene)
     -- Create tilemap once if it doesn't exist
     if not scene.backgroundTilemap then
-        -- Load grass tiles (4 tiles horizontally)
-        -- Try different naming conventions
-        local grassTiles = gfx.imagetable.new("Images/bg-grass-table-4-1")
+        -- Load grass tiles
+        -- File: Images/grass-table-32-32.png (128x32 image with 4 tiles)
+        -- SDK automatically finds the -table-32-32 version when you load "Images/grass"
+        local grassTiles = gfx.imagetable.new("Images/grass")
 
         if not grassTiles then
-            -- Try alternative naming
-            grassTiles = gfx.imagetable.new("Images/bg grass-table-4-1")
-        end
-
-        if not grassTiles then
-            -- Try without table suffix (might be separate files)
-            grassTiles = gfx.imagetable.new("Images/bg-grass")
-        end
-
-        if not grassTiles then
-            print("ERROR: Failed to load grass tilemap. Tried:")
-            print("  Images/bg-grass-table-4-1")
-            print("  Images/bg grass-table-4-1")
-            print("  Images/bg-grass")
-            print("Please check:")
-            print("  1. File exists in Images/ folder")
-            print("  2. File is named: bg-grass-table-4-1.png (for image table)")
-            print("  3. Or use 4 separate files: bg-grass-1.png through bg-grass-4.png")
+            print("ERROR: Failed to load grass tilemap from Images/grass-table-32-32.png")
             return
         end
 
@@ -66,7 +50,7 @@ BackgroundSystem = System.new("background", {}, function(entities, scene)
         local tilesWide = math.ceil(worldW / tileSize)
         local tilesHigh = math.ceil(worldH / tileSize)
 
-        tilemap:setSize(tilesWide, tilesHigh)
+        tilemap:setSize(32, 32)
 
         -- Fill tilemap with random grass tiles (1-4)
         for y = 1, tilesHigh do

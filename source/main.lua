@@ -35,7 +35,6 @@ import "game/systems/player_system"
 import "game/systems/crank_system"
 import "game/systems/collision_system"
 import "game/systems/audio_system"
-import "game/systems/synth_system"
 import "game/systems/render_system"
 import "game/systems/happiness_ui_system"
 
@@ -52,7 +51,6 @@ GAME_WORLD = World.new()
 GAME_WORLD:setScene(MenuScene())
 
 function playdate.update()
-    playdate.graphics.sprite.update()
-    playdate.timer.updateTimers()
-    GAME_WORLD:update()
+    playdate.graphics.sprite.update()  -- Draw sprites first
+    GAME_WORLD:update()  -- Draw background and UI on top
 end
