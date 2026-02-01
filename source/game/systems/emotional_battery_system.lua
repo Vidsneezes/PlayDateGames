@@ -59,9 +59,12 @@ EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity"
                 scene.explosionsAngry = (scene.explosionsAngry or 0) + 1
             end
 
-            -- Remove sprite from display list immediately
+            -- Remove sprites from display list immediately
             if e.boidsprite and e.boidsprite.body then
                 e.boidsprite.body:remove()
+            end
+            if e.boidsprite and e.boidsprite.head then
+                e.boidsprite.head:remove()
             end
 
             -- Skip rest of processing for this entity
