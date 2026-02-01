@@ -45,6 +45,10 @@ function BoidScene()
     scene.explosionsHappy = 0 -- exploded at 100 happiness
     scene.explosionsAngry = 0 -- exploded at 0 happiness
 
+    -- SAD Bomb (emergency tool)
+    scene.sadBombs = 3        -- remaining charges
+    scene.screenFlash = 0     -- frames of white flash remaining (0 = no flash)
+
     -- Helper: Spawn multiple boids with random positions and emotions
     local function spawnRandomBoids(scene, count)
         local worldW = scene.camera.worldWidth
@@ -98,6 +102,7 @@ function BoidScene()
     function scene:onEnter()
         -- Register systems in execution order
         self:addSystem(CameraSystem)
+        self:addSystem(BombSystem)             -- B button: SAD bomb
         self:addSystem(HappinessCrankSystem)   -- Influence mode: crank UP for happiness
         self:addSystem(CaptureCrankSystem)     -- Capture mode: crank DOWN to capture
         self:addSystem(EmotionalBatterySystem) -- Update emotions after happiness changes
@@ -113,6 +118,7 @@ function BoidScene()
         self:addSystem(RenderExplosionSystem)  -- Draw explosions and cleanup
         self:addSystem(RenderExplosionMarkSystem) -- Draw permanent X marks ON TOP of everything
         self:addSystem(RenderMaskSystem)       -- Draw mode-specific mask overlay (RE-ENABLED FOR TESTING)
+        self:addSystem(ScreenFlashSystem)      -- Screen flash effect (SAD bomb) - MUST BE LAST
         -- self:addSystem(RenderUISystem)           -- Happiness gauge (DISABLED - using individual HP bars)
 
         -- Spawn test boids
@@ -217,9 +223,9 @@ function BoidScene()
         gfx.setColor(gfx.kColorBlack)
         gfx.drawLine(0, SCREEN_HEIGHT - statusBarHeight, SCREEN_WIDTH, SCREEN_HEIGHT - statusBarHeight)
 
-        -- Draw status bar text (emotion counts only)
+        -- Draw status bar text (emotion counts and bomb count)
         local statusY = SCREEN_HEIGHT - statusBarHeight + 10
-        gfx.drawText("Happy: " .. happyCount .. "  Sad: " .. sadCount .. "  Angry: " .. angryCount, 10, statusY)
+        gfx.drawText("Happy: " .. happyCount .. "  Sad: " .. sadCount .. "  Angry: " .. angryCount .. "  Bombs: " .. self.sadBombs, 10, statusY)
 
         -- Draw mode indicator in lower right (UI area)
         local modeText
