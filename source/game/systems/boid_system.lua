@@ -87,13 +87,13 @@ BoidSystem = System.new("boid", {"transform", "velocity", "boidsprite"}, functio
         -- Handle Sad Boids
         elseif e.sadBoid then
             local sad = e.sadBoid
-            -- Sad boids move in cardinal directions and bounce off edges (like happy but slower)
+            -- Sad boids move toward edges and STOP there (no bounce)
             local worldW = scene.camera and scene.camera.worldWidth or WORLD_WIDTH
             local worldH = scene.camera and scene.camera.worldHeight or WORLD_HEIGHT
             local padding = scene.camera and scene.camera.padding or 0
             local spriteSize = 32
 
-            -- If velocity is zero, pick a random cardinal direction
+            -- If velocity is zero, pick a random cardinal direction toward an edge
             if v.dx == 0 and v.dy == 0 then
                 if math.random() > 0.5 then
                     -- Move horizontally
@@ -106,18 +106,20 @@ BoidSystem = System.new("boid", {"transform", "velocity", "boidsprite"}, functio
                 end
             end
 
-            -- Bounce off edges (respecting padding)
+            -- Stop at edges (don't bounce) - sad boids stay at edges until emotion changes
             local nextX = t.x + v.dx
             local nextY = t.y + v.dy
 
-            -- Bounce off left/right edges
+            -- Stop at left/right edges
             if nextX <= padding or nextX >= worldW - padding - spriteSize then
-                v.dx = -v.dx
+                v.dx = 0
+                v.dy = 0
             end
 
-            -- Bounce off top/bottom edges
+            -- Stop at top/bottom edges
             if nextY <= padding or nextY >= worldH - padding - spriteSize then
-                v.dy = -v.dy
+                v.dx = 0
+                v.dy = 0
             end
 
         -- Handle Angry Boids
