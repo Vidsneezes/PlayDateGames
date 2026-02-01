@@ -35,8 +35,7 @@ end
 -- BoidSystem processes entities with transform and velocity
 -- It checks for emotion components and applies appropriate behaviors
 BoidSystem = System.new("boid", {"transform", "velocity", "boidsprite"}, function(entities, scene)
-    -- Boids frozen while paused
-    local isPaused = scene.isPaused or false
+    -- Boids always move (no pause!)
 
     for _, e in ipairs(entities) do
         local t = e.transform
@@ -45,8 +44,7 @@ BoidSystem = System.new("boid", {"transform", "velocity", "boidsprite"}, functio
 
         -- Skip movement logic for captured boids (but still render them)
         if not e.captured then
-            -- Skip movement logic if paused
-            if not isPaused then
+            -- Movement logic always runs
             -- Handle Happy Boids
             if e.happyBoid then
             local happy = e.happyBoid
@@ -157,14 +155,9 @@ BoidSystem = System.new("boid", {"transform", "velocity", "boidsprite"}, functio
             end
         end
 
-            -- End movement logic
-            end
-
-            -- Apply movement (only if not paused)
-            if not isPaused then
-                t.x += v.dx
-                t.y += v.dy
-            end
+            -- Apply movement (always)
+            t.x += v.dx
+            t.y += v.dy
         end  -- end of movement logic for non-captured boids
 
         -- Render ALL boids (captured or not) with camera offset

@@ -36,11 +36,7 @@ CameraSystem = System.new("camera", {}, function(entities, scene)
         return
     end
 
-    -- Camera frozen while paused
-    if scene.isPaused then
-        return
-    end
-
+    -- Camera always movable (no pause!)
     local cam = scene.camera
     local speed = 15  -- pixels per frame at 30 FPS (faster for quick navigation)
 

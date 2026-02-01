@@ -35,8 +35,8 @@ local function hasStopped(velocity)
 end
 
 EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity", "emotionalBattery"}, function(entities, scene)
-    -- Double drain while paused (risk/reward for pausing)
-    local drainMultiplier = scene.isPaused and 2.0 or 1.0
+    -- No pause multiplier - game always runs at same speed
+    local drainMultiplier = 1.0
 
     for _, e in ipairs(entities) do
         -- Skip captured boids (happiness frozen)
