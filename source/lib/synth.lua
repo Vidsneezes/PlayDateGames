@@ -5,7 +5,7 @@ musicTrackStates = {
     drums = true,
     melody = false
 }
-musicVolume = 0.1
+musicVolume = 0.35
 
 function SynthStart(scene, trackName)
     -- Create our controller entity with the new SynthEmitter
