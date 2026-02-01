@@ -22,27 +22,27 @@ function BoidScene()
         y = 0,
         worldWidth = SCREEN_WIDTH * 2 + 200,   -- 1000 (800 + 100px padding on each side)
         worldHeight = SCREEN_HEIGHT * 2 + 200, -- 680 (480 + 100px padding on each side)
-        padding = 100  -- Boids cannot enter this padded border area
+        padding = 100                          -- Boids cannot enter this padded border area
     }
 
     -- Pause state (starts playing)
     scene.isPaused = false
 
     -- Current mode (influence = happiness, capture = freeze boids)
-    scene.currentMode = "influence"  -- "influence" or "capture"
-    scene.captureProgress = 0        -- progress toward capturing (0-180 degrees)
+    scene.currentMode = "influence" -- "influence" or "capture"
+    scene.captureProgress = 0       -- progress toward capturing (0-180 degrees)
 
     -- Track explosions
-    scene.explosionsHappy = 0  -- exploded at 100 happiness
-    scene.explosionsAngry = 0  -- exploded at 0 happiness
+    scene.explosionsHappy = 0 -- exploded at 100 happiness
+    scene.explosionsAngry = 0 -- exploded at 0 happiness
 
     -- Helper: Spawn multiple boids with random positions and emotions
     local function spawnRandomBoids(scene, count)
         local worldW = scene.camera.worldWidth
         local worldH = scene.camera.worldHeight
         local padding = scene.camera.padding
-        local spriteSize = 32  -- Updated to 32x32 for testing
-        local emotions = {"happy", "sad", "angry"}
+        local spriteSize = 32 -- Updated to 32x32 for testing
+        local emotions = { "happy", "sad", "angry" }
 
         for i = 1, count do
             -- Random position (keeping sprite in bounds, respecting padding)
@@ -55,11 +55,11 @@ function BoidScene()
             -- Set initial battery based on emotion (safe values, not at explosion thresholds)
             local initialBattery = 80
             if emotionType == "happy" then
-                initialBattery = 80   -- Safe for happy (61-99, avoiding 100 explosion)
+                initialBattery = 80 -- Safe for happy (61-99, avoiding 100 explosion)
             elseif emotionType == "sad" then
-                initialBattery = 50   -- Mid-range for sad (31-60)
+                initialBattery = 50 -- Mid-range for sad (31-60)
             elseif emotionType == "angry" then
-                initialBattery = 20   -- Safe for angry (1-30, avoiding 0 explosion)
+                initialBattery = 20 -- Safe for angry (1-30, avoiding 0 explosion)
             end
 
             -- Create boid with appropriate component
@@ -86,30 +86,32 @@ function BoidScene()
     function scene:onEnter()
         -- Register systems in execution order
         self:addSystem(CameraSystem)
-        self:addSystem(HappinessCrankSystem)     -- Influence mode: crank UP for happiness
-        self:addSystem(CaptureCrankSystem)       -- Capture mode: crank DOWN to capture
-        self:addSystem(EmotionalBatterySystem)   -- Update emotions after happiness changes
-        self:addSystem(EmotionInfluenceSystem)   -- Proximity effects (comment out if too slow)
-        self:addSystem(BoidSystem)               -- Update boid AI and sprites
-        self:addSystem(RenderClearSystem)        -- Clear screen to white
-        self:addSystem(RenderBackgroundSystem)   -- Draw grass tilemap
-        self:addSystem(RenderSpriteSystem)       -- Draw boid sprites
-        self:addSystem(RenderBoidHPSystem)       -- Draw HP bars on top of sprites
-        self:addSystem(RenderCapturedSystem)     -- Draw squares around captured boids
-        self:addSystem(RenderExplosionSystem)    -- Draw explosions and cleanup
+        self:addSystem(HappinessCrankSystem)   -- Influence mode: crank UP for happiness
+        self:addSystem(CaptureCrankSystem)     -- Capture mode: crank DOWN to capture
+        self:addSystem(EmotionalBatterySystem) -- Update emotions after happiness changes
+        self:addSystem(EmotionInfluenceSystem) -- Proximity effects (comment out if too slow)
+        self:addSystem(BoidSystem)             -- Update boid AI and sprites
+        self:addSystem(RenderClearSystem)      -- Clear screen to white
+        self:addSystem(RenderBackgroundSystem) -- Draw grass tilemap
+        self:addSystem(RenderSpriteSystem)     -- Draw boid sprites
+        self:addSystem(RenderBoidHPSystem)     -- Draw HP bars on top of sprites
+        self:addSystem(RenderCapturedSystem)   -- Draw squares around captured boids
+        self:addSystem(RenderExplosionSystem)  -- Draw explosions and cleanup
         -- self:addSystem(RenderUISystem)           -- Happiness gauge (DISABLED - using individual HP bars)
 
         -- Spawn test boids
         -- ADJUST THIS NUMBER to test performance
-        local BOID_COUNT = 10  -- Small count for testing gameplay feel
+        local BOID_COUNT = 10 -- Small count for testing gameplay feel
         spawnRandomBoids(self, BOID_COUNT)
 
         -- Store total count for win screen
         self.totalBoidCount = BOID_COUNT
+
+        SynthStart(self, "theme")
     end
 
     function scene:onExit()
-        -- Clean up if needed
+        SynthDestroy(self)
     end
 
     function scene:update()
@@ -121,7 +123,7 @@ function BoidScene()
         -- B button switches mode (while playing)
         if playdate.buttonJustPressed(playdate.kButtonB) and not self.isPaused then
             self.currentMode = (self.currentMode == "influence") and "capture" or "influence"
-            self.captureProgress = 0  -- reset capture progress when switching
+            self.captureProgress = 0 -- reset capture progress when switching
         end
 
         -- B button increases happiness (crank alternative) - only while paused in influence mode
@@ -141,11 +143,11 @@ function BoidScene()
                 local frameBottom = frameInset + ((SCREEN_HEIGHT - statusBarHeight) - (frameInset * 2))
 
                 return screenX >= frameLeft and screenX <= frameRight and
-                       screenY >= frameTop and screenY <= frameBottom
+                    screenY >= frameTop and screenY <= frameBottom
             end
 
             -- Find boids in frame and increase happiness
-            local happinessIncrease = 10  -- Fixed amount per B press
+            local happinessIncrease = 10 -- Fixed amount per B press
             for _, entity in ipairs(self.entities) do
                 if entity.emotionalBattery and entity.transform then
                     if isInCameraFrame(entity.transform) then
@@ -156,7 +158,8 @@ function BoidScene()
             end
         end
 
-        Scene.update(self)  -- runs all registered systems
+        Scene.update(self) -- runs all registered systems
+        SynthUpdate(self)
 
         -- Check win/lose conditions during play mode
         if not self.isPaused then
@@ -218,7 +221,7 @@ function BoidScene()
 
         -- UI Layout constants
         local statusBarHeight = 35
-        local gaugeWidth = 30  -- includes padding
+        local gaugeWidth = 30 -- includes padding
         local frameSize = 10
 
         -- Draw bottom status bar (white background)
@@ -237,12 +240,12 @@ function BoidScene()
         local modeText
         if self.currentMode == "influence" then
             modeText = self.isPaused and "Influencing" or "Mode: Influence"
-        else  -- capture mode
+        else -- capture mode
             modeText = self.isPaused and "Capturing" or "Mode: Capture"
         end
 
         local textWidth = gfx.getTextSize(modeText)
-        local boxPadding = 5  -- larger box
+        local boxPadding = 5 -- larger box
         local modeX = SCREEN_WIDTH - textWidth - 15
         local modeY = SCREEN_HEIGHT - statusBarHeight + 10
 
@@ -293,7 +296,7 @@ function BoidScene()
             local progBarWidth = 80
             local progBarHeight = 6
             local progBarX = centerX - progBarWidth / 2
-            local progBarY = centerY + 15  -- below the cross
+            local progBarY = centerY + 15 -- below the cross
 
             -- Background
             gfx.setColor(gfx.kColorWhite)
