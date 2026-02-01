@@ -15,8 +15,8 @@
 local pd = playdate
 
 CaptureCrankSystem = System.new("captureCrank", {"transform", "emotionalBattery"}, function(entities, scene)
-    -- Only work in capture mode (no pause check!)
-    if scene.currentMode ~= "capture" then
+    -- Only work in capture mode while NOT paused (real-time!)
+    if scene.isPaused or scene.currentMode ~= "capture" then
         return
     end
 

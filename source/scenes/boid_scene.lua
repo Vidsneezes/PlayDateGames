@@ -118,20 +118,26 @@ function BoidScene()
     end
 
     function scene:update()
-        -- A button switches mode (no more pause!)
+        -- A button switches mode
         if playdate.buttonJustPressed(playdate.kButtonA) then
             self.currentMode = (self.currentMode == "influence") and "capture" or "influence"
             self.captureProgress = 0 -- reset capture progress when switching
+
+            -- Influence mode = paused, Capture mode = running
+            if self.currentMode == "influence" then
+                self.isPaused = true  -- Pause for influence
+            else
+                self.isPaused = false -- Unpause for capture
+            end
         end
 
         -- B button does nothing (removed old logic)
-        -- Game always runs, no pause state
 
         Scene.update(self) -- runs all registered systems
         SynthUpdate(self)
 
-        -- Check win/lose conditions (always, no pause)
-        if true then
+        -- Check win/lose conditions (only when not paused)
+        if not self.isPaused then
             local allHappy = true
             local allAngry = true
             local boidCount = 0
@@ -260,7 +266,7 @@ function BoidScene()
         gfx.drawLine(centerX - crossSize, centerY, centerX + crossSize, centerY)
         gfx.drawLine(centerX, centerY - crossSize, centerX, centerY + crossSize)
 
-        -- Show capture progress bar below center cross (when in capture mode)
+        -- Show capture progress bar below center cross (only when there's progress)
         if self.currentMode == "capture" and self.captureProgress > 0 then
             local progBarWidth = 80
             local progBarHeight = 6

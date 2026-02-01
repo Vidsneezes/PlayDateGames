@@ -36,7 +36,11 @@ CameraSystem = System.new("camera", {}, function(entities, scene)
         return
     end
 
-    -- Camera always movable (no pause!)
+    -- Camera frozen in influence mode (paused), movable in capture mode
+    if scene.isPaused then
+        return
+    end
+
     local cam = scene.camera
     local speed = 15  -- pixels per frame at 30 FPS (faster for quick navigation)
 
@@ -55,6 +59,11 @@ CameraSystem = System.new("camera", {}, function(entities, scene)
     end
     if pd.buttonIsPressed(pd.kButtonDown) then
         dy += speed
+    end
+
+    -- If camera moved in capture mode, reset capture progress!
+    if (dx ~= 0 or dy ~= 0) and scene.currentMode == "capture" then
+        scene.captureProgress = 0
     end
 
     -- Update camera position
