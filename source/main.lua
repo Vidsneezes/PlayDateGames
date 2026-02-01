@@ -4,6 +4,7 @@ import "CoreLibs/graphics"
 import "CoreLibs/sprites"
 import "CoreLibs/timer"
 import "CoreLibs/animation"
+import "CoreLibs/animator"
 
 -- Utilities
 import "lib/utils"
