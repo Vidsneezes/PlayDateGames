@@ -15,7 +15,11 @@ function MenuScene()
     local scene = Scene.new("menu")
 
     function scene:onEnter()
-        -- TODO: Load menu assets, play title music, etc.
+        -- Start menu music (procedural jazz track)
+        SoundBank.playMusic("menu")
+        SoundBank.setTrackVolume("bass", 0.8)
+        SoundBank.setTrackVolume("melody", 0.6)
+        SoundBank.setTrackVolume("drums", 0.4)
     end
 
     function scene:update()
@@ -31,7 +35,8 @@ function MenuScene()
     end
 
     function scene:onExit()
-        -- TODO: Stop title music, clean up, etc.
+        -- Stop menu music when leaving
+        SoundBank.stopMusic()
     end
 
     return scene

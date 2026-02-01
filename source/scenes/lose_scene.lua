@@ -14,7 +14,11 @@ function LoseScene()
     local scene = Scene.new("lose")
 
     function scene:onEnter()
-        -- TODO: Play lose sound, etc.
+        -- Play defeat music (sad descending tones)
+        SoundBank.playMusic("lose")
+        SoundBank.setTrackVolume("bass", 0.8)
+        SoundBank.setTrackVolume("melody", 0.7)
+        SoundBank.setTrackVolume("drums", 0.3)
     end
 
     function scene:update()
@@ -30,7 +34,8 @@ function LoseScene()
     end
 
     function scene:onExit()
-        -- Clean up
+        -- Stop defeat music
+        SoundBank.stopMusic()
     end
 
     return scene

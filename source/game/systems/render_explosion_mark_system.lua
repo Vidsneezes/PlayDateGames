@@ -21,14 +21,6 @@ local gfx = playdate.graphics
 local ripSprite = nil
 
 RenderExplosionMarkSystem = System.new("renderExplosionMark", {"transform", "explosionMark"}, function(entities, scene)
-    -- Load RIP sprite on first frame
-    if not ripSprite then
-        ripSprite = gfx.image.new("Images/rip")
-        if not ripSprite then
-            print("WARNING: Failed to load Images/rip.png - using text fallback")
-        end
-    end
-
     -- Get camera offset
     local camX = 0
     local camY = 0
@@ -42,14 +34,6 @@ RenderExplosionMarkSystem = System.new("renderExplosionMark", {"transform", "exp
         local screenX = e.transform.x - camX
         local screenY = e.transform.y - camY
 
-        if ripSprite then
-            -- Draw RIP sprite (centered on explosion position)
-            local width, height = ripSprite:getSize()
-            ripSprite:draw(screenX - width / 2, screenY - height / 2)
-        else
-            -- Fallback: Draw "X" character if sprite didn't load
-            gfx.setColor(gfx.kColorBlack)
-            gfx.drawText("X", screenX - 4, screenY - 8)
-        end
+        e.explosionMark.sprite:moveTo(screenX, screenY)
     end
 end)

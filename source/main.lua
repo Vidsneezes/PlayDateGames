@@ -10,6 +10,7 @@ import "CoreLibs/animator"
 import "lib/utils"
 import "lib/resources"
 import "lib/synth"
+import "lib/sound_bank"
 
 -- ECS Core
 import "ecs/entity"

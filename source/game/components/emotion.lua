@@ -74,7 +74,11 @@ end
 -- ExplosionMark - permanent X mark showing where a boid exploded
 -- These marks never disappear, creating a visual history of explosions
 function ExplosionMark()
+    local spriteX = playdate.graphics.sprite.new(tombstoneImage)
+    spriteX:setZIndex(-200)
+    spriteX:add()
     return {
-        markType = "X"  -- could support different mark types later
+        markType = "X",  -- could support different mark types later
+        sprite = spriteX
     }
 end

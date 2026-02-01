@@ -17,7 +17,11 @@ function WinScene(boidCount, explosionsHappy, explosionsAngry)
     local angryExplosions = explosionsAngry or 0
 
     function scene:onEnter()
-        -- TODO: Play victory sound, save score, etc.
+        -- Play victory music!
+        SoundBank.playMusic("win")
+        SoundBank.setTrackVolume("bass", 0.9)
+        SoundBank.setTrackVolume("melody", 0.8)
+        SoundBank.setTrackVolume("drums", 0.6)
     end
 
     function scene:update()
@@ -47,7 +51,8 @@ function WinScene(boidCount, explosionsHappy, explosionsAngry)
     end
 
     function scene:onExit()
-        -- Clean up
+        -- Stop victory music
+        SoundBank.stopMusic()
     end
 
     return scene
