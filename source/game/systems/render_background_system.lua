@@ -47,10 +47,21 @@ RenderBackgroundSystem = System.new("renderBackground", {}, function(entities, s
 
         tilemap:setSize(tilesWide, tilesHigh)
 
-        -- Fill with random grass tiles (1-4)
+        -- Border width in tiles (100px padding = ~3 tiles at 32px each)
+        local borderWidth = 3
+
+        -- Fill with grass tiles and black border
         for y = 1, tilesHigh do
             for x = 1, tilesWide do
-                tilemap:setTileAtPosition(x, y, math.random(1, 4))
+                -- Check if this tile is in the border area
+                local isBorder = (x <= borderWidth or x > tilesWide - borderWidth or
+                                  y <= borderWidth or y > tilesHigh - borderWidth)
+
+                if isBorder then
+                    tilemap:setTileAtPosition(x, y, 5)  -- Black border tile
+                else
+                    tilemap:setTileAtPosition(x, y, math.random(1, 4))  -- Random grass
+                end
             end
         end
 
