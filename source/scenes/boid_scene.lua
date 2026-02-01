@@ -112,11 +112,11 @@ function BoidScene()
         self:addSystem(AudioMusicSystem)       -- Dynamic music based on boid counts
         self:addSystem(RenderClearSystem)      -- Clear screen to white
         self:addSystem(RenderBackgroundSystem) -- Draw grass tilemap
+        self:addSystem(RenderExplosionMarkSystem) -- Draw RIP marks (behind boids, on grass)
         self:addSystem(RenderSpriteSystem)     -- Draw boid sprites
         self:addSystem(RenderBoidHPSystem)     -- Draw HP bars on top of sprites
         self:addSystem(RenderCapturedSystem)   -- Draw squares around captured boids
         self:addSystem(RenderExplosionSystem)  -- Draw explosions and cleanup
-        self:addSystem(RenderExplosionMarkSystem) -- Draw permanent X marks ON TOP of everything
         self:addSystem(RenderMaskSystem)       -- Draw mode-specific mask overlay (RE-ENABLED FOR TESTING)
         self:addSystem(ScreenFlashSystem)      -- Screen flash effect (SAD bomb) - MUST BE LAST
         -- self:addSystem(RenderUISystem)           -- Happiness gauge (DISABLED - using individual HP bars)
