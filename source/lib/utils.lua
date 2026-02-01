@@ -123,18 +123,26 @@ function getCameraPosition(camera, gfx)
 end
 
 -- Spawn an explosion effect entity at the given position
--- Returns the created entity (in case you need to track it)
+-- Also creates a permanent X mark at the explosion location
+-- Returns the created explosion entity (in case you need to track it)
 function spawnExplosion(scene, x, y, lifetime)
     -- Play explosion sound
     SynthTriggerSFX("explosion")
 
-    -- Create a new explosion entity
+    -- Create a new explosion entity (temporary - plays animation)
     local explosion = Entity.new({
         transform = Transform(x, y),
         explosionEffect = ExplosionEffect(lifetime or 10),-- default 1 second
         explosionAnim = ExplosionAnim()
     })
 
+    -- Create a permanent X mark at the explosion location
+    local mark = Entity.new({
+        transform = Transform(x, y),
+        explosionMark = ExplosionMark()
+    })
+
     scene:addEntity(explosion)
+    scene:addEntity(mark)
     return explosion
 end

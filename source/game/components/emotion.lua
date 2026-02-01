@@ -70,3 +70,11 @@ function ExplosionEffect(lifetime)
         lifetime = lifetime or 30,  -- frames before cleanup (30 = 1 second at 30 FPS)
     }
 end
+
+-- ExplosionMark - permanent X mark showing where a boid exploded
+-- These marks never disappear, creating a visual history of explosions
+function ExplosionMark()
+    return {
+        markType = "X"  -- could support different mark types later
+    }
+end

@@ -107,6 +107,7 @@ function BoidScene()
         self:addSystem(AudioMusicSystem)       -- Dynamic music based on boid counts
         self:addSystem(RenderClearSystem)      -- Clear screen to white
         self:addSystem(RenderBackgroundSystem) -- Draw grass tilemap
+        self:addSystem(RenderExplosionMarkSystem) -- Draw permanent X marks where boids exploded
         self:addSystem(RenderSpriteSystem)     -- Draw boid sprites
         self:addSystem(RenderBoidHPSystem)     -- Draw HP bars on top of sprites
         self:addSystem(RenderCapturedSystem)   -- Draw squares around captured boids
