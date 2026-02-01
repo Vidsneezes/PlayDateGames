@@ -1,9 +1,15 @@
 --[[
-    HAPPINESS UI SYSTEM
-    Draws the happiness meter showing total happiness of visible boids.
+    UI RENDER SYSTEM
+    Draws all UI elements for the game.
 
-    Displays a vertical bar on the right side of the screen.
-    Bar fill represents: (total happiness of visible boids) / (max possible happiness)
+    Shows:
+    - Captured count (Happy: X/5)
+    - Explosion count (Exp: X/5)
+    - Bomb charges (vertical B letters in upper right)
+    - Mode indicator
+    - Camera frame with corners
+    - Center cross
+    - Capture progress bar
 
     ── Playdate SDK Quick Reference ──────────────────────
 
@@ -11,81 +17,124 @@
         gfx.setColor(gfx.kColorBlack / kColorWhite)
         gfx.drawRect(x, y, w, h)    -- outline
         gfx.fillRect(x, y, w, h)    -- filled
-        gfx.setLineWidth(width)
+        gfx.drawLine(x1, y1, x2, y2)
         gfx.drawText(text, x, y)
+        gfx.getTextSize(text) -> width, height
 
     ──────────────────────────────────────────────────────
 ]]
 
 local gfx = playdate.graphics
 
--- Helper: Check if a boid is visible in the current viewport
-local function isVisible(transform, camera)
-    local camX = camera.x
-    local camY = camera.y
-
-    return transform.x >= camX and transform.x <= camX + SCREEN_WIDTH and
-           transform.y >= camY and transform.y <= camY + SCREEN_HEIGHT
-end
-
-RenderUISystem = System.new("renderUI", {"transform", "emotionalBattery"}, function(entities, scene)
-    if not scene.camera then return end
-
-    -- Only show happiness gauge while paused
-    if not scene.isPaused then
-        return
-    end
-
-    -- Find visible boids and calculate happiness
-    local visibleCount = 0
-    local totalHappiness = 0
-
-    for _, e in ipairs(entities) do
-        if isVisible(e.transform, scene.camera) then
-            visibleCount += 1
-            totalHappiness += e.emotionalBattery.value
+RenderUISystem = System.new("renderUI", {}, function(entities, scene)
+    -- Count captured boids and total explosions
+    local capturedCount = 0
+    for _, entity in ipairs(scene.entities) do
+        if entity.captured then
+            capturedCount += 1
         end
     end
 
-    -- Calculate happiness ratio
-    local maxHappiness = visibleCount * 100
-    local happinessRatio = 0
-    if maxHappiness > 0 then
-        happinessRatio = totalHappiness / maxHappiness
+    local totalExplosions = scene.explosionsHappy + scene.explosionsAngry
+
+    -- UI Layout constants
+    local statusBarHeight = 35
+    local frameSize = 10
+
+    -- Draw bottom status bar (white background)
+    gfx.setColor(gfx.kColorWhite)
+    gfx.fillRect(0, SCREEN_HEIGHT - statusBarHeight, SCREEN_WIDTH, statusBarHeight)
+
+    -- Draw status bar border
+    gfx.setColor(gfx.kColorBlack)
+    gfx.drawLine(0, SCREEN_HEIGHT - statusBarHeight, SCREEN_WIDTH, SCREEN_HEIGHT - statusBarHeight)
+
+    -- Draw status bar text (captured and explosions)
+    local statusY = SCREEN_HEIGHT - statusBarHeight + 10
+    gfx.drawText("Happy: " .. capturedCount .. "/5  Exp: " .. totalExplosions .. "/5", 10, statusY)
+
+    -- Draw mode indicator in lower right (UI area)
+    local modeText
+    if scene.currentMode == "influence" then
+        modeText = "Mode: Influence"
+    else -- capture mode
+        modeText = "Mode: Capture"
     end
 
-    -- Draw happiness bar on right side with white background panel
-    local panelX = SCREEN_WIDTH - 30  -- 30px from right edge
-    local panelY = 0  -- reaches all the way to the top
-    local panelWidth = 30
-    local statusBarHeight = 35
-    local panelHeight = SCREEN_HEIGHT - statusBarHeight  -- full height minus status bar
+    local textWidth = gfx.getTextSize(modeText)
+    local boxPadding = 5
+    local modeX = SCREEN_WIDTH - textWidth - 15
+    local modeY = SCREEN_HEIGHT - statusBarHeight + 10
 
-    -- Draw white background panel
+    -- Simple box with black text
     gfx.setColor(gfx.kColorWhite)
-    gfx.fillRect(panelX, panelY, panelWidth, panelHeight)
-
-    -- Draw panel border
+    gfx.fillRect(modeX - boxPadding, modeY - 3, textWidth + boxPadding * 2, 20)
     gfx.setColor(gfx.kColorBlack)
-    gfx.drawRect(panelX, panelY, panelWidth, panelHeight)
+    gfx.drawRect(modeX - boxPadding, modeY - 3, textWidth + boxPadding * 2, 20)
+    gfx.drawText(modeText, modeX, modeY)
 
-    -- Draw happiness bar inside panel
-    local barX = panelX + 7  -- centered in panel
-    local barY = panelY + 10
-    local barWidth = 16
-    local barHeight = panelHeight - 20
+    -- Draw bombs vertically in upper right corner
+    local bombX = SCREEN_WIDTH - 20
+    local bombStartY = 10
+    local bombSpacing = 15
 
-    -- Draw bar outline
-    gfx.setColor(gfx.kColorBlack)
-    gfx.setLineWidth(2)
-    gfx.drawRect(barX, barY, barWidth, barHeight)
+    for i = 1, scene.sadBombs do
+        gfx.drawText("B", bombX, bombStartY + (i - 1) * bombSpacing)
+    end
 
-    -- Draw fill (current happiness)
-    local fillHeight = barHeight * happinessRatio
-    local fillY = barY + (barHeight - fillHeight)  -- Fill from bottom
+    -- Draw camera frame (size depends on mode)
+    local frameInset = (scene.currentMode == "capture") and 40 or 64
+    local frameWidth = SCREEN_WIDTH - (frameInset * 2)
+    local frameHeight = (SCREEN_HEIGHT - statusBarHeight) - (frameInset * 2)
 
-    if fillHeight > 0 then
+    local playLeft = frameInset
+    local playTop = frameInset
+    local playRight = frameInset + frameWidth
+    local playBottom = frameInset + frameHeight
+
+    -- Top-left corner
+    gfx.drawLine(playLeft, playTop, playLeft + frameSize, playTop)
+    gfx.drawLine(playLeft, playTop, playLeft, playTop + frameSize)
+
+    -- Top-right corner
+    gfx.drawLine(playRight - frameSize, playTop, playRight, playTop)
+    gfx.drawLine(playRight, playTop, playRight, playTop + frameSize)
+
+    -- Bottom-left corner
+    gfx.drawLine(playLeft, playBottom, playLeft + frameSize, playBottom)
+    gfx.drawLine(playLeft, playBottom - frameSize, playLeft, playBottom)
+
+    -- Bottom-right corner
+    gfx.drawLine(playRight - frameSize, playBottom, playRight, playBottom)
+    gfx.drawLine(playRight, playBottom - frameSize, playRight, playBottom)
+
+    -- Center cross (in middle of playable area)
+    local centerX = (playLeft + playRight) / 2
+    local centerY = (playTop + playBottom) / 2
+    local crossSize = 5
+    gfx.drawLine(centerX - crossSize, centerY, centerX + crossSize, centerY)
+    gfx.drawLine(centerX, centerY - crossSize, centerX, centerY + crossSize)
+
+    -- Show capture progress bar below center cross (only when there's meaningful progress)
+    if scene.currentMode == "capture" and scene.captureProgress >= 10 then
+        local progBarWidth = 80
+        local progBarHeight = 6
+        local progBarX = centerX - progBarWidth / 2
+        local progBarY = centerY + 15 -- below the cross
+
+        -- Background
+        gfx.setColor(gfx.kColorWhite)
+        gfx.fillRect(progBarX, progBarY, progBarWidth, progBarHeight)
+
+        -- Border
         gfx.setColor(gfx.kColorBlack)
-        gfx.fillRect(barX + 2, fillY + 2, barWidth - 4, fillHeight - 4)
+        gfx.drawRect(progBarX, progBarY, progBarWidth, progBarHeight)
+
+        -- Fill based on progress (0-180 degrees)
+        local fillWidth = (scene.captureProgress / 180) * progBarWidth
+        if fillWidth > 0 then
+            gfx.setColor(gfx.kColorBlack)
+            gfx.fillRect(progBarX + 1, progBarY + 1, fillWidth - 2, progBarHeight - 2)
+        end
     end
 end)

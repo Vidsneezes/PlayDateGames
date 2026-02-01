@@ -10,8 +10,9 @@
 
 local gfx = playdate.graphics
 
-function LoseScene()
+function LoseScene(explosionsHappy, explosionsAngry)
     local scene = Scene.new("lose")
+    local totalExplosions = (explosionsHappy or 0) + (explosionsAngry or 0)
 
     function scene:onEnter()
         -- Play defeat music (sad descending tones)
@@ -25,11 +26,13 @@ function LoseScene()
         gfx.clear(gfx.kColorWhite)
 
         gfx.drawTextAligned("*YOU LOSE*", 200, 80, kTextAlignment.center)
-        gfx.drawTextAligned("Everyone is angry!", 200, 110, kTextAlignment.center)
-        gfx.drawTextAligned("Press A to try again", 200, 140, kTextAlignment.center)
+        gfx.drawTextAligned(totalExplosions .. " people exploded!", 200, 100, kTextAlignment.center)
+        gfx.drawTextAligned("Everybody is angry!", 200, 120, kTextAlignment.center)
+        gfx.drawTextAligned("Press A to try again", 200, 150, kTextAlignment.center)
 
         if playdate.buttonJustPressed(playdate.kButtonA) then
-            GAME_WORLD:queueScene(MenuScene())
+            SoundBank.playSfx("coin")
+            GAME_WORLD:queueScene(CreditScene())
         end
     end
 

@@ -30,6 +30,7 @@ function MenuScene()
         gfx.drawTextAligned("Press A to start", 200, 120, kTextAlignment.center)
 
         if playdate.buttonJustPressed(playdate.kButtonA) then
+            SoundBank.playSfx("coin")
             GAME_WORLD:queueScene(BoidScene())
         end
     end

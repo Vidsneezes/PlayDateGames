@@ -123,6 +123,7 @@ function BoidScene()
         self:addSystem(EmotionalBatterySystem) -- Update emotions after happiness changes
         self:addSystem(EmotionInfluenceSystem) -- Proximity effects (comment out if too slow)
         self:addSystem(BoidSystem)             -- Update boid AI and sprites
+        self:addSystem(BoidSpawnSystem)        -- Spawn new boids when count is low
         self:addSystem(ExplosionEffectSystem)  -- Update explosion entity lifetimes
         self:addSystem(AudioMusicSystem)       -- Dynamic music based on boid counts
         self:addSystem(RenderClearSystem)      -- Clear screen to white
@@ -133,12 +134,12 @@ function BoidScene()
         self:addSystem(RenderExplosionSystem)  -- Draw explosions and cleanup
         self:addSystem(RenderExplosionMarkSystem) -- Draw RIP marks (must be after sprites)
         self:addSystem(RenderMaskSystem)       -- Draw mode-specific mask overlay (RE-ENABLED FOR TESTING)
+        self:addSystem(RenderUISystem)         -- Draw UI elements (status bar, bombs, frame, etc.)
         self:addSystem(ScreenFlashSystem)      -- Screen flash effect (SAD bomb) - MUST BE LAST
-        -- self:addSystem(RenderUISystem)           -- Happiness gauge (DISABLED - using individual HP bars)
 
         -- Spawn test boids
         -- ADJUST THIS NUMBER to test performance
-        local BOID_COUNT = 10 -- Small count for testing gameplay feel
+        local BOID_COUNT = 5 -- Start small, BoidSpawnSystem will add more
         spawnRandomBoids(self, BOID_COUNT)
 
         -- Store total count for win screen
@@ -214,128 +215,18 @@ function BoidScene()
 
             -- Win if you capture 5 boids
             if capturedCount >= 5 then
-                -- Pass actual survivor count (non-captured + captured)
-                local survivorCount = boidCount + capturedCount
-                GAME_WORLD:queueScene(WinScene(survivorCount, self.explosionsHappy, self.explosionsAngry))
+                GAME_WORLD:queueScene(WinScene(self.explosionsHappy, self.explosionsAngry))
                 return
             end
 
             -- Lose if 5 boids exploded
             if (self.explosionsHappy + self.explosionsAngry) >= 5 then
-                GAME_WORLD:queueScene(LoseScene())
+                GAME_WORLD:queueScene(LoseScene(self.explosionsHappy, self.explosionsAngry))
                 return
             end
         end
 
-        -- Count emotions in a single loop
-        local happyCount = 0
-        local sadCount = 0
-        local angryCount = 0
-
-        for _, entity in ipairs(self.entities) do
-            if entity.happyBoid then
-                happyCount += 1
-            elseif entity.sadBoid then
-                sadCount += 1
-            elseif entity.angryBoid then
-                angryCount += 1
-            end
-        end
-
-        -- UI Layout constants
-        local statusBarHeight = 35
-        local gaugeWidth = 30 -- includes padding
-        local frameSize = 10
-
-        -- Draw bottom status bar (white background)
-        gfx.setColor(gfx.kColorWhite)
-        gfx.fillRect(0, SCREEN_HEIGHT - statusBarHeight, SCREEN_WIDTH, statusBarHeight)
-
-        -- Draw status bar border
-        gfx.setColor(gfx.kColorBlack)
-        gfx.drawLine(0, SCREEN_HEIGHT - statusBarHeight, SCREEN_WIDTH, SCREEN_HEIGHT - statusBarHeight)
-
-        -- Draw status bar text (emotion counts and bomb count)
-        local statusY = SCREEN_HEIGHT - statusBarHeight + 10
-        gfx.drawText("Happy: " .. happyCount .. "  Sad: " .. sadCount .. "  Angry: " .. angryCount .. "  Bombs: " .. self.sadBombs, 10, statusY)
-
-        -- Draw mode indicator in lower right (UI area)
-        local modeText
-        if self.currentMode == "influence" then
-            modeText = "Mode: Influence"
-        else -- capture mode
-            modeText = "Mode: Capture"
-        end
-
-        local textWidth = gfx.getTextSize(modeText)
-        local boxPadding = 5 -- larger box
-        local modeX = SCREEN_WIDTH - textWidth - 15
-        local modeY = SCREEN_HEIGHT - statusBarHeight + 10
-
-        -- Simple box with black text (same style for both states)
-        gfx.setColor(gfx.kColorWhite)
-        gfx.fillRect(modeX - boxPadding, modeY - 3, textWidth + boxPadding * 2, 20)
-        gfx.setColor(gfx.kColorBlack)
-        gfx.drawRect(modeX - boxPadding, modeY - 3, textWidth + boxPadding * 2, 20)
-        gfx.drawText(modeText, modeX, modeY)
-
-        -- Draw camera frame (size depends on mode) -- SWAPPED FOR TESTING
-        -- Influence mode: smaller frame (64px inset - 25% larger than before) -- SWAPPED!
-        -- Capture mode: larger frame (40px inset) -- SWAPPED!
-        local frameInset = (self.currentMode == "capture") and 40 or 64
-        local frameWidth = SCREEN_WIDTH - (frameInset * 2)
-        local frameHeight = (SCREEN_HEIGHT - statusBarHeight) - (frameInset * 2)
-
-        local playLeft = frameInset
-        local playTop = frameInset
-        local playRight = frameInset + frameWidth
-        local playBottom = frameInset + frameHeight
-
-        -- Top-left corner
-        gfx.drawLine(playLeft, playTop, playLeft + frameSize, playTop)
-        gfx.drawLine(playLeft, playTop, playLeft, playTop + frameSize)
-
-        -- Top-right corner
-        gfx.drawLine(playRight - frameSize, playTop, playRight, playTop)
-        gfx.drawLine(playRight, playTop, playRight, playTop + frameSize)
-
-        -- Bottom-left corner
-        gfx.drawLine(playLeft, playBottom, playLeft + frameSize, playBottom)
-        gfx.drawLine(playLeft, playBottom - frameSize, playLeft, playBottom)
-
-        -- Bottom-right corner
-        gfx.drawLine(playRight - frameSize, playBottom, playRight, playBottom)
-        gfx.drawLine(playRight, playBottom - frameSize, playRight, playBottom)
-
-        -- Center cross (in middle of playable area)
-        local centerX = (playLeft + playRight) / 2
-        local centerY = (playTop + playBottom) / 2
-        local crossSize = 5
-        gfx.drawLine(centerX - crossSize, centerY, centerX + crossSize, centerY)
-        gfx.drawLine(centerX, centerY - crossSize, centerX, centerY + crossSize)
-
-        -- Show capture progress bar below center cross (only when there's meaningful progress)
-        if self.currentMode == "capture" and self.captureProgress >= 10 then
-            local progBarWidth = 80
-            local progBarHeight = 6
-            local progBarX = centerX - progBarWidth / 2
-            local progBarY = centerY + 15 -- below the cross
-
-            -- Background
-            gfx.setColor(gfx.kColorWhite)
-            gfx.fillRect(progBarX, progBarY, progBarWidth, progBarHeight)
-
-            -- Border
-            gfx.setColor(gfx.kColorBlack)
-            gfx.drawRect(progBarX, progBarY, progBarWidth, progBarHeight)
-
-            -- Fill based on progress (0-180 degrees)
-            local fillWidth = (self.captureProgress / 180) * progBarWidth
-            if fillWidth > 0 then
-                gfx.setColor(gfx.kColorBlack)
-                gfx.fillRect(progBarX + 1, progBarY + 1, fillWidth - 2, progBarHeight - 2)
-            end
-        end
+        -- UI is now handled by RenderUISystem
     end
 
     return scene
