@@ -83,15 +83,16 @@ EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity"
         local drainMultiplier = 1.0
 
         if scene.isPaused then
-            -- Influence mode (paused): Only drain boids INSIDE the frame at 2x rate!
+            -- Influence mode (paused): Only drain boids INSIDE the picture frame at 2x rate!
             -- Frame size is 80px for influence mode (narrow viewport after swap)
             if isInCameraFrame(e.transform, scene.camera, 80) then
                 shouldDrain = true
                 drainMultiplier = 2.0  -- Double drain for pressure!
             end
         else
-            -- Capture mode (not paused): Drain all boids in camera at normal rate
-            if isInCameraFrame(e.transform, scene.camera) then
+            -- Capture mode (not paused): Only drain boids INSIDE the picture frame at normal rate
+            -- Frame size is 40px for capture mode (wide viewport after swap)
+            if isInCameraFrame(e.transform, scene.camera, 40) then
                 shouldDrain = true
                 drainMultiplier = 1.0  -- Normal drain
             end
