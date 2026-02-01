@@ -25,6 +25,7 @@ function GameOverScene()
         gfx.drawTextAligned("Press A to Restart", 200, 140, kTextAlignment.center)
 
         if playdate.buttonJustPressed(playdate.kButtonA) then
+            SoundBank.playSfx("coin")
             GAME_WORLD:queueScene(MenuScene())
         end
     end

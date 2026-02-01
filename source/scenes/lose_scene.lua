@@ -31,7 +31,8 @@ function LoseScene(explosionsHappy, explosionsAngry)
         gfx.drawTextAligned("Press A to try again", 200, 150, kTextAlignment.center)
 
         if playdate.buttonJustPressed(playdate.kButtonA) then
-            GAME_WORLD:queueScene(MenuScene())
+            SoundBank.playSfx("coin")
+            GAME_WORLD:queueScene(CreditScene())
         end
     end
 

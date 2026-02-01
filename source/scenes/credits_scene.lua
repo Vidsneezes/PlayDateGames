@@ -23,13 +23,17 @@ function CreditScene()
         local ypos = -60
 
         gfx.drawTextAligned("*Thanks for playing!*", 200, 80 + ypos, kTextAlignment.center)
-        gfx.drawTextAligned("Game by The Big Mahjong Boys!", 200, 110+ ypos, kTextAlignment.center)
-        gfx.drawTextAligned("Dennis", 200, 160+ ypos, kTextAlignment.center)
-        gfx.drawTextAligned("Kiyoma", 200, 190+ ypos, kTextAlignment.center)
-        gfx.drawTextAligned("RodAraujo", 200, 220+ ypos, kTextAlignment.center)
-        gfx.drawTextAligned("Vidsneeze(Oscar)", 200, 250+ ypos, kTextAlignment.center)
+        gfx.drawTextAligned("Game by The Big Mahjong Boys!", 200, 100+ ypos, kTextAlignment.center)
+        gfx.drawTextAligned("Dennis", 200, 130+ ypos, kTextAlignment.center)
+        gfx.drawTextAligned("Kiyoma", 200, 160+ ypos, kTextAlignment.center)
+        gfx.drawTextAligned("RodAraujo", 200, 190+ ypos, kTextAlignment.center)
+        gfx.drawTextAligned("Vidsneeze(Oscar)", 200, 220+ ypos, kTextAlignment.center)
+
+        gfx.drawTextAligned("Press A to continue", 200, 260+ ypos, kTextAlignment.center)
+
 
         if playdate.buttonJustPressed(playdate.kButtonA) then
+            SoundBank.playSfx("coin")
             GAME_WORLD:queueScene(MenuScene())
         end
     end

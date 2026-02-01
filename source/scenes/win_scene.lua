@@ -38,6 +38,7 @@ function WinScene(explosionsHappy, explosionsAngry)
         end
 
         if playdate.buttonJustPressed(playdate.kButtonA) then
+            SoundBank.playSfx("coin")
             GAME_WORLD:queueScene(CreditScene())
         end
     end
