@@ -110,12 +110,10 @@ function BoidScene()
 
         -- Store total count for win screen
         self.totalBoidCount = BOID_COUNT
-
-        SynthStart(self, "theme")
     end
 
     function scene:onExit()
-        SynthDestroy(self)
+        -- TODO: Stop music, clean up, etc.
     end
 
     function scene:update()
@@ -133,9 +131,8 @@ function BoidScene()
         end
 
         -- B button does nothing (removed old logic)
-
         Scene.update(self) -- runs all registered systems
-        SynthUpdate(self)
+
 
         -- Check win/lose conditions (only when not paused)
         if not self.isPaused then
