@@ -53,12 +53,12 @@ CaptureCrankSystem = System.new("captureCrank", {"transform", "emotionalBattery"
                             scene.explosionsAngry = (scene.explosionsAngry or 0) + 1
                         end
 
-                        -- Remove sprite from display list
+                        -- Hide sprites (but don't remove yet - let explosion system handle it)
                         if e.boidsprite and e.boidsprite.body then
-                            e.boidsprite.body:remove()
+                            e.boidsprite.body:setVisible(false)
                         end
                         if e.boidsprite and e.boidsprite.head then
-                            e.boidsprite.head:remove()
+                            e.boidsprite.head:setVisible(false)
                         end
                     end
                 end
