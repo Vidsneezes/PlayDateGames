@@ -82,3 +82,14 @@ function ExplosionMark()
         sprite = spriteX
     }
 end
+
+-- CapturedBubble - permanent ghost bubble showing a captured boid
+-- These marks never disappear, showing all captured boids
+function CapturedBubble()
+    local bubbleSprite = playdate.graphics.sprite.new(bubbleHappyImage)
+    bubbleSprite:setZIndex(-200)
+    bubbleSprite:add()
+    return {
+        sprite = bubbleSprite
+    }
+end

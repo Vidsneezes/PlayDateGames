@@ -20,6 +20,7 @@ explosionAnimeTable = playdate.graphics.imagetable.new("Images/explosion-table-3
 maskFocusImage = playdate.graphics.image.new("Images/mask-focus")
 
 tombstoneImage = playdate.graphics.image.new("Images/rip")
+bubbleHappyImage = playdate.graphics.image.new("Images/bubble_happy")
 
 imageTableBodyMove = playdate.graphics.imagetable.new(8)
 imageTableBodyMove:setImage(1, bodyMoveAnimeTable:getImage(1))
