@@ -35,7 +35,7 @@ end
 -- BoidSystem processes entities with transform and velocity
 -- It checks for emotion components and applies appropriate behaviors
 BoidSystem = System.new("boid", {"transform", "velocity", "boidsprite"}, function(entities, scene)
-    -- Boids frozen while paused
+    -- Boids frozen in influence mode (paused), move in capture mode
     local isPaused = scene.isPaused or false
 
     for _, e in ipairs(entities) do
@@ -45,7 +45,7 @@ BoidSystem = System.new("boid", {"transform", "velocity", "boidsprite"}, functio
 
         -- Skip movement logic for captured boids (but still render them)
         if not e.captured then
-            -- Skip movement logic if paused
+            -- Only move when not paused (capture mode)
             if not isPaused then
             -- Handle Happy Boids
             if e.happyBoid then
@@ -157,8 +157,7 @@ BoidSystem = System.new("boid", {"transform", "velocity", "boidsprite"}, functio
             end
         end
 
-            -- End movement logic
-            end
+            end  -- end isPaused check
 
             -- Apply movement (only if not paused)
             if not isPaused then
