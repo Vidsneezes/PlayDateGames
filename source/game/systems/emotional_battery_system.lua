@@ -108,10 +108,10 @@ EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity"
             elseif currentEmotion == "sad" then
                 if hasStopped(v) then
                     -- At edge, drain faster
-                    battery.value -= 0.21 * drainMultiplier  -- was 0.3
+                    battery.value -= 0.28 * drainMultiplier  -- was 0.21, increased for faster sadness drain
                 else
                     -- Moving, drain slower
-                    battery.value -= 0.07 * drainMultiplier  -- was 0.1
+                    battery.value -= 0.10 * drainMultiplier  -- was 0.07, increased for faster sadness drain
                 end
             elseif currentEmotion == "angry" then
                 -- Drain to 0 then stop
