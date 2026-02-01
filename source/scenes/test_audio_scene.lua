@@ -35,9 +35,9 @@ function TestAudioScene()
         -- Set initial volumes
         -- Melody starts muted (0.0)
         audioController.synthEmitter.trackVolumes = {
-            bass = 1.0,
-            drums = 1.0,
-            melody = 0.0
+            bass = 0,
+            drums = 0,
+            melody = 0
         }
     end
 
@@ -98,16 +98,16 @@ function TestAudioScene()
 
         -- SFX Triggers
         if playdate.buttonJustPressed(playdate.kButtonUp) then
-            table.insert(audioController.synthEmitter.sfxTriggers, "jump")
+            table.insert(audioController.synthEmitter.sfxTriggers, "pitch_up")
         end
         if playdate.buttonJustPressed(playdate.kButtonDown) then
-            table.insert(audioController.synthEmitter.sfxTriggers, "coin")
+            table.insert(audioController.synthEmitter.sfxTriggers, "pitch_down")
         end
         if playdate.buttonJustPressed(playdate.kButtonLeft) then
-            table.insert(audioController.synthEmitter.sfxTriggers, "explosion")
+            table.insert(audioController.synthEmitter.sfxTriggers, "ding")
         end
         if playdate.buttonJustPressed(playdate.kButtonRight) then
-            table.insert(audioController.synthEmitter.sfxTriggers, "hit")
+            table.insert(audioController.synthEmitter.sfxTriggers, "powerup")
         end
 
         -- Music Layer Toggles
