@@ -25,12 +25,12 @@ function BoidScene()
         padding = 100                          -- Boids cannot enter this padded border area
     }
 
-    -- Pause state (starts playing)
+    -- Pause state (starts in capture mode = not paused)
     scene.isPaused = false
 
-    -- Current mode (influence = happiness, capture = freeze boids)
-    scene.currentMode = "influence" -- "influence" or "capture"
-    scene.captureProgress = 0       -- progress toward capturing (0-180 degrees)
+    -- Current mode (starts in capture mode so game is running!)
+    scene.currentMode = "capture" -- "influence" or "capture"
+    scene.captureProgress = 0     -- progress toward capturing (0-180 degrees)
 
     -- Track explosions
     scene.explosionsHappy = 0 -- exploded at 100 happiness
@@ -94,6 +94,7 @@ function BoidScene()
         self:addSystem(EmotionalBatterySystem) -- Update emotions after happiness changes
         self:addSystem(EmotionInfluenceSystem) -- Proximity effects (comment out if too slow)
         self:addSystem(BoidSystem)             -- Update boid AI and sprites
+        self:addSystem(AudioMusicSystem)       -- Dynamic music based on boid counts
         self:addSystem(RenderClearSystem)      -- Clear screen to white
         self:addSystem(RenderBackgroundSystem) -- Draw grass tilemap
         self:addSystem(RenderSpriteSystem)     -- Draw boid sprites
@@ -118,53 +119,25 @@ function BoidScene()
     end
 
     function scene:update()
-        -- A button toggles pause
+        -- A button switches mode
         if playdate.buttonJustPressed(playdate.kButtonA) then
-            self.isPaused = not self.isPaused
-        end
-
-        -- B button switches mode (while playing)
-        if playdate.buttonJustPressed(playdate.kButtonB) and not self.isPaused then
             self.currentMode = (self.currentMode == "influence") and "capture" or "influence"
             self.captureProgress = 0 -- reset capture progress when switching
-        end
 
-        -- B button increases happiness (crank alternative) - only while paused in influence mode
-        if playdate.buttonJustPressed(playdate.kButtonB) and self.isPaused and self.currentMode == "influence" then
-            -- Helper: Check if a boid is within the camera frame
-            local function isInCameraFrame(transform)
-                local camX = self.camera.x
-                local camY = self.camera.y
-                local screenX = transform.x - camX
-                local screenY = transform.y - camY
-
-                local frameInset = 40
-                local statusBarHeight = 35
-                local frameLeft = frameInset
-                local frameTop = frameInset
-                local frameRight = frameInset + (SCREEN_WIDTH - (frameInset * 2))
-                local frameBottom = frameInset + ((SCREEN_HEIGHT - statusBarHeight) - (frameInset * 2))
-
-                return screenX >= frameLeft and screenX <= frameRight and
-                    screenY >= frameTop and screenY <= frameBottom
-            end
-
-            -- Find boids in frame and increase happiness
-            local happinessIncrease = 10 -- Fixed amount per B press
-            for _, entity in ipairs(self.entities) do
-                if entity.emotionalBattery and entity.transform then
-                    if isInCameraFrame(entity.transform) then
-                        entity.emotionalBattery.value += happinessIncrease
-                        entity.emotionalBattery.value = clamp(entity.emotionalBattery.value, 0, 100)
-                    end
-                end
+            -- Influence mode = paused, Capture mode = running
+            if self.currentMode == "influence" then
+                self.isPaused = true  -- Pause for influence
+            else
+                self.isPaused = false -- Unpause for capture
             end
         end
+
+        -- B button does nothing (removed old logic)
 
         Scene.update(self) -- runs all registered systems
         SynthUpdate(self)
 
-        -- Check win/lose conditions during play mode
+        -- Check win/lose conditions (only when not paused)
         if not self.isPaused then
             local allHappy = true
             local allAngry = true
@@ -242,9 +215,9 @@ function BoidScene()
         -- Draw mode indicator in lower right (UI area)
         local modeText
         if self.currentMode == "influence" then
-            modeText = self.isPaused and "Influencing" or "Mode: Influence"
+            modeText = "Mode: Influence"
         else -- capture mode
-            modeText = self.isPaused and "Capturing" or "Mode: Capture"
+            modeText = "Mode: Capture"
         end
 
         local textWidth = gfx.getTextSize(modeText)
@@ -294,8 +267,8 @@ function BoidScene()
         gfx.drawLine(centerX - crossSize, centerY, centerX + crossSize, centerY)
         gfx.drawLine(centerX, centerY - crossSize, centerX, centerY + crossSize)
 
-        -- Show capture progress bar below center cross (when in capture mode and paused)
-        if self.currentMode == "capture" and self.isPaused and self.captureProgress > 0 then
+        -- Show capture progress bar below center cross (only when there's meaningful progress)
+        if self.currentMode == "capture" and self.captureProgress >= 10 then
             local progBarWidth = 80
             local progBarHeight = 6
             local progBarX = centerX - progBarWidth / 2

@@ -15,20 +15,21 @@
 local pd = playdate
 
 CaptureCrankSystem = System.new("captureCrank", {"transform", "emotionalBattery"}, function(entities, scene)
-    -- Only work while paused in capture mode
-    if not scene.isPaused or scene.currentMode ~= "capture" then
+    -- Only work in capture mode while NOT paused (real-time!)
+    if scene.isPaused or scene.currentMode ~= "capture" then
         return
     end
 
     -- Get crank rotation
     local crankChange = pd.getCrankChange()
 
-    -- DEBUG: B button also advances capture (simulates cranking down) -- DISABLED
-    -- if pd.buttonIsPressed(pd.kButtonB) then
-    --     crankChange = -10  -- Simulate cranking down
-    -- end
+    -- DEBUG: B button also advances capture (simulates cranking down) -- RE-ENABLED
+    if pd.buttonIsPressed(pd.kButtonB) then
+        crankChange = -10  -- Simulate cranking down
+    end
 
-    if crankChange < 0 then  -- Cranking DOWN (negative values)
+    -- Deadzone: ignore tiny crank movements (< 1 degree) to prevent noise
+    if crankChange < -1 then  -- Cranking DOWN with meaningful movement
         -- Accumulate capture progress (clamp at 180)
         scene.captureProgress = (scene.captureProgress or 0) + math.abs(crankChange)
         scene.captureProgress = math.min(scene.captureProgress, 180)
@@ -64,9 +65,8 @@ CaptureCrankSystem = System.new("captureCrank", {"transform", "emotionalBattery"
                 end
             end
 
-            -- Reset progress and unpause
+            -- Reset progress (no unpause needed!)
             scene.captureProgress = 0
-            scene.isPaused = false
         end
     end
 end)

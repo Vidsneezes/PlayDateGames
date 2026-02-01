@@ -24,7 +24,7 @@
 local pd = playdate
 
 HappinessCrankSystem = System.new("happinessCrank", {"transform", "emotionalBattery"}, function(entities, scene)
-    -- Crank only works while paused in influence mode
+    -- Only work while paused in influence mode
     if not scene.isPaused or scene.currentMode ~= "influence" then
         return
     end
