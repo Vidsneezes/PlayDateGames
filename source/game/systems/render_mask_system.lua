@@ -20,16 +20,8 @@ local gfx = playdate.graphics
 local maskFocus = nil
 
 RenderMaskSystem = System.new("renderMask", {}, function(entities, scene)
-    -- Load mask on first frame
-    if not maskFocus then
-        maskFocus = gfx.image.new("Images/mask-focus")
-        if not maskFocus then
-            print("ERROR: Failed to load Images/mask-focus.png")
-        end
-    end
-
     -- Only draw mask in influence mode (capture mode has no mask)
-    if scene.currentMode == "influence" and maskFocus then
-        maskFocus:draw(0, 0)
+    if scene.currentMode == "influence" then
+        maskFocusImage:draw(0, 0)
     end
 end)
