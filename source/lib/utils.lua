@@ -131,7 +131,8 @@ function spawnExplosion(scene, x, y, lifetime)
     -- Create a new explosion entity
     local explosion = Entity.new({
         transform = Transform(x, y),
-        explosionEffect = ExplosionEffect(lifetime or 30)  -- default 1 second
+        explosionEffect = ExplosionEffect(lifetime or 10),-- default 1 second
+        explosionAnim = ExplosionAnim()
     })
 
     scene:addEntity(explosion)
