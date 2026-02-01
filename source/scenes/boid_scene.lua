@@ -66,17 +66,20 @@ function BoidScene()
             local boid = Entity.new({
                 transform = Transform(x, y),
                 velocity = Velocity(0, 0),
-                boidsprite = BoidSpriteComp(createEmotionSprite(emotionType)),
+                boidsprite = BoidSpriteComp(createEmotionSprite(emotionType), emotionType),
                 emotionalBattery = EmotionalBattery(initialBattery)
             })
 
             -- Add emotion component based on type
             if emotionType == "happy" then
                 boid.happyBoid = HappyBoid()
+                boid.emotion = "happy"
             elseif emotionType == "sad" then
                 boid.sadBoid = SadBoid()
+                boid.emotion = "sad"
             elseif emotionType == "angry" then
                 boid.angryBoid = AngryBoid()
+                boid.emotion = "angry"
             end
 
             scene:addEntity(boid)

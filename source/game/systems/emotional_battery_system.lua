@@ -134,7 +134,7 @@ EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity"
             if e.sprite then
                 e.sprite.image = newImage
             elseif e.boidsprite and e.boidsprite.body and e.boidsprite.head then
-                e.boidsprite.head:setImage(newImage)
+                e.boidsprite.emotion = newEmotion
             end
         end
 
