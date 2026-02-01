@@ -19,9 +19,36 @@ local gfx = playdate.graphics
 -- Load mask once (cached)
 local maskFocus = nil
 
+local lastMaskFocusMode = nil
+
+local yPosition = -30
+
+local animationDuration = 250
+local startX,endX = -300,0
+local easingFunction = playdate.easingFunctions.inOutCubic
+local animator = nil
+
 RenderMaskSystem = System.new("renderMask", {}, function(entities, scene)
+    
+    if not (lastMaskFocusMode == nil) then
+        
+        if not (lastMaskFocusMode == scene.currentMode) then
+            if scene.currentMode == "influence" then
+                animator = playdate.graphics.animator.new(animationDuration, startX, endX, easingFunction)
+                animator.repeatCount = 0
+            end
+        end
+
+
+    end
+
     -- Only draw mask in influence mode (capture mode has no mask)
     if scene.currentMode == "influence" then
-        maskFocusImage:draw(0, 0)
+        if animator then 
+            maskFocusImage:draw(0, animator:currentValue())
+        end
     end
+
+    lastMaskFocusMode = scene.currentMode
+
 end)
