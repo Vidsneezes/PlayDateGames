@@ -18,14 +18,12 @@ function SynthStart(scene, trackName)
     audioController.synthEmitter.musicTrigger = trackName
     musicPlaying = true
 
-    -- Melody starts muted (0.0)
+    -- Set track volumes to default music volume (0.35)
     audioController.synthEmitter.trackVolumes = {
-        bass = 0.0,
-        drums = 0.0,
-        melody = 0.0
+        bass = musicVolume,
+        drums = musicVolume,
+        melody = musicVolume
     }
-
-    SynthDefaultTrackState()
 end
 
 function SynthDefaultTrackState()
