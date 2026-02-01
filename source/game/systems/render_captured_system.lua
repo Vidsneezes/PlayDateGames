@@ -28,6 +28,7 @@ RenderCapturedSystem = System.new("renderCaptured", {"transform", "capturedBubbl
         local screenX = e.transform.x - camX
         local screenY = e.transform.y - camY
 
+        e.capturedBubble.sprite:setImage(animationGhost:image())
         e.capturedBubble.sprite:moveTo(screenX, screenY)
     end
 end)

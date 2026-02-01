@@ -17,6 +17,8 @@ bodyMoveAnimeTable = playdate.graphics.imagetable.new("Images/boidAnims-table-32
 
 explosionAnimeTable = playdate.graphics.imagetable.new("Images/explosion-table-32-32")
 
+ghostAnimeTable = playdate.graphics.imagetable.new("Images/ghost-table-32-32")
+
 uiEmotestable = playdate.graphics.imagetable.new("Images/ui-table-32-32")
 
 maskFocusImage = playdate.graphics.image.new("Images/mask-focus")
@@ -105,4 +107,6 @@ animationBomb = playdate.graphics.animation.loop.new(120,imageTableBomb, true)
 animationUIHappy = playdate.graphics.animation.loop.new(120,imageTableHappy, true)
 animationUINoMask = playdate.graphics.animation.loop.new(120,imageTableUiNoMask,true)
 animationUIMask = playdate.graphics.animation.loop.new(120,imageTableUiMask,true)
+
+animationGhost = playdate.graphics.animation.loop.new(75,ghostAnimeTable, true)
 
