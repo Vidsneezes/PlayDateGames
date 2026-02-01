@@ -24,7 +24,7 @@ local lastMaskFocusMode = nil
 local yPosition = -30
 
 local animationDuration = 250
-local startY,endY = -384,-75
+local startY,endY = -397,-75
 local easingFunction = playdate.easingFunctions.outBounce
 local easingFunctionTakeOff = playdate.easingFunctions.inQuart
 local animator = nil
@@ -42,8 +42,6 @@ RenderMaskSystem = System.new("renderMask", {}, function(entities, scene)
                 animator.repeatCount = 0
             end
         end
-
-
     end
 
     -- Only draw mask in influence mode (capture mode has no mask)
