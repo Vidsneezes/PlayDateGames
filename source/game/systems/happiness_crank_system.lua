@@ -33,10 +33,10 @@ HappinessCrankSystem = System.new("happinessCrank", {"transform", "emotionalBatt
     local crankChange = pd.getCrankChange()
 
     if crankChange ~= 0 and scene.camera then
-        -- Find all boids within camera frame (80px inset - NARROW for testing)
+        -- Find all boids within camera frame (64px inset - 25% larger area than before)
         local frameBoids = {}
         for _, e in ipairs(entities) do
-            if isInCameraFrame(e.transform, scene.camera, 80) then
+            if isInCameraFrame(e.transform, scene.camera, 64) then
                 frameBoids[#frameBoids + 1] = e
             end
         end

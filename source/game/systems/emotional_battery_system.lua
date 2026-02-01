@@ -87,8 +87,8 @@ EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity"
 
         if scene.isPaused then
             -- Influence mode (paused): Only drain boids INSIDE the picture frame at 2x rate!
-            -- Frame size is 80px for influence mode (narrow viewport after swap)
-            if isInCameraFrame(e.transform, scene.camera, 80) then
+            -- Frame size is 64px for influence mode (25% larger area than before)
+            if isInCameraFrame(e.transform, scene.camera, 64) then
                 shouldDrain = true
                 drainMultiplier = 2.0  -- Double drain for pressure!
             end

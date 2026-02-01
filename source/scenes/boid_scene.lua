@@ -262,9 +262,9 @@ function BoidScene()
         gfx.drawText(modeText, modeX, modeY)
 
         -- Draw camera frame (size depends on mode) -- SWAPPED FOR TESTING
-        -- Influence mode: smaller frame (80px inset) -- SWAPPED!
+        -- Influence mode: smaller frame (64px inset - 25% larger than before) -- SWAPPED!
         -- Capture mode: larger frame (40px inset) -- SWAPPED!
-        local frameInset = (self.currentMode == "capture") and 40 or 80
+        local frameInset = (self.currentMode == "capture") and 40 or 64
         local frameWidth = SCREEN_WIDTH - (frameInset * 2)
         local frameHeight = (SCREEN_HEIGHT - statusBarHeight) - (frameInset * 2)
 
