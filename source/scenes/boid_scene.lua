@@ -32,6 +32,15 @@ function BoidScene()
     scene.currentMode = "capture" -- "influence" or "capture"
     scene.captureProgress = 0     -- progress toward capturing (0-180 degrees)
 
+    -- Mask animation state
+    scene.maskAnimation = {
+        state = "idle",           -- "idle" | "putting_on" | "taking_off"
+        frame = 0,                -- current animation frame (0-indexed)
+        frameTimer = 0,           -- frames until next animation frame
+        framesPerStep = 2,        -- how many game frames per animation frame (2 = 15fps animation at 30fps game)
+        targetMode = nil          -- mode to switch to after animation completes
+    }
+
     -- Track explosions
     scene.explosionsHappy = 0 -- exploded at 100 happiness
     scene.explosionsAngry = 0 -- exploded at 0 happiness
@@ -119,16 +128,37 @@ function BoidScene()
     end
 
     function scene:update()
-        -- A button switches mode
+        -- A button switches mode (triggers animation)
         if playdate.buttonJustPressed(playdate.kButtonA) then
-            self.currentMode = (self.currentMode == "influence") and "capture" or "influence"
+            local targetMode = (self.currentMode == "influence") and "capture" or "influence"
             self.captureProgress = 0 -- reset capture progress when switching
 
-            -- Influence mode = paused, Capture mode = running
-            if self.currentMode == "influence" then
-                self.isPaused = true  -- Pause for influence
+            -- Trigger mask animation
+            if targetMode == "influence" then
+                -- Going to influence mode = putting mask on
+                self.maskAnimation.state = "putting_on"
+                self.maskAnimation.frame = 0
+                self.maskAnimation.frameTimer = 0
+                self.maskAnimation.targetMode = "influence"
+                self.isPaused = true  -- Pause immediately for influence
             else
-                self.isPaused = false -- Unpause for capture
+                -- Going to capture mode = taking mask off
+                self.maskAnimation.state = "taking_off"
+                self.maskAnimation.frame = 0
+                self.maskAnimation.frameTimer = 0
+                self.maskAnimation.targetMode = "capture"
+                self.isPaused = false -- Unpause immediately for capture
+            end
+        end
+
+        -- Update mask animation if active
+        if self.maskAnimation.state ~= "idle" then
+            self.maskAnimation.frameTimer += 1
+
+            -- Advance animation frame when timer reaches threshold
+            if self.maskAnimation.frameTimer >= self.maskAnimation.framesPerStep then
+                self.maskAnimation.frame += 1
+                self.maskAnimation.frameTimer = 0
             end
         end
 
