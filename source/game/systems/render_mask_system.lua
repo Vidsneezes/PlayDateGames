@@ -38,16 +38,16 @@ RenderMaskSystem = System.new("renderMask", {}, function(entities, scene)
         end
     end
 
-    -- Draw appropriate mask based on current mode
+    -- Draw appropriate mask based on current mode (SWAPPED FOR TESTING)
     if scene.currentMode == "influence" then
-        -- Influence mode: wide view mask (freeze)
-        if maskFreeze then
-            maskFreeze:draw(0, 0)
-        end
-    elseif scene.currentMode == "capture" then
-        -- Capture mode: narrow view mask (focus)
+        -- Influence mode: NARROW view mask (focus) -- SWAPPED!
         if maskFocus then
             maskFocus:draw(0, 0)
+        end
+    elseif scene.currentMode == "capture" then
+        -- Capture mode: WIDE view mask (freeze) -- SWAPPED!
+        if maskFreeze then
+            maskFreeze:draw(0, 0)
         end
     end
 end)

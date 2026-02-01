@@ -78,23 +78,41 @@ EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity"
             currentEmotion = "angry"
         end
 
-        -- Only drain battery in capture mode (not paused) AND if within camera frame
-        if not scene.isPaused and isInCameraFrame(e.transform, scene.camera) then
-            -- Drain battery based on current emotion (30% slower for balance)
+        -- Drain battery based on mode and position
+        local shouldDrain = false
+        local drainMultiplier = 1.0
+
+        if scene.isPaused then
+            -- Influence mode (paused): Only drain boids INSIDE the frame at 2x rate!
+            -- Frame size is 80px for influence mode (narrow viewport after swap)
+            if isInCameraFrame(e.transform, scene.camera, 80) then
+                shouldDrain = true
+                drainMultiplier = 2.0  -- Double drain for pressure!
+            end
+        else
+            -- Capture mode (not paused): Drain all boids in camera at normal rate
+            if isInCameraFrame(e.transform, scene.camera) then
+                shouldDrain = true
+                drainMultiplier = 1.0  -- Normal drain
+            end
+        end
+
+        if shouldDrain then
+            -- Drain battery based on current emotion (30% slower base rate)
             if currentEmotion == "happy" then
-                battery.value -= 0.14  -- was 0.2
+                battery.value -= 0.14 * drainMultiplier  -- was 0.2, now with multiplier
             elseif currentEmotion == "sad" then
                 if hasStopped(v) then
                     -- At edge, drain faster
-                    battery.value -= 0.21  -- was 0.3
+                    battery.value -= 0.21 * drainMultiplier  -- was 0.3
                 else
                     -- Moving, drain slower
-                    battery.value -= 0.07  -- was 0.1
+                    battery.value -= 0.07 * drainMultiplier  -- was 0.1
                 end
             elseif currentEmotion == "angry" then
                 -- Drain to 0 then stop
                 if battery.value > 0 then
-                    battery.value -= 0.014  -- was 0.02
+                    battery.value -= 0.014 * drainMultiplier  -- was 0.02
                 end
             end
 
