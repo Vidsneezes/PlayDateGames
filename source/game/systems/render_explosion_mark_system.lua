@@ -18,11 +18,6 @@
 local gfx = playdate.graphics
 
 RenderExplosionMarkSystem = System.new("renderExplosionMark", {"transform", "explosionMark"}, function(entities, scene)
-    -- Debug: print how many marks we're rendering
-    if #entities > 0 then
-        print("Rendering " .. #entities .. " explosion marks")
-    end
-
     -- Get camera offset
     local camX = 0
     local camY = 0

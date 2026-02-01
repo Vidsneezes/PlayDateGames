@@ -142,8 +142,6 @@ function spawnExplosion(scene, x, y, lifetime)
         explosionMark = ExplosionMark()
     })
 
-    print("Created explosion mark at " .. x .. ", " .. y)
-
     scene:addEntity(explosion)
     scene:addEntity(mark)
     return explosion
