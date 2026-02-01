@@ -101,6 +101,7 @@ function BoidScene()
         self:addSystem(RenderBoidHPSystem)     -- Draw HP bars on top of sprites
         self:addSystem(RenderCapturedSystem)   -- Draw squares around captured boids
         self:addSystem(RenderExplosionSystem)  -- Draw explosions and cleanup
+        self:addSystem(RenderMaskSystem)       -- Draw mode-specific mask overlay (RE-ENABLED FOR TESTING)
         -- self:addSystem(RenderUISystem)           -- Happiness gauge (DISABLED - using individual HP bars)
 
         -- Spawn test boids
@@ -229,10 +230,10 @@ function BoidScene()
         gfx.drawRect(modeX - boxPadding, modeY - 3, textWidth + boxPadding * 2, 20)
         gfx.drawText(modeText, modeX, modeY)
 
-        -- Draw camera frame (size depends on mode)
-        -- Influence mode: normal frame (40px inset)
-        -- Capture mode: smaller frame (80px inset)
-        local frameInset = (self.currentMode == "capture") and 80 or 40
+        -- Draw camera frame (size depends on mode) -- SWAPPED FOR TESTING
+        -- Influence mode: smaller frame (80px inset) -- SWAPPED!
+        -- Capture mode: larger frame (40px inset) -- SWAPPED!
+        local frameInset = (self.currentMode == "capture") and 40 or 80
         local frameWidth = SCREEN_WIDTH - (frameInset * 2)
         local frameHeight = (SCREEN_HEIGHT - statusBarHeight) - (frameInset * 2)
 

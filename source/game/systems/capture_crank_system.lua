@@ -23,10 +23,10 @@ CaptureCrankSystem = System.new("captureCrank", {"transform", "emotionalBattery"
     -- Get crank rotation
     local crankChange = pd.getCrankChange()
 
-    -- DEBUG: B button also advances capture (simulates cranking down) -- RE-ENABLED
-    if pd.buttonIsPressed(pd.kButtonB) then
-        crankChange = -10  -- Simulate cranking down
-    end
+    -- DEBUG: B button also advances capture (simulates cranking down) -- DISABLED
+    -- if pd.buttonIsPressed(pd.kButtonB) then
+    --     crankChange = -10  -- Simulate cranking down
+    -- end
 
     -- Deadzone: ignore tiny crank movements (< 1 degree) to prevent noise
     if crankChange < -1 then  -- Cranking DOWN with meaningful movement
@@ -36,9 +36,9 @@ CaptureCrankSystem = System.new("captureCrank", {"transform", "emotionalBattery"
 
         -- Check if threshold reached (180 degrees)
         if scene.captureProgress >= 180 then
-            -- Find all boids in capture frame and capture them
+            -- Find all boids in capture frame and capture them (40px inset - WIDE for testing)
             for _, e in ipairs(entities) do
-                if not e.captured and isInCameraFrame(e.transform, scene.camera, 80) then
+                if not e.captured and isInCameraFrame(e.transform, scene.camera, 40) then
                     -- Check if boid is happy (battery > 60)
                     if e.emotionalBattery.value > 60 then
                         -- Capture this happy boid!
