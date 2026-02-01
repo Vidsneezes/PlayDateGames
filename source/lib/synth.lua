@@ -5,7 +5,7 @@ musicTrackStates = {
     drums = true,
     melody = false
 }
-musicVolume = 0.5;
+musicVolume = 0.1
 
 function SynthStart(scene, trackName)
     -- Create our controller entity with the new SynthEmitter
@@ -73,7 +73,7 @@ function SynthUpdate(scene)
 end
 
 function SynthSetTrackState(trackName, state)
-    audioController.synthEmitter.trackVolumes[trackName] = state and 1.0 or 0.0
+    audioController.synthEmitter.trackVolumes[trackName] = state and musicVolume or 0.0
 end
 
 function SynthTriggerSFX(sfxName)
