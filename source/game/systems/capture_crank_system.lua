@@ -43,6 +43,32 @@ CaptureCrankSystem = System.new("captureCrank", {"transform", "emotionalBattery"
                     if e.emotionalBattery.value > 60 then
                         -- Capture this happy boid!
                         e.captured = Captured()
+
+                        -- Hide the boid's sprites
+                        if e.boidsprite and e.boidsprite.body then
+                            e.boidsprite.body:setVisible(false)
+                        end
+                        if e.boidsprite and e.boidsprite.head then
+                            e.boidsprite.head:setVisible(false)
+                        end
+
+                        -- Spawn a bubble entity at this position
+                        local bubble = Entity.new({
+                            transform = Transform(e.transform.x, e.transform.y),
+                            capturedBubble = CapturedBubble()
+                        })
+
+                        -- Add cleanup method for bubble sprite
+                        function bubble:cleanup()
+                            if self.capturedBubble and self.capturedBubble.sprite then
+                                self.capturedBubble.sprite:remove()
+                            end
+                        end
+
+                        scene:addEntity(bubble)
+
+                        -- Play capture sound
+                        SoundBank.playSfx("ding")
                     else
                         -- Not happy - explode instead!
 
