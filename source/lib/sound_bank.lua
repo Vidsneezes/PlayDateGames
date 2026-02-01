@@ -5,7 +5,7 @@
 
     SFX: jump, coin, explosion, hit, coin2, dash, ding, powerup, hurt, pitch_up, pitch_down
     Music: theme, music1, music2
-]]
+    ]]
 
 local pd = playdate
 local snd = pd.sound
@@ -144,34 +144,37 @@ local function stepSequencer()
     local pIdx = musicState.currentPatternIdx
 
     for name, track in pairs(musicState.tracks) do
-        local currentPhrase = track.patterns[pIdx] or track.patterns[1]
-        local note = currentPhrase and currentPhrase[step]
-
-        if note and note > 0 and track.volume > 0 then
-            if name == "drums" then
-                track.synth:setDecay(0.05)
-                track.synth:playNote(100, track.volume * 0.8, 0.05)
-            else
-                track.synth:playNote(note, track.volume * 0.5, 0.15)
+        local currentPhrase = track.patterns[pIdx]
+        if currentPhrase then
+            local note = currentPhrase[step]
+            if note and note > 0 and track.volume > 0 then
+                if name == "drums" then
+                    track.synth:setDecay(0.05)
+                    track.synth:playNote(100, track.volume * 0.8, 0.05)
+                else
+                    track.synth:playNote(note, track.volume * 0.5, 0.15)
+                end
             end
         end
     end
 
+    -- Avance de paso
     musicState.step += 1
+
     if musicState.step > 16 then
         musicState.step = 1
-        local totalPatterns = #musicState.tracks.bass.patterns
 
-        -- Lógica de Loop: Si es el último paso del último patrón
-        if pIdx >= totalPatterns then
+        -- Verificamos si hay más patrones
+        if pIdx < #musicState.tracks.bass.patterns then
+            musicState.currentPatternIdx += 1
+        else
+            -- Fin de la lista de patrones
             if musicState.loop then
                 musicState.currentPatternIdx = 1
             else
-                SoundBank.stopMusic() -- Termina la ejecución si loop es false
-                return
+                SoundBank.stopMusic()
+                return -- Salimos para no programar el siguiente timer
             end
-        else
-            musicState.currentPatternIdx = pIdx + 1
         end
     end
 
