@@ -51,7 +51,10 @@ RenderUISystem = System.new("renderUI", {}, function(entities, scene)
 
     -- Draw status bar text (captured and explosions)
     local statusY = SCREEN_HEIGHT - statusBarHeight + 10
-    gfx.drawText("Happy: " .. capturedCount .. "/5  Exp: " .. totalExplosions .. "/5", 10, statusY)
+    animationBoidHeadHappy:draw(2, statusY - 8)
+    gfx.drawText(capturedCount .. "/5", 32, statusY)
+
+--    gfx.drawText("Happy: " .. capturedCount .. "/5  Exp: " .. totalExplosions .. "/5", 10, statusY)
 
     -- Draw mode indicator in lower right (UI area)
     local modeText
@@ -63,23 +66,28 @@ RenderUISystem = System.new("renderUI", {}, function(entities, scene)
 
     local textWidth = gfx.getTextSize(modeText)
     local boxPadding = 5
-    local modeX = SCREEN_WIDTH - textWidth - 15
+    local modeX = SCREEN_WIDTH - 34
     local modeY = SCREEN_HEIGHT - statusBarHeight + 10
 
     -- Simple box with black text
-    gfx.setColor(gfx.kColorWhite)
-    gfx.fillRect(modeX - boxPadding, modeY - 3, textWidth + boxPadding * 2, 20)
-    gfx.setColor(gfx.kColorBlack)
-    gfx.drawRect(modeX - boxPadding, modeY - 3, textWidth + boxPadding * 2, 20)
-    gfx.drawText(modeText, modeX, modeY)
+    if scene.currentMode == "influence" then
+        animationUIMask:draw(modeX, statusY - 8)
+    else
+        animationUINoMask:draw(modeX, statusY - 8)
+    end
+    --gfx.setColor(gfx.kColorWhite)
+    --gfx.fillRect(modeX - boxPadding, modeY - 3, textWidth + boxPadding * 2, 20)
+    --gfx.setColor(gfx.kColorBlack)
+    --gfx.drawRect(modeX - boxPadding, modeY - 3, textWidth + boxPadding * 2, 20)
+    --gfx.drawText(modeText, modeX, modeY)
 
     -- Draw bombs vertically in upper right corner
-    local bombX = SCREEN_WIDTH - 20
+    local bombX = SCREEN_WIDTH - 32
     local bombStartY = 10
     local bombSpacing = 15
 
     for i = 1, scene.sadBombs do
-        gfx.drawText("B", bombX, bombStartY + (i - 1) * bombSpacing)
+        animationBomb:draw(bombX, bombStartY + (i - 1) * bombSpacing)
     end
 
     -- Draw camera frame (size depends on mode)

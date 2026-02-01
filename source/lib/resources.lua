@@ -17,6 +17,8 @@ bodyMoveAnimeTable = playdate.graphics.imagetable.new("Images/boidAnims-table-32
 
 explosionAnimeTable = playdate.graphics.imagetable.new("Images/explosion-table-32-32")
 
+uiEmotestable = playdate.graphics.imagetable.new("Images/ui-table-32-32")
+
 maskFocusImage = playdate.graphics.image.new("Images/mask-focus")
 
 tombstoneImage = playdate.graphics.image.new("Images/rip")
@@ -67,7 +69,37 @@ imageTableExplosion:setImage(2, explosionAnimeTable:getImage(2))
 imageTableExplosion:setImage(3, explosionAnimeTable:getImage(3))
 imageTableExplosion:setImage(4, explosionAnimeTable:getImage(4))
 
+imageTableHappy = playdate.graphics.imagetable.new(4)
+imageTableHappy:setImage(1, uiEmotestable:getImage(9))
+imageTableHappy:setImage(2, uiEmotestable:getImage(10))
+imageTableHappy:setImage(3, uiEmotestable:getImage(11))
+imageTableHappy:setImage(4, uiEmotestable:getImage(12))
+
+imageTableBomb = playdate.graphics.imagetable.new(4)
+imageTableBomb:setImage(1, uiEmotestable:getImage(21))
+imageTableBomb:setImage(2, uiEmotestable:getImage(22))
+imageTableBomb:setImage(3, uiEmotestable:getImage(23))
+imageTableBomb:setImage(4, uiEmotestable:getImage(24))
+
+imageTableUiNoMask = playdate.graphics.imagetable.new(4)
+imageTableUiNoMask:setImage(1, uiEmotestable:getImage(1))
+imageTableUiNoMask:setImage(2, uiEmotestable:getImage(2))
+imageTableUiNoMask:setImage(3, uiEmotestable:getImage(3))
+imageTableUiNoMask:setImage(4, uiEmotestable:getImage(4))
+
+imageTableUiMask = playdate.graphics.imagetable.new(4)
+imageTableUiMask:setImage(1, uiEmotestable:getImage(5))
+imageTableUiMask:setImage(2, uiEmotestable:getImage(6))
+imageTableUiMask:setImage(3, uiEmotestable:getImage(7))
+imageTableUiMask:setImage(4, uiEmotestable:getImage(8))
+
 animationBoidBodyMove = playdate.graphics.animation.loop.new(80, imageTableBodyMove, true)
 animationBoidHeadHappy = playdate.graphics.animation.loop.new(80, imageTableHeadHappy, true)
 animationBoidHeadSad = playdate.graphics.animation.loop.new(80, imageTableHeadSad, true)
 animationBoidHeadAngry = playdate.graphics.animation.loop.new(80, imageTableHeadAngry, true)
+
+animationBomb = playdate.graphics.animation.loop.new(120,imageTableBomb, true)
+animationUIHappy = playdate.graphics.animation.loop.new(120,imageTableHappy, true)
+animationUINoMask = playdate.graphics.animation.loop.new(120,imageTableUiNoMask,true)
+animationUIMask = playdate.graphics.animation.loop.new(120,imageTableUiMask,true)
+
