@@ -2,6 +2,9 @@
     SOUND BANK (DYNAMIC MULTI-PATTERN)
     - Reactive Music Sequencer (Multi-track & Multi-phrase)
     - Polyphonic SFX Pool
+
+    SFX: jump, coin, explosion, hit, coin2, dash, ding, powerup, hurt, pitch_up, pitch_down
+    Music: theme, music1, music2
 ]]
 
 local pd = playdate
