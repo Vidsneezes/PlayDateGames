@@ -214,15 +214,13 @@ function BoidScene()
 
             -- Win if you capture 5 boids
             if capturedCount >= 5 then
-                -- Pass actual survivor count (non-captured + captured)
-                local survivorCount = boidCount + capturedCount
-                GAME_WORLD:queueScene(WinScene(survivorCount, self.explosionsHappy, self.explosionsAngry))
+                GAME_WORLD:queueScene(WinScene(self.explosionsHappy, self.explosionsAngry))
                 return
             end
 
             -- Lose if 5 boids exploded
             if (self.explosionsHappy + self.explosionsAngry) >= 5 then
-                GAME_WORLD:queueScene(LoseScene())
+                GAME_WORLD:queueScene(LoseScene(self.explosionsHappy, self.explosionsAngry))
                 return
             end
         end
