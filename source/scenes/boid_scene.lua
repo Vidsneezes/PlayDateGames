@@ -129,37 +129,16 @@ function BoidScene()
     end
 
     function scene:update()
-        -- A button switches mode (triggers animation)
+        -- A button switches mode (instant transition)
         if playdate.buttonJustPressed(playdate.kButtonA) then
-            local targetMode = (self.currentMode == "influence") and "capture" or "influence"
+            self.currentMode = (self.currentMode == "influence") and "capture" or "influence"
             self.captureProgress = 0 -- reset capture progress when switching
 
-            -- Trigger mask animation
-            if targetMode == "influence" then
-                -- Going to influence mode = putting mask on
-                self.maskAnimation.state = "putting_on"
-                self.maskAnimation.frame = 0
-                self.maskAnimation.frameTimer = 0
-                self.maskAnimation.targetMode = "influence"
-                self.isPaused = true  -- Pause immediately for influence
+            -- Update pause state based on mode
+            if self.currentMode == "influence" then
+                self.isPaused = true  -- Pause for influence
             else
-                -- Going to capture mode = taking mask off
-                self.maskAnimation.state = "taking_off"
-                self.maskAnimation.frame = 0
-                self.maskAnimation.frameTimer = 0
-                self.maskAnimation.targetMode = "capture"
-                self.isPaused = false -- Unpause immediately for capture
-            end
-        end
-
-        -- Update mask animation if active
-        if self.maskAnimation.state ~= "idle" then
-            self.maskAnimation.frameTimer += 1
-
-            -- Advance animation frame when timer reaches threshold
-            if self.maskAnimation.frameTimer >= self.maskAnimation.framesPerStep then
-                self.maskAnimation.frame += 1
-                self.maskAnimation.frameTimer = 0
+                self.isPaused = false -- Unpause for capture
             end
         end
 
