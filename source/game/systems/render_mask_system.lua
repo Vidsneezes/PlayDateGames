@@ -24,8 +24,9 @@ local lastMaskFocusMode = nil
 local yPosition = -30
 
 local animationDuration = 250
-local startX,endX = -300,0
-local easingFunction = playdate.easingFunctions.inOutCubic
+local startY,endY = -384,-75
+local easingFunction = playdate.easingFunctions.outBounce
+local easingFunctionTakeOff = playdate.easingFunctions.inQuart
 local animator = nil
 
 RenderMaskSystem = System.new("renderMask", {}, function(entities, scene)
@@ -34,7 +35,10 @@ RenderMaskSystem = System.new("renderMask", {}, function(entities, scene)
         
         if not (lastMaskFocusMode == scene.currentMode) then
             if scene.currentMode == "influence" then
-                animator = playdate.graphics.animator.new(animationDuration, startX, endX, easingFunction)
+                animator = playdate.graphics.animator.new(animationDuration, startY, endY, easingFunction)
+                animator.repeatCount = 0
+            elseif scene.currentMode == "capture" then
+                 animator = playdate.graphics.animator.new(animationDuration, endY, startY, easingFunctionTakeOff)
                 animator.repeatCount = 0
             end
         end
@@ -43,11 +47,12 @@ RenderMaskSystem = System.new("renderMask", {}, function(entities, scene)
     end
 
     -- Only draw mask in influence mode (capture mode has no mask)
-    if scene.currentMode == "influence" then
-        if animator then 
-            maskFocusImage:draw(0, animator:currentValue())
-        end
+    if animator then
+        maskFocusImage:draw(0, animator:currentValue())
+    else 
+        maskFocusImage:draw(0, startY)
     end
+
 
     lastMaskFocusMode = scene.currentMode
 
