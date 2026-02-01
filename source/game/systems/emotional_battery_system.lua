@@ -18,22 +18,6 @@
 
 local gfx = playdate.graphics
 
--- Helper: Create sprite for emotion type
--- PLACEHOLDER SHAPES RE-ENABLED at 32x32 for testing
-local function createEmotionSprite(emotionType)
-    local img = boidSpriteHappy
-
-    if emotionType == "happy" then
-        img = boidSpriteHappy
-    elseif emotionType == "sad" then
-        img = boidSpriteSad
-    elseif emotionType == "angry" then
-        img = boidSpriteAngry -- Square
-    end
-
-    return img
-end
-
 -- Helper: Get current emotion type based on battery value
 local function getEmotionFromBattery(batteryValue)
     if batteryValue > 60 then
@@ -55,6 +39,11 @@ EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity"
     local drainMultiplier = scene.isPaused and 2.0 or 1.0
 
     for _, e in ipairs(entities) do
+        -- Skip captured boids (happiness frozen)
+        if e.captured then
+            goto continue
+        end
+
         local battery = e.emotionalBattery
         local v = e.velocity
 
@@ -70,16 +59,19 @@ EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity"
                 scene.explosionsAngry = (scene.explosionsAngry or 0) + 1
             end
 
-            -- Remove sprite from display list immediately
+            -- Remove sprites from display list immediately
             if e.boidsprite and e.boidsprite.body then
                 e.boidsprite.body:remove()
+            end
+            if e.boidsprite and e.boidsprite.head then
+                e.boidsprite.head:remove()
             end
 
             -- Skip rest of processing for this entity
             goto continue
         end
 
-        -- Determine current emotion type
+        -- Determine current emotion type (BEFORE camera frame check so it's available later)
         local currentEmotion = nil
         if e.happyBoid then
             currentEmotion = "happy"
@@ -89,26 +81,29 @@ EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity"
             currentEmotion = "angry"
         end
 
-        -- Drain battery based on current emotion (30% slower for balance, doubled while paused!)
-        if currentEmotion == "happy" then
-            battery.value -= 0.14 * drainMultiplier  -- was 0.2
-        elseif currentEmotion == "sad" then
-            if hasStopped(v) then
-                -- At edge, drain faster
-                battery.value -= 0.21 * drainMultiplier  -- was 0.3
-            else
-                -- Moving, drain slower
-                battery.value -= 0.07 * drainMultiplier  -- was 0.1
+        -- Only drain battery if boid is within camera frame
+        if isInCameraFrame(e.transform, scene.camera) then
+            -- Drain battery based on current emotion (30% slower for balance, doubled while paused!)
+            if currentEmotion == "happy" then
+                battery.value -= 0.14 * drainMultiplier  -- was 0.2
+            elseif currentEmotion == "sad" then
+                if hasStopped(v) then
+                    -- At edge, drain faster
+                    battery.value -= 0.21 * drainMultiplier  -- was 0.3
+                else
+                    -- Moving, drain slower
+                    battery.value -= 0.07 * drainMultiplier  -- was 0.1
+                end
+            elseif currentEmotion == "angry" then
+                -- Drain to 0 then stop
+                if battery.value > 0 then
+                    battery.value -= 0.014 * drainMultiplier  -- was 0.02
+                end
             end
-        elseif currentEmotion == "angry" then
-            -- Drain to 0 then stop
-            if battery.value > 0 then
-                battery.value -= 0.014 * drainMultiplier  -- was 0.02
-            end
-        end
 
-        -- Clamp battery value
-        battery.value = clamp(battery.value, 0, battery.max)
+            -- Clamp battery value
+            battery.value = clamp(battery.value, 0, battery.max)
+        end
 
         -- Check if emotion should change
         local newEmotion = getEmotionFromBattery(battery.value)
@@ -138,8 +133,8 @@ EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity"
             local newImage = createEmotionSprite(newEmotion)
             if e.sprite then
                 e.sprite.image = newImage
-            elseif e.boidsprite and e.boidsprite.body then
-                e.boidsprite.body:setImage(newImage)
+            elseif e.boidsprite and e.boidsprite.body and e.boidsprite.head then
+                e.boidsprite.emotion = newEmotion
             end
         end
 

@@ -16,51 +16,38 @@ local gfx = playdate.graphics
 function BoidScene()
     local scene = Scene.new("boid")
 
-    -- Camera for scrolling world (4x viewport area)
+    -- Camera for scrolling world (4x viewport area + 100px padding on each side)
     scene.camera = {
         x = 0,
         y = 0,
-        worldWidth = SCREEN_WIDTH * 2,  -- 800 (2x width = 4x area total)
-        worldHeight = SCREEN_HEIGHT * 2 -- 480 (2x height = 4x area total)
+        worldWidth = SCREEN_WIDTH * 2 + 200,   -- 1000 (800 + 100px padding on each side)
+        worldHeight = SCREEN_HEIGHT * 2 + 200, -- 680 (480 + 100px padding on each side)
+        padding = 100                          -- Boids cannot enter this padded border area
     }
 
     -- Pause state (starts playing)
     scene.isPaused = false
 
+    -- Current mode (influence = happiness, capture = freeze boids)
+    scene.currentMode = "influence" -- "influence" or "capture"
+    scene.captureProgress = 0       -- progress toward capturing (0-180 degrees)
+
     -- Track explosions
     scene.explosionsHappy = 0 -- exploded at 100 happiness
     scene.explosionsAngry = 0 -- exploded at 0 happiness
-
-    -- Helper: Create temporary sprite for each emotion type
-    -- PLACEHOLDER SHAPES RE-ENABLED at 32x32 for testing
-    local function createBoidSprite(emotionType)
-        local img = boidSpriteHappy
-
-        if emotionType == "happy" then
-            -- Triangle (pointing up)
-            img = boidSpriteHappy
-        elseif emotionType == "sad" then
-            -- Circle
-            img = boidSpriteSad
-        elseif emotionType == "angry" then
-            -- Square
-            img = boidSpriteAngry
-        end
-
-        return img
-    end
 
     -- Helper: Spawn multiple boids with random positions and emotions
     local function spawnRandomBoids(scene, count)
         local worldW = scene.camera.worldWidth
         local worldH = scene.camera.worldHeight
+        local padding = scene.camera.padding
         local spriteSize = 32 -- Updated to 32x32 for testing
         local emotions = { "happy", "sad", "angry" }
 
         for i = 1, count do
-            -- Random position (keeping sprite in bounds)
-            local x = math.random(0, worldW - spriteSize)
-            local y = math.random(0, worldH - spriteSize)
+            -- Random position (keeping sprite in bounds, respecting padding)
+            local x = math.random(padding, worldW - padding - spriteSize)
+            local y = math.random(padding, worldH - padding - spriteSize)
 
             -- Random emotion
             local emotionType = emotions[math.random(1, 3)]
@@ -79,17 +66,20 @@ function BoidScene()
             local boid = Entity.new({
                 transform = Transform(x, y),
                 velocity = Velocity(0, 0),
-                boidsprite = BoidSpriteComp(createBoidSprite(emotionType)),
+                boidsprite = BoidSpriteComp(createEmotionSprite(emotionType), emotionType),
                 emotionalBattery = EmotionalBattery(initialBattery)
             })
 
             -- Add emotion component based on type
             if emotionType == "happy" then
                 boid.happyBoid = HappyBoid()
+                boid.emotion = "happy"
             elseif emotionType == "sad" then
                 boid.sadBoid = SadBoid()
+                boid.emotion = "sad"
             elseif emotionType == "angry" then
                 boid.angryBoid = AngryBoid()
+                boid.emotion = "angry"
             end
 
             scene:addEntity(boid)
@@ -99,7 +89,8 @@ function BoidScene()
     function scene:onEnter()
         -- Register systems in execution order
         self:addSystem(CameraSystem)
-        self:addSystem(HappinessCrankSystem)   -- Read crank input first
+        self:addSystem(HappinessCrankSystem)   -- Influence mode: crank UP for happiness
+        self:addSystem(CaptureCrankSystem)     -- Capture mode: crank DOWN to capture
         self:addSystem(EmotionalBatterySystem) -- Update emotions after happiness changes
         self:addSystem(EmotionInfluenceSystem) -- Proximity effects (comment out if too slow)
         self:addSystem(BoidSystem)             -- Update boid AI and sprites
@@ -107,6 +98,7 @@ function BoidScene()
         self:addSystem(RenderBackgroundSystem) -- Draw grass tilemap
         self:addSystem(RenderSpriteSystem)     -- Draw boid sprites
         self:addSystem(RenderBoidHPSystem)     -- Draw HP bars on top of sprites
+        self:addSystem(RenderCapturedSystem)   -- Draw squares around captured boids
         self:addSystem(RenderExplosionSystem)  -- Draw explosions and cleanup
         -- self:addSystem(RenderUISystem)           -- Happiness gauge (DISABLED - using individual HP bars)
 
@@ -122,9 +114,6 @@ function BoidScene()
     end
 
     function scene:onExit()
-        -- Clean up if needed
-        bgset = false
-        playdate.graphics.sprite.removeAll()
         SynthDestroy(self)
     end
 
@@ -134,8 +123,14 @@ function BoidScene()
             self.isPaused = not self.isPaused
         end
 
-        -- B button increases happiness (crank alternative) - only while paused
-        if playdate.buttonJustPressed(playdate.kButtonB) and self.isPaused then
+        -- B button switches mode (while playing)
+        if playdate.buttonJustPressed(playdate.kButtonB) and not self.isPaused then
+            self.currentMode = (self.currentMode == "influence") and "capture" or "influence"
+            self.captureProgress = 0 -- reset capture progress when switching
+        end
+
+        -- B button increases happiness (crank alternative) - only while paused in influence mode
+        if playdate.buttonJustPressed(playdate.kButtonB) and self.isPaused and self.currentMode == "influence" then
             -- Helper: Check if a boid is within the camera frame
             local function isInCameraFrame(transform)
                 local camX = self.camera.x
@@ -174,30 +169,38 @@ function BoidScene()
             local allHappy = true
             local allAngry = true
             local boidCount = 0
+            local capturedCount = 0
 
             for _, entity in ipairs(self.entities) do
                 if entity.emotionalBattery then
-                    boidCount += 1
+                    if entity.captured then
+                        capturedCount += 1
+                    else
+                        -- Only count non-captured boids for happiness check
+                        boidCount += 1
 
-                    -- Check happiness (battery > 60)
-                    if entity.emotionalBattery.value <= 60 then
-                        allHappy = false
-                    end
+                        -- Check happiness (battery > 60)
+                        if entity.emotionalBattery.value <= 60 then
+                            allHappy = false
+                        end
 
-                    -- Check if angry (has angryBoid component)
-                    if not entity.angryBoid then
-                        allAngry = false
+                        -- Check if angry (has angryBoid component)
+                        if not entity.angryBoid then
+                            allAngry = false
+                        end
                     end
                 end
             end
 
-            -- Win if all boids are happy (and there are boids)
-            if allHappy and boidCount > 0 then
-                GAME_WORLD:queueScene(WinScene(boidCount, self.explosionsHappy, self.explosionsAngry))
+            -- Win if all non-captured boids are happy OR if everything is captured
+            if (allHappy and boidCount >= 0) or (boidCount == 0 and capturedCount > 0) then
+                -- Pass actual survivor count (non-captured + captured)
+                local survivorCount = boidCount + capturedCount
+                GAME_WORLD:queueScene(WinScene(survivorCount, self.explosionsHappy, self.explosionsAngry))
                 return
             end
 
-            -- Lose if all boids are angry (and there are boids)
+            -- Lose if all non-captured boids are angry (and there are uncaptured boids)
             if allAngry and boidCount > 0 then
                 GAME_WORLD:queueScene(LoseScene())
                 return
@@ -236,22 +239,30 @@ function BoidScene()
         local statusY = SCREEN_HEIGHT - statusBarHeight + 10
         gfx.drawText("Happy: " .. happyCount .. "  Sad: " .. sadCount .. "  Angry: " .. angryCount, 10, statusY)
 
-        -- Draw pause state indicator in lower right (UI area)
-        local pauseText = self.isPaused and "PAUSED" or "PLAYING"
-        local textWidth = gfx.getTextSize(pauseText)
+        -- Draw mode indicator in lower right (UI area)
+        local modeText
+        if self.currentMode == "influence" then
+            modeText = self.isPaused and "Influencing" or "Mode: Influence"
+        else -- capture mode
+            modeText = self.isPaused and "Capturing" or "Mode: Capture"
+        end
+
+        local textWidth = gfx.getTextSize(modeText)
         local boxPadding = 5 -- larger box
-        local pauseX = SCREEN_WIDTH - textWidth - 15
-        local pauseY = SCREEN_HEIGHT - statusBarHeight + 10
+        local modeX = SCREEN_WIDTH - textWidth - 15
+        local modeY = SCREEN_HEIGHT - statusBarHeight + 10
 
         -- Simple box with black text (same style for both states)
         gfx.setColor(gfx.kColorWhite)
-        gfx.fillRect(pauseX - boxPadding, pauseY - 3, textWidth + boxPadding * 2, 20)
+        gfx.fillRect(modeX - boxPadding, modeY - 3, textWidth + boxPadding * 2, 20)
         gfx.setColor(gfx.kColorBlack)
-        gfx.drawRect(pauseX - boxPadding, pauseY - 3, textWidth + boxPadding * 2, 20)
-        gfx.drawText(pauseText, pauseX, pauseY)
+        gfx.drawRect(modeX - boxPadding, modeY - 3, textWidth + boxPadding * 2, 20)
+        gfx.drawText(modeText, modeX, modeY)
 
-        -- Draw camera frame (smaller and centered, ignoring gauge for centering)
-        local frameInset = 40 -- distance from edges (larger = smaller frame)
+        -- Draw camera frame (size depends on mode)
+        -- Influence mode: normal frame (40px inset)
+        -- Capture mode: smaller frame (80px inset)
+        local frameInset = (self.currentMode == "capture") and 80 or 40
         local frameWidth = SCREEN_WIDTH - (frameInset * 2)
         local frameHeight = (SCREEN_HEIGHT - statusBarHeight) - (frameInset * 2)
 
@@ -282,6 +293,29 @@ function BoidScene()
         local crossSize = 5
         gfx.drawLine(centerX - crossSize, centerY, centerX + crossSize, centerY)
         gfx.drawLine(centerX, centerY - crossSize, centerX, centerY + crossSize)
+
+        -- Show capture progress bar below center cross (when in capture mode and paused)
+        if self.currentMode == "capture" and self.isPaused and self.captureProgress > 0 then
+            local progBarWidth = 80
+            local progBarHeight = 6
+            local progBarX = centerX - progBarWidth / 2
+            local progBarY = centerY + 15 -- below the cross
+
+            -- Background
+            gfx.setColor(gfx.kColorWhite)
+            gfx.fillRect(progBarX, progBarY, progBarWidth, progBarHeight)
+
+            -- Border
+            gfx.setColor(gfx.kColorBlack)
+            gfx.drawRect(progBarX, progBarY, progBarWidth, progBarHeight)
+
+            -- Fill based on progress (0-180 degrees)
+            local fillWidth = (self.captureProgress / 180) * progBarWidth
+            if fillWidth > 0 then
+                gfx.setColor(gfx.kColorBlack)
+                gfx.fillRect(progBarX + 1, progBarY + 1, fillWidth - 2, progBarHeight - 2)
+            end
+        end
     end
 
     return scene

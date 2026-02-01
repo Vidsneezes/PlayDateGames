@@ -43,8 +43,10 @@ BoidSystem = System.new("boid", {"transform", "velocity", "boidsprite"}, functio
         local v = e.velocity
         local s = e.boidsprite
 
-        -- Skip movement logic if paused
-        if not isPaused then
+        -- Skip movement logic for captured boids (but still render them)
+        if not e.captured then
+            -- Skip movement logic if paused
+            if not isPaused then
             -- Handle Happy Boids
             if e.happyBoid then
             local happy = e.happyBoid
@@ -66,47 +68,49 @@ BoidSystem = System.new("boid", {"transform", "velocity", "boidsprite"}, functio
             -- Bounce off edges (like angry boids but slower)
             local worldW = scene.camera and scene.camera.worldWidth or WORLD_WIDTH
             local worldH = scene.camera and scene.camera.worldHeight or WORLD_HEIGHT
+            local padding = scene.camera and scene.camera.padding or 0
             local spriteSize = 32  -- Updated to 32x32 for testing
 
             local nextX = t.x + v.dx
             local nextY = t.y + v.dy
 
-            -- Bounce off left/right edges
-            if nextX <= 0 or nextX >= worldW - spriteSize then
+            -- Bounce off left/right edges (respecting padding)
+            if nextX <= padding or nextX >= worldW - padding - spriteSize then
                 v.dx = -v.dx
             end
 
-            -- Bounce off top/bottom edges
-            if nextY <= 0 or nextY >= worldH - spriteSize then
+            -- Bounce off top/bottom edges (respecting padding)
+            if nextY <= padding or nextY >= worldH - padding - spriteSize then
                 v.dy = -v.dy
             end
 
         -- Handle Sad Boids
         elseif e.sadBoid then
             local sad = e.sadBoid
-            -- Move toward nearest world edge (but keep full sprite visible)
+            -- Move toward nearest world edge (but keep full sprite visible, respecting padding)
             local worldW = scene.camera and scene.camera.worldWidth or WORLD_WIDTH
             local worldH = scene.camera and scene.camera.worldHeight or WORLD_HEIGHT
+            local padding = scene.camera and scene.camera.padding or 0
             local spriteSize = 32  -- sprite is 32x32 pixels
 
-            -- Distance to each edge (accounting for sprite size)
-            local distLeft = t.x - 0  -- left edge target is 0
-            local distRight = (worldW - spriteSize) - t.x  -- right edge target keeps sprite in bounds
-            local distTop = t.y - 0  -- top edge target is 0
-            local distBottom = (worldH - spriteSize) - t.y  -- bottom edge target keeps sprite in bounds
+            -- Distance to each edge (accounting for sprite size and padding)
+            local distLeft = t.x - padding  -- left edge at padding
+            local distRight = (worldW - padding - spriteSize) - t.x  -- right edge at worldW - padding
+            local distTop = t.y - padding  -- top edge at padding
+            local distBottom = (worldH - padding - spriteSize) - t.y  -- bottom edge at worldH - padding
 
             -- Find closest edge
             local minDist = math.min(distLeft, distRight, distTop, distBottom)
             local targetX, targetY
 
             if minDist == distLeft then
-                targetX, targetY = 0, t.y
+                targetX, targetY = padding, t.y
             elseif minDist == distRight then
-                targetX, targetY = worldW - spriteSize, t.y
+                targetX, targetY = worldW - padding - spriteSize, t.y
             elseif minDist == distTop then
-                targetX, targetY = t.x, 0
+                targetX, targetY = t.x, padding
             else
-                targetX, targetY = t.x, worldH - spriteSize
+                targetX, targetY = t.x, worldH - padding - spriteSize
             end
 
             local dx = targetX - t.x
@@ -136,32 +140,34 @@ BoidSystem = System.new("boid", {"transform", "velocity", "boidsprite"}, functio
             -- Check for edge collisions and bounce
             local worldW = scene.camera and scene.camera.worldWidth or WORLD_WIDTH
             local worldH = scene.camera and scene.camera.worldHeight or WORLD_HEIGHT
+            local padding = scene.camera and scene.camera.padding or 0
             local spriteSize = 32  -- Updated to 32x32 for testing
 
             local nextX = t.x + v.dx
             local nextY = t.y + v.dy
 
-            -- Bounce off left/right edges
-            if nextX <= 0 or nextX >= worldW - spriteSize then
+            -- Bounce off left/right edges (respecting padding)
+            if nextX <= padding or nextX >= worldW - padding - spriteSize then
                 v.dx = -v.dx
             end
 
-            -- Bounce off top/bottom edges
-            if nextY <= 0 or nextY >= worldH - spriteSize then
+            -- Bounce off top/bottom edges (respecting padding)
+            if nextY <= padding or nextY >= worldH - padding - spriteSize then
                 v.dy = -v.dy
             end
         end
 
-        -- End movement logic
-        end
+            -- End movement logic
+            end
 
-        -- Apply movement (only if not paused)
-        if not isPaused then
-            t.x += v.dx
-            t.y += v.dy
-        end
+            -- Apply movement (only if not paused)
+            if not isPaused then
+                t.x += v.dx
+                t.y += v.dy
+            end
+        end  -- end of movement logic for non-captured boids
 
-        -- Render Boids (HP bars now in separate system)
+        -- Render ALL boids (captured or not) with camera offset
         local camX = 0
         local camY = 0
         if scene.camera then
@@ -169,10 +175,21 @@ BoidSystem = System.new("boid", {"transform", "velocity", "boidsprite"}, functio
             camY = scene.camera.y
         end
 
-        if s.visible and s.body then
+        if s.visible and s.body and s.head then
             local screenX = t.x - camX
             local screenY = t.y - camY
+            s.body:setImage(animationBoidBodyMove:image())
             s.body:moveTo(screenX, screenY)
+
+            if s.emotion == "happy" then
+                s.head:setImage(animationBoidHeadHappy:image())
+            elseif s.emotion == "sad" then
+                s.head:setImage(animationBoidHeadSad:image())
+            elseif s.emotion == "angry" then
+                s.head:setImage(animationBoidHeadAngry:image())
+            end
+            
+            s.head:moveTo(screenX, screenY)
         end
     end
 end)

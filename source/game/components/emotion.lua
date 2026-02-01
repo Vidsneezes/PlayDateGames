@@ -54,3 +54,10 @@ function Exploding()
         frameCount = 0  -- frames to show explosion
     }
 end
+
+-- Captured marker (entity is frozen in place with locked happiness)
+function Captured()
+    return {
+        frozen = true  -- movement and happiness frozen
+    }
+end
