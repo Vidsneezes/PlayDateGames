@@ -29,6 +29,8 @@ function MenuScene()
         gfx.drawTextAligned("Masked Boidlings", 200, 60, kTextAlignment.center)
         gfx.drawTextAligned("Press A to start", 200, 120, kTextAlignment.center)
 
+        titleScreen:draw(0,0)
+
         if playdate.buttonJustPressed(playdate.kButtonA) then
             SoundBank.playSfx("coin")
             GAME_WORLD:queueScene(BoidScene())

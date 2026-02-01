@@ -83,7 +83,7 @@ RenderUISystem = System.new("renderUI", {}, function(entities, scene)
 
     -- Draw bombs vertically in upper right corner
     local bombX = SCREEN_WIDTH - 32
-    local bombStartY = 10
+    local bombStartY = 5
     local bombSpacing = 15
 
     for i = 1, scene.sadBombs do

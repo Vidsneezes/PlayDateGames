@@ -21,6 +21,8 @@ uiEmotestable = playdate.graphics.imagetable.new("Images/ui-table-32-32")
 
 maskFocusImage = playdate.graphics.image.new("Images/mask-focus")
 
+titleScreen = playdate.graphics.image.new("Images/title-screen")
+
 tombstoneImage = playdate.graphics.image.new("Images/rip")
 bubbleHappyImage = playdate.graphics.image.new("Images/bubble_happy")
 
