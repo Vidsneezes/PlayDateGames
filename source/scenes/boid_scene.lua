@@ -131,7 +131,28 @@ function BoidScene()
     end
 
     function scene:onExit()
-        -- TODO: Stop music, clean up, etc.
+        -- Stop game music
+        SoundBank.stopMusic()
+
+        -- Clean up all boid sprites and mark entities inactive
+        for _, entity in ipairs(self.entities) do
+            if entity.boidsprite then
+                if entity.boidsprite.body then
+                    entity.boidsprite.body:remove()
+                end
+                if entity.boidsprite.head then
+                    entity.boidsprite.head:remove()
+                end
+            end
+            -- Mark all entities as inactive to ensure cleanup
+            entity.active = false
+        end
+
+        -- Note: We don't call sprite.removeAll() because it would break the tilemap
+        -- Boid sprites are already manually removed above
+        -- Explosion marks (RIP) don't use sprites - they're drawn directly
+
+        print("BoidScene cleanup complete - " .. #self.entities .. " entities cleaned")
     end
 
     function scene:update()
