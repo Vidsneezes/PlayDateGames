@@ -61,3 +61,12 @@ function Captured()
         frozen = true  -- movement and happiness frozen
     }
 end
+
+-- ExplosionEffect - separate entity for explosion animations
+-- This component marks entities that are explosion effects (not boids)
+function ExplosionEffect(lifetime)
+    return {
+        age = 0,                    -- frames since creation
+        lifetime = lifetime or 30,  -- frames before cleanup (30 = 1 second at 30 FPS)
+    }
+end

@@ -1,6 +1,10 @@
 --[[
     EXPLOSION RENDER SYSTEM
-    Draws explosion effects and cleans up exploding entities.
+    Draws explosion effects.
+
+    Handles two types of explosion entities:
+    1. Legacy "exploding" component (boids) - rendered once then deleted
+    2. "explosionEffect" component (new dedicated entities) - rendered for their lifetime
 
     Runs after all other rendering to ensure explosions are visible.
 
@@ -15,7 +19,7 @@
 
 local gfx = playdate.graphics
 
-RenderExplosionSystem = System.new("renderExplosion", { "transform", "exploding" }, function(entities, scene)
+RenderExplosionSystem = System.new("renderExplosion", { "transform" }, function(entities, scene)
     -- Get camera offset
     local camX = 0
     local camY = 0
@@ -24,20 +28,23 @@ RenderExplosionSystem = System.new("renderExplosion", { "transform", "exploding"
         camY = scene.camera.y
     end
 
-    -- Draw explosions and mark for cleanup
+    -- Draw explosions
     for _, e in ipairs(entities) do
-        local screenX = e.transform.x - camX
-        local screenY = e.transform.y - camY
-        local explosionSize = 40
+        -- Only render entities with explosion-related components
+        if e.exploding or e.explosionEffect then
+            local screenX = e.transform.x - camX
+            local screenY = e.transform.y - camY
+            local explosionSize = 40
 
-        -- Draw explosion square (placeholder)
-        gfx.setColor(gfx.kColorBlack)
-        gfx.fillRect(screenX - explosionSize / 2, screenY - explosionSize / 2, explosionSize, explosionSize)
+            -- Draw explosion square (placeholder - teammate will replace with animation)
+            gfx.setColor(gfx.kColorBlack)
+            gfx.fillRect(screenX - explosionSize / 2, screenY - explosionSize / 2, explosionSize, explosionSize)
 
-        -- Mark entity for deletion after drawing
-        e.active = false
-
-        -- Play sfx sound
-        SynthTriggerSFX("explosion")
+            -- Legacy: clean up old "exploding" boids immediately
+            if e.exploding then
+                e.active = false
+                SynthTriggerSFX("explosion")
+            end
+        end
     end
 end)

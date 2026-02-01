@@ -46,9 +46,6 @@ EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity"
 
         -- Check for explosion FIRST (before drain) - battery at 0 or 100
         if battery.value <= 0 or battery.value >= 100 then
-            -- Mark entity as exploding (will be drawn and deleted by explosion system)
-            e.exploding = Exploding()
-
             -- Track explosion type for stats
             if battery.value >= 100 then
                 scene.explosionsHappy = (scene.explosionsHappy or 0) + 1
@@ -63,6 +60,12 @@ EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity"
             if e.boidsprite and e.boidsprite.head then
                 e.boidsprite.head:remove()
             end
+
+            -- Spawn explosion effect entity at this position
+            spawnExplosion(scene, e.transform.x, e.transform.y)
+
+            -- Mark boid for deletion
+            e.active = false
 
             -- Skip rest of processing for this entity
             goto continue

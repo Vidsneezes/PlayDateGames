@@ -45,7 +45,6 @@ CaptureCrankSystem = System.new("captureCrank", {"transform", "emotionalBattery"
                         e.captured = Captured()
                     else
                         -- Not happy - explode instead!
-                        e.exploding = Exploding()
 
                         -- Track explosion type for stats
                         if e.emotionalBattery.value >= 100 then
@@ -54,13 +53,19 @@ CaptureCrankSystem = System.new("captureCrank", {"transform", "emotionalBattery"
                             scene.explosionsAngry = (scene.explosionsAngry or 0) + 1
                         end
 
-                        -- Hide sprites (but don't remove yet - let explosion system handle it)
+                        -- Hide sprites immediately
                         if e.boidsprite and e.boidsprite.body then
                             e.boidsprite.body:setVisible(false)
                         end
                         if e.boidsprite and e.boidsprite.head then
                             e.boidsprite.head:setVisible(false)
                         end
+
+                        -- Spawn explosion effect entity at this position
+                        spawnExplosion(scene, e.transform.x, e.transform.y)
+
+                        -- Mark boid for deletion
+                        e.active = false
                     end
                 end
             end

@@ -121,3 +121,19 @@ function getCameraPosition(camera, gfx)
     gfx.drawRect(borderX, borderY, worldW, worldH)
     gfx.setLineWidth(1)
 end
+
+-- Spawn an explosion effect entity at the given position
+-- Returns the created entity (in case you need to track it)
+function spawnExplosion(scene, x, y, lifetime)
+    -- Play explosion sound
+    SynthTriggerSFX("explosion")
+
+    -- Create a new explosion entity
+    local explosion = Entity.new({
+        transform = Transform(x, y),
+        explosionEffect = ExplosionEffect(lifetime or 30)  -- default 1 second
+    })
+
+    scene:addEntity(explosion)
+    return explosion
+end
