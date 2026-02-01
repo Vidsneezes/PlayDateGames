@@ -94,6 +94,7 @@ function BoidScene()
         self:addSystem(EmotionalBatterySystem) -- Update emotions after happiness changes
         self:addSystem(EmotionInfluenceSystem) -- Proximity effects (comment out if too slow)
         self:addSystem(BoidSystem)             -- Update boid AI and sprites
+        self:addSystem(AudioMusicSystem)       -- Dynamic music based on boid counts
         self:addSystem(RenderClearSystem)      -- Clear screen to white
         self:addSystem(RenderBackgroundSystem) -- Draw grass tilemap
         self:addSystem(RenderSpriteSystem)     -- Draw boid sprites
