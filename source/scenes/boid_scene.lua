@@ -188,7 +188,9 @@ function BoidScene()
 
             -- Win if all non-captured boids are happy OR if everything is captured
             if (allHappy and boidCount >= 0) or (boidCount == 0 and capturedCount > 0) then
-                GAME_WORLD:queueScene(WinScene(self.totalBoidCount, self.explosionsHappy, self.explosionsAngry))
+                -- Pass actual survivor count (non-captured + captured)
+                local survivorCount = boidCount + capturedCount
+                GAME_WORLD:queueScene(WinScene(survivorCount, self.explosionsHappy, self.explosionsAngry))
                 return
             end
 
