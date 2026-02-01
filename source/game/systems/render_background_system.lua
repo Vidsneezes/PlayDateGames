@@ -61,6 +61,6 @@ RenderBackgroundSystem = System.new("renderBackground", {}, function(entities, s
     -- Draw tilemap with camera offset
     if scene.backgroundTilemap and scene.camera then
         scene.backgroundTilemap:draw(-scene.camera.x, -scene.camera.y)
-        -- print("Drawing background at", -scene.camera.x, -scene.camera.y)  -- Debug
+        print("BG: cam=("..scene.camera.x..", "..scene.camera.y..") draw=("..-scene.camera.x..", "..-scene.camera.y..")")  -- Debug
     end
 end)

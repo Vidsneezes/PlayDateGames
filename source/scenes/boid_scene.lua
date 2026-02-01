@@ -101,6 +101,7 @@ function BoidScene()
         self:addSystem(RenderBoidHPSystem)     -- Draw HP bars on top of sprites
         self:addSystem(RenderCapturedSystem)   -- Draw squares around captured boids
         self:addSystem(RenderExplosionSystem)  -- Draw explosions and cleanup
+        -- self:addSystem(RenderMaskSystem)       -- Draw mode-specific mask overlay (DISABLED FOR DEBUG)
         -- self:addSystem(RenderUISystem)           -- Happiness gauge (DISABLED - using individual HP bars)
 
         -- Spawn test boids
