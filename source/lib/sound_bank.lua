@@ -71,15 +71,15 @@ local musicState = {
     step = 1,
     tempo = 150, -- ms per step (approx 100 BPM for 16th notes)
     tracks = {
-        bass = { synth = snd.synth.new(snd.kWaveTriangle), pattern = {}, volume = 1.0 },
-        drums = { synth = snd.synth.new(snd.kWaveNoise), pattern = {}, volume = 1.0 },
-        melody = { synth = snd.synth.new(snd.kWaveSquare), pattern = {}, volume = 0.0 }, -- Start Muted
+        bass = { synth = snd.synth.new(snd.kWaveTriangle), pattern = {}, volume = 0 },
+        drums = { synth = snd.synth.new(snd.kWaveNoise), pattern = {}, volume = 0 },
+        melody = { synth = snd.synth.new(snd.kWaveSquare), pattern = {}, volume = 0 }, -- Start Muted
     }
 }
 
 -- Init Instruments
-musicState.tracks.bass.synth:setVolume(0.6)
-musicState.tracks.drums.synth:setVolume(0.5)
+musicState.tracks.bass.synth:setVolume(0.9)
+musicState.tracks.drums.synth:setVolume(0.6)
 musicState.tracks.melody.synth:setVolume(0.5)
 
 -- SEQUENCER LOGIC
