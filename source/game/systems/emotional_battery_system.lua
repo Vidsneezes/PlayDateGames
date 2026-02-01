@@ -35,13 +35,6 @@ local function hasStopped(velocity)
 end
 
 EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity", "emotionalBattery"}, function(entities, scene)
-    -- Only drain in capture mode (not paused), no drain in influence mode (paused)
-    if scene.isPaused then
-        return  -- No battery drain while paused
-    end
-
-    local drainMultiplier = 1.0  -- Constant drain rate in capture mode
-
     for _, e in ipairs(entities) do
         -- Skip captured boids (happiness frozen)
         if e.captured then
@@ -85,23 +78,23 @@ EmotionalBatterySystem = System.new("emotionalBattery", {"transform", "velocity"
             currentEmotion = "angry"
         end
 
-        -- Only drain battery if boid is within camera frame
-        if isInCameraFrame(e.transform, scene.camera) then
-            -- Drain battery based on current emotion (30% slower for balance, doubled while paused!)
+        -- Only drain battery in capture mode (not paused) AND if within camera frame
+        if not scene.isPaused and isInCameraFrame(e.transform, scene.camera) then
+            -- Drain battery based on current emotion (30% slower for balance)
             if currentEmotion == "happy" then
-                battery.value -= 0.14 * drainMultiplier  -- was 0.2
+                battery.value -= 0.14  -- was 0.2
             elseif currentEmotion == "sad" then
                 if hasStopped(v) then
                     -- At edge, drain faster
-                    battery.value -= 0.21 * drainMultiplier  -- was 0.3
+                    battery.value -= 0.21  -- was 0.3
                 else
                     -- Moving, drain slower
-                    battery.value -= 0.07 * drainMultiplier  -- was 0.1
+                    battery.value -= 0.07  -- was 0.1
                 end
             elseif currentEmotion == "angry" then
                 -- Drain to 0 then stop
                 if battery.value > 0 then
-                    battery.value -= 0.014 * drainMultiplier  -- was 0.02
+                    battery.value -= 0.014  -- was 0.02
                 end
             end
 
