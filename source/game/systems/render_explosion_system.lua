@@ -42,7 +42,7 @@ RenderExplosionSystem = System.new("renderExplosion", { "transform", "explosionA
             -- Legacy: clean up old "exploding" boids immediately
             if e.exploding then
                 e.active = false
-                SynthTriggerSFX("explosion")
+                SoundBank.playSfx("explosion")
             end
         end
     end

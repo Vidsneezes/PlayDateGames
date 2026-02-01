@@ -127,7 +127,7 @@ end
 -- Returns the created explosion entity (in case you need to track it)
 function spawnExplosion(scene, x, y, lifetime)
     -- Play explosion sound
-    SynthTriggerSFX("explosion")
+    SoundBank.playSfx("explosion")
 
     -- Create a new explosion entity (temporary - plays animation)
     local explosion = Entity.new({

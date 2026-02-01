@@ -2,6 +2,22 @@
     SOUND BANK (DYNAMIC MULTI-PATTERN)
     - Reactive Music Sequencer (Multi-track & Multi-phrase)
     - Polyphonic SFX Pool
+
+    USAGE IN SCENES:
+
+    1. Play music (in scene:onEnter):
+        SoundBank.playMusic("menu")  -- or "win", "lose", etc.
+        SoundBank.setTrackVolume("bass", 0.8)
+        SoundBank.setTrackVolume("melody", 0.7)
+        SoundBank.setTrackVolume("drums", 0.6)
+
+    2. Stop music (in scene:onExit):
+        SoundBank.stopMusic()
+
+    3. Play sound effects (anywhere, anytime - no setup needed):
+        SoundBank.playSfx("explosion")  -- "jump", "coin", "hit", "explosion"
+
+    NOTE: No initialization required! SoundBank is always ready.
 ]]
 
 local pd = playdate
