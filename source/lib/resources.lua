@@ -15,6 +15,8 @@ boidSpriteHappy = playdate.graphics.image.new("Images/boidspritehappy")
 
 bodyMoveAnimeTable = playdate.graphics.imagetable.new("Images/boidAnims-table-32-32")
 
+explosionAnimeTable = playdate.graphics.imagetable.new("Images/explosion-table-32-32")
+
 imageTableBodyMove = playdate.graphics.imagetable.new(8)
 imageTableBodyMove:setImage(1, bodyMoveAnimeTable:getImage(1))
 imageTableBodyMove:setImage(2, bodyMoveAnimeTable:getImage(2))
@@ -54,6 +56,12 @@ imageTableHeadAngry:setImage(5, bodyMoveAnimeTable:getImage(29))
 imageTableHeadAngry:setImage(6, bodyMoveAnimeTable:getImage(30))
 imageTableHeadAngry:setImage(7, bodyMoveAnimeTable:getImage(31))
 imageTableHeadAngry:setImage(8, bodyMoveAnimeTable:getImage(32))
+
+imageTableExplosion = playdate.graphics.imagetable.new(4)
+imageTableExplosion:setImage(1, explosionAnimeTable:getImage(1))
+imageTableExplosion:setImage(2, explosionAnimeTable:getImage(2))
+imageTableExplosion:setImage(3, explosionAnimeTable:getImage(3))
+imageTableExplosion:setImage(4, explosionAnimeTable:getImage(4))
 
 animationBoidBodyMove = playdate.graphics.animation.loop.new(80, imageTableBodyMove, true)
 animationBoidHeadHappy = playdate.graphics.animation.loop.new(80, imageTableHeadHappy, true)
