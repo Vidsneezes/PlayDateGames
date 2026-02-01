@@ -11,7 +11,7 @@
 ]]
 
 -- Visual representation (used by RenderSystem)
-function BoidSpriteComp(imgHead)
+function BoidSpriteComp(imgHead, startEmo)
     local spriteBody = playdate.graphics.sprite.new(animationBoidBodyMove:image())
     spriteBody:setOpaque(false)  -- Transparent background (don't cover grass)
     spriteBody:add()
@@ -22,5 +22,6 @@ function BoidSpriteComp(imgHead)
         head = spriteHead,
         body = spriteBody,
         visible = true,
+        emotion = startEmo
     }
 end

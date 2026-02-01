@@ -178,7 +178,17 @@ BoidSystem = System.new("boid", {"transform", "velocity", "boidsprite"}, functio
         if s.visible and s.body and s.head then
             local screenX = t.x - camX
             local screenY = t.y - camY
+            s.body:setImage(animationBoidBodyMove:image())
             s.body:moveTo(screenX, screenY)
+
+            if s.emotion == "happy" then
+                s.head:setImage(animationBoidHeadHappy:image())
+            elseif s.emotion == "sad" then
+                s.head:setImage(animationBoidHeadSad:image())
+            elseif s.emotion == "angry" then
+                s.head:setImage(animationBoidHeadAngry:image())
+            end
+            
             s.head:moveTo(screenX, screenY)
         end
     end
