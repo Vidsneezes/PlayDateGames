@@ -4,7 +4,7 @@
 
 # Build directories and intermediate files
 build/
-pdxinfo 
+ 
 
 # Common OS-generated files
 .DS_Store
