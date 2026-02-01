@@ -25,12 +25,12 @@ function BoidScene()
         padding = 100                          -- Boids cannot enter this padded border area
     }
 
-    -- Pause state (starts playing)
+    -- Pause state (starts in capture mode = not paused)
     scene.isPaused = false
 
-    -- Current mode (influence = happiness, capture = freeze boids)
-    scene.currentMode = "influence" -- "influence" or "capture"
-    scene.captureProgress = 0       -- progress toward capturing (0-180 degrees)
+    -- Current mode (starts in capture mode so game is running!)
+    scene.currentMode = "capture" -- "influence" or "capture"
+    scene.captureProgress = 0     -- progress toward capturing (0-180 degrees)
 
     -- Track explosions
     scene.explosionsHappy = 0 -- exploded at 100 happiness
