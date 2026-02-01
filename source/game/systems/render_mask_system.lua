@@ -2,8 +2,8 @@
     MASK RENDER SYSTEM
     Draws mode-specific mask overlays on top of the game.
 
-    - mask-freeze.png: Influence mode (wide view, paused)
-    - mask-focus.png: Capture mode (narrow view, active)
+    - mask-focus.png: Influence mode only (narrow view, paused)
+    - Capture mode: No mask (full screen view)
 
     Masks are drawn after all game elements but before UI.
 
@@ -18,19 +18,11 @@
 
 local gfx = playdate.graphics
 
--- Load masks once (cached)
-local maskFreeze = nil  -- Influence mode (wide view)
-local maskFocus = nil   -- Capture mode (narrow view)
+-- Load mask once (cached)
+local maskFocus = nil   -- Influence mode (narrow view)
 
 RenderMaskSystem = System.new("renderMask", {}, function(entities, scene)
-    -- Load masks on first frame
-    if not maskFreeze then
-        maskFreeze = gfx.image.new("Images/mask-freeze")
-        if not maskFreeze then
-            print("ERROR: Failed to load Images/mask-freeze.png")
-        end
-    end
-
+    -- Load mask on first frame
     if not maskFocus then
         maskFocus = gfx.image.new("Images/mask-focus")
         if not maskFocus then
@@ -38,16 +30,10 @@ RenderMaskSystem = System.new("renderMask", {}, function(entities, scene)
         end
     end
 
-    -- Draw appropriate mask based on current mode (SWAPPED FOR TESTING)
+    -- Only draw mask in influence mode (capture mode has no mask)
     if scene.currentMode == "influence" then
-        -- Influence mode: NARROW view mask (focus) -- SWAPPED!
         if maskFocus then
             maskFocus:draw(0, 0)
-        end
-    elseif scene.currentMode == "capture" then
-        -- Capture mode: WIDE view mask (freeze) -- SWAPPED!
-        if maskFreeze then
-            maskFreeze:draw(0, 0)
         end
     end
 end)
