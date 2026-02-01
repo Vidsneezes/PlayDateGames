@@ -26,8 +26,9 @@ function LoseScene(explosionsHappy, explosionsAngry)
         gfx.clear(gfx.kColorWhite)
 
         gfx.drawTextAligned("*YOU LOSE*", 200, 80, kTextAlignment.center)
-        gfx.drawTextAligned(totalExplosions .. " people exploded!", 200, 110, kTextAlignment.center)
-        gfx.drawTextAligned("Press A to try again", 200, 140, kTextAlignment.center)
+        gfx.drawTextAligned(totalExplosions .. " people exploded!", 200, 100, kTextAlignment.center)
+        gfx.drawTextAligned("Everybody is angry!", 200, 120, kTextAlignment.center)
+        gfx.drawTextAligned("Press A to try again", 200, 150, kTextAlignment.center)
 
         if playdate.buttonJustPressed(playdate.kButtonA) then
             GAME_WORLD:queueScene(MenuScene())

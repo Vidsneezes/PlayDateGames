@@ -123,6 +123,7 @@ function BoidScene()
         self:addSystem(EmotionalBatterySystem) -- Update emotions after happiness changes
         self:addSystem(EmotionInfluenceSystem) -- Proximity effects (comment out if too slow)
         self:addSystem(BoidSystem)             -- Update boid AI and sprites
+        self:addSystem(BoidSpawnSystem)        -- Spawn new boids when count is low
         self:addSystem(ExplosionEffectSystem)  -- Update explosion entity lifetimes
         self:addSystem(AudioMusicSystem)       -- Dynamic music based on boid counts
         self:addSystem(RenderClearSystem)      -- Clear screen to white
@@ -138,7 +139,7 @@ function BoidScene()
 
         -- Spawn test boids
         -- ADJUST THIS NUMBER to test performance
-        local BOID_COUNT = 10 -- Small count for testing gameplay feel
+        local BOID_COUNT = 5 -- Start small, BoidSpawnSystem will add more
         spawnRandomBoids(self, BOID_COUNT)
 
         -- Store total count for win screen

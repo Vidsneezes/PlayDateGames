@@ -33,7 +33,7 @@ function WinScene(explosionsHappy, explosionsAngry)
             gfx.drawTextAligned("But " .. totalExplosions .. " people exploded!", 200, 120, kTextAlignment.center)
             gfx.drawTextAligned("Press A to continue", 200, 150, kTextAlignment.center)
         else
-            gfx.drawTextAligned("Perfect! No explosions!", 200, 120, kTextAlignment.center)
+            gfx.drawTextAligned("And nobody exploded!", 200, 120, kTextAlignment.center)
             gfx.drawTextAligned("Press A to continue", 200, 150, kTextAlignment.center)
         end
 
