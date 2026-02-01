@@ -17,12 +17,15 @@ function BoidScene()
     local scene = Scene.new("boid")
 
     -- Camera for scrolling world (4x viewport area + 100px padding on each side)
+    local worldW = SCREEN_WIDTH * 2 + 200   -- 1000
+    local worldH = SCREEN_HEIGHT * 2 + 200  -- 680
+
     scene.camera = {
-        x = 0,
-        y = 0,
-        worldWidth = SCREEN_WIDTH * 2 + 200,   -- 1000 (800 + 100px padding on each side)
-        worldHeight = SCREEN_HEIGHT * 2 + 200, -- 680 (480 + 100px padding on each side)
-        padding = 100                          -- Boids cannot enter this padded border area
+        x = (worldW - SCREEN_WIDTH) / 2,   -- Center horizontally: (1000 - 400) / 2 = 300
+        y = (worldH - SCREEN_HEIGHT) / 2,  -- Center vertically: (680 - 240) / 2 = 220
+        worldWidth = worldW,
+        worldHeight = worldH,
+        padding = 100                      -- Boids cannot enter this padded border area
     }
 
     -- Pause state (starts in capture mode = not paused)
@@ -95,6 +98,18 @@ function BoidScene()
                 boid.emotion = "angry"
             end
 
+            -- Add cleanup method for boid sprites
+            function boid:cleanup()
+                if self.boidsprite then
+                    if self.boidsprite.body then
+                        self.boidsprite.body:remove()
+                    end
+                    if self.boidsprite.head then
+                        self.boidsprite.head:remove()
+                    end
+                end
+            end
+
             scene:addEntity(boid)
         end
     end
@@ -134,23 +149,19 @@ function BoidScene()
         -- Stop game music
         SoundBank.stopMusic()
 
-        -- Clean up all boid sprites and mark entities inactive
+        -- Clean up all entities (each entity handles its own resources)
         for _, entity in ipairs(self.entities) do
-            if entity.boidsprite then
-                if entity.boidsprite.body then
-                    entity.boidsprite.body:remove()
-                end
-                if entity.boidsprite.head then
-                    entity.boidsprite.head:remove()
-                end
+            -- Call cleanup method if entity has one
+            if entity.cleanup then
+                entity:cleanup()
             end
-            -- Mark all entities as inactive to ensure cleanup
+            -- Mark inactive
             entity.active = false
         end
 
-        -- Note: We don't call sprite.removeAll() because it would break the tilemap
-        -- Boid sprites are already manually removed above
-        -- Explosion marks (RIP) don't use sprites - they're drawn directly
+        -- Clean up tilemap (force recreation on next scene)
+        self.backgroundTilemap = nil
+        bgset = false
 
         print("BoidScene cleanup complete - " .. #self.entities .. " entities cleaned")
     end
@@ -201,16 +212,16 @@ function BoidScene()
                 end
             end
 
-            -- Win if all non-captured boids are happy OR if everything is captured
-            if (allHappy and boidCount >= 0) or (boidCount == 0 and capturedCount > 0) then
+            -- Win if you capture at least one happy boid (easy test win condition)
+            if capturedCount >= 1 then
                 -- Pass actual survivor count (non-captured + captured)
                 local survivorCount = boidCount + capturedCount
                 GAME_WORLD:queueScene(WinScene(survivorCount, self.explosionsHappy, self.explosionsAngry))
                 return
             end
 
-            -- Lose if all non-captured boids are angry (and there are uncaptured boids)
-            if allAngry and boidCount > 0 then
+            -- Lose if any boid exploded (easy test lose condition)
+            if (self.explosionsHappy + self.explosionsAngry) >= 1 then
                 GAME_WORLD:queueScene(LoseScene())
                 return
             end

@@ -142,6 +142,13 @@ function spawnExplosion(scene, x, y, lifetime)
         explosionMark = ExplosionMark()
     })
 
+    -- Add cleanup method for explosion mark
+    function mark:cleanup()
+        if self.explosionMark and self.explosionMark.sprite then
+            self.explosionMark.sprite:remove()
+        end
+    end
+
     scene:addEntity(explosion)
     scene:addEntity(mark)
     return explosion
