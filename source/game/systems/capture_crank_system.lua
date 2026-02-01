@@ -23,10 +23,10 @@ CaptureCrankSystem = System.new("captureCrank", {"transform", "emotionalBattery"
     -- Get crank rotation
     local crankChange = pd.getCrankChange()
 
-    -- DEBUG: B button also advances capture (simulates cranking down)
-    if pd.buttonIsPressed(pd.kButtonB) then
-        crankChange = -10  -- Simulate cranking down
-    end
+    -- DEBUG: B button also advances capture (simulates cranking down) -- DISABLED
+    -- if pd.buttonIsPressed(pd.kButtonB) then
+    --     crankChange = -10  -- Simulate cranking down
+    -- end
 
     if crankChange < 0 then  -- Cranking DOWN (negative values)
         -- Accumulate capture progress (clamp at 180)
@@ -53,12 +53,12 @@ CaptureCrankSystem = System.new("captureCrank", {"transform", "emotionalBattery"
                             scene.explosionsAngry = (scene.explosionsAngry or 0) + 1
                         end
 
-                        -- Remove sprite from display list
+                        -- Hide sprites (but don't remove yet - let explosion system handle it)
                         if e.boidsprite and e.boidsprite.body then
-                            e.boidsprite.body:remove()
+                            e.boidsprite.body:setVisible(false)
                         end
                         if e.boidsprite and e.boidsprite.head then
-                            e.boidsprite.head:remove()
+                            e.boidsprite.head:setVisible(false)
                         end
                     end
                 end
