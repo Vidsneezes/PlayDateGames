@@ -23,10 +23,10 @@ CaptureCrankSystem = System.new("captureCrank", {"transform", "emotionalBattery"
     -- Get crank rotation
     local crankChange = pd.getCrankChange()
 
-    -- DEBUG: B button also advances capture (simulates cranking down) -- RE-ENABLED
-    if pd.buttonIsPressed(pd.kButtonB) then
-        crankChange = -10  -- Simulate cranking down
-    end
+    -- DEBUG: B button also advances capture (simulates cranking down) -- DISABLED
+    -- if pd.buttonIsPressed(pd.kButtonB) then
+    --     crankChange = -10  -- Simulate cranking down
+    -- end
 
     -- Deadzone: ignore tiny crank movements (< 1 degree) to prevent noise
     if crankChange < -1 then  -- Cranking DOWN with meaningful movement
