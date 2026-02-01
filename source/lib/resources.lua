@@ -67,3 +67,5 @@ animationBoidBodyMove = playdate.graphics.animation.loop.new(80, imageTableBodyM
 animationBoidHeadHappy = playdate.graphics.animation.loop.new(80, imageTableHeadHappy, true)
 animationBoidHeadSad = playdate.graphics.animation.loop.new(80, imageTableHeadSad, true)
 animationBoidHeadAngry = playdate.graphics.animation.loop.new(80, imageTableHeadAngry, true)
+
+animationExplosion = playdate.graphics.animation.loop.new(80,imageTableExplosion, true)

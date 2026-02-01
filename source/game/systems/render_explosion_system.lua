@@ -37,8 +37,7 @@ RenderExplosionSystem = System.new("renderExplosion", { "transform" }, function(
             local explosionSize = 40
 
             -- Draw explosion square (placeholder - teammate will replace with animation)
-            gfx.setColor(gfx.kColorBlack)
-            gfx.fillRect(screenX - explosionSize / 2, screenY - explosionSize / 2, explosionSize, explosionSize)
+            animationExplosion:draw(screenX,screenY)
 
             -- Legacy: clean up old "exploding" boids immediately
             if e.exploding then
