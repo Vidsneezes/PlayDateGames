@@ -22,10 +22,10 @@ EmotionInfluenceSystem = System.new("emotionInfluence", {"transform", "emotional
     end
 
     -- Configuration
-    local ANGRY_INFLUENCE_RADIUS = 60      -- pixels
-    local ANGRY_DRAIN_AMOUNT = 0.15         -- extra drain per frame
-    local EDGE_DANGER_ZONE = 40             -- pixels from edge
-    local EDGE_DRAIN_AMOUNT = 0.2           -- extra drain per frame
+    local ANGRY_INFLUENCE_RADIUS = 80      -- pixels (was 60)
+    local ANGRY_DRAIN_AMOUNT = 0.25        -- extra drain per frame (was 0.15)
+    local EDGE_DANGER_ZONE = 40            -- pixels from edge
+    local EDGE_DRAIN_AMOUNT = 0.2          -- extra drain per frame
 
     local worldW = scene.camera and scene.camera.worldWidth or 800
     local worldH = scene.camera and scene.camera.worldHeight or 480

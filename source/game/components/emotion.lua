@@ -34,7 +34,7 @@ end
 -- Angry boids chase other (non-angry) boids
 function AngryBoid(speed, detectionRange)
     return {
-        speed = speed or 2.0,              -- movement speed
+        speed = speed or 2.5,              -- movement speed (was 2.0)
         detectionRange = detectionRange or 999,  -- how far they can detect targets
     }
 end
