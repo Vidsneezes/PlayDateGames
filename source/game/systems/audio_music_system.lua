@@ -30,6 +30,23 @@
 ]]
 
 AudioMusicSystem = System.new("audioMusic", {"emotionalBattery"}, function(entities, scene)
+    --[[
+        ════════════════════════════════════════════════════
+        INITIALIZATION (runs once on first frame)
+        ════════════════════════════════════════════════════
+    ]]
+    if not scene.audioMusicInitialized then
+        scene.audioMusicInitialized = true
+
+        -- YOUR INITIALIZATION CODE HERE!
+        -- Load audio files, set up music tracks, etc.
+        -- Example:
+        -- loadMusicTrack("tense_theme")
+        -- loadMusicTrack("calm_theme")
+        -- setDefaultVolume(0.7)
+
+    end
+
     -- Count boids by state
     local totalBoids = 0
     local capturedBoids = 0
@@ -106,5 +123,24 @@ AudioMusicSystem = System.new("audioMusic", {"emotionalBattery"}, function(entit
     -- YOUR AUDIO CODE HERE!
     -- You have access to all the count variables above
 
+
+    --[[
+        ════════════════════════════════════════════════════
+        CLEANUP (runs once when needed)
+        ════════════════════════════════════════════════════
+    ]]
+    -- Detect when to clean up (customize this condition!)
+    local shouldCleanup = (totalBoids == 0)  -- Example: all boids gone
+
+    if shouldCleanup and not scene.audioMusicCleanedUp then
+        scene.audioMusicCleanedUp = true
+
+        -- YOUR CLEANUP CODE HERE!
+        -- Stop music, free audio resources, etc.
+        -- Example:
+        -- stopAllMusic()
+        -- unloadMusicTracks()
+
+    end
 
 end)

@@ -28,7 +28,8 @@ CaptureCrankSystem = System.new("captureCrank", {"transform", "emotionalBattery"
         crankChange = -10  -- Simulate cranking down
     end
 
-    if crankChange < 0 then  -- Cranking DOWN (negative values)
+    -- Deadzone: ignore tiny crank movements (< 1 degree) to prevent noise
+    if crankChange < -1 then  -- Cranking DOWN with meaningful movement
         -- Accumulate capture progress (clamp at 180)
         scene.captureProgress = (scene.captureProgress or 0) + math.abs(crankChange)
         scene.captureProgress = math.min(scene.captureProgress, 180)

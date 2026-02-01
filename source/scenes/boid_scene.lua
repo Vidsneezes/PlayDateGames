@@ -267,8 +267,8 @@ function BoidScene()
         gfx.drawLine(centerX - crossSize, centerY, centerX + crossSize, centerY)
         gfx.drawLine(centerX, centerY - crossSize, centerX, centerY + crossSize)
 
-        -- Show capture progress bar below center cross (only when there's progress)
-        if self.currentMode == "capture" and self.captureProgress > 0 then
+        -- Show capture progress bar below center cross (only when there's meaningful progress)
+        if self.currentMode == "capture" and self.captureProgress >= 10 then
             local progBarWidth = 80
             local progBarHeight = 6
             local progBarX = centerX - progBarWidth / 2
