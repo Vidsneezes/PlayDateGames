@@ -24,6 +24,7 @@ import "game/components/collision"
 import "game/components/audio"
 import "game/components/emotion"
 import "game/components/boidvisual"
+import "game/components/ExplosionAnim"
 
 -- Game Systems (each file is independent -- safe to edit in parallel)
 import "game/systems/camera_system"

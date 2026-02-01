@@ -19,7 +19,7 @@
 
 local gfx = playdate.graphics
 
-RenderExplosionSystem = System.new("renderExplosion", { "transform" }, function(entities, scene)
+RenderExplosionSystem = System.new("renderExplosion", { "transform", "explosionAnim" }, function(entities, scene)
     -- Get camera offset
     local camX = 0
     local camY = 0
@@ -34,10 +34,10 @@ RenderExplosionSystem = System.new("renderExplosion", { "transform" }, function(
         if e.exploding or e.explosionEffect then
             local screenX = e.transform.x - camX
             local screenY = e.transform.y - camY
-            local explosionSize = 40
+            local explosionSize = 28
 
             -- Draw explosion square (placeholder - teammate will replace with animation)
-            animationExplosion:draw(screenX,screenY)
+            e.explosionAnim.animation:draw(screenX - explosionSize / 2, screenY - explosionSize / 2, explosionSize, explosionSize)
 
             -- Legacy: clean up old "exploding" boids immediately
             if e.exploding then
